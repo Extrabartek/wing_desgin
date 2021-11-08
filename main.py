@@ -12,4 +12,3 @@ def print_hi(name):
 asdasdhfdahfd
 
 print('hello')
-hello
