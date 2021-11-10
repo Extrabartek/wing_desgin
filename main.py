@@ -266,8 +266,34 @@ def bending_moment(x, wingbox, planform):
 
 
 # deflection profiles
-def lateral_deflection(moment):  # dv/dy
-    integrate.dblquad()
+def lateral_deflection(y,moment, material, wingbox):  # dv/dy , E modulus is for one material (can be improved later)
+    """
+    This function returns the lateral deflection (v) at y distance away from the root chord,
+    :param y: Distance away from the root [m]
+    :type y: float
+    :param moment: The bending moment function
+    :type moment: function
+    :param material: Type of material used
+    :type: Material
+    :param wingbox: Type of wingbox used
+    :type: Wingbox
+    :return: Lateral deflection [m]
+    :type: float
+    """
+    return -1 * integrate.dblquad(moment / (material.E * wingbox.moment_of_inertia), 0, y, 0, y)
+
+def twist_angle(y,torsion,wingbox,material):
+    """
+    This function returns the twist angle at y distance away from the root chord
+    :param y: Distance away from the root [m]
+    :type y: float
+    :param torsion: The torsion function
+    :typetor
+    :param wingbox:
+    :param material:
+    :return:
+    """
+    return integrate.quad(torsion/(wingbox.torsional_constant * material.G),0,y)
 
 # finish this
 # def second_moment_of_inertia(x):
