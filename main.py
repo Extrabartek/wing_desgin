@@ -264,7 +264,7 @@ def bending_moment(x, wingbox, planform):
     # According to the Mechanics of Materials the bending moment should be a double integral of the distributed load
     # intensity (lift_distribution - g*(mass_distribution)). Should discuss that in the session
 
-    moment = integrate.nquad(lambda a: (lift_distribution(a)-g*wingbox.mass_distribution(planform, a)), [[x, planform.b/2],  [x, planform.b/2]])
+    moment = integrate.nquad(lambda a: (lift_distribution(a)-g*wingbox.mass_distribution(planform, a)), [x, planform.b/2])[0]
     return -moment  # minus sign is included for coordinates
 
 
@@ -292,9 +292,12 @@ def twist_angle(y,torsion,wingbox,material):
     :type y: float
     :param torsion: The torsion function
     :type torsion: float
-    :param wingbox:Type o
-    :param material:
-    :return:
+    :param wingbox: The wingbox used
+    :type wingbox: WingBox
+    :param material: The material used
+    :type material: Material
+    :return: Twist angle [rad]
+    :rtype: float
     """
     return integrate.quad(torsion/(wingbox.torsional_constant * material.G),0,y)
 
