@@ -40,11 +40,12 @@ class Planform:
     """
 
     # if any parameters need to be added follow the method for the already added parameters
-    def __init__(self, b, cr, ct, sweep_le):
+    def __init__(self, b, cr, ct, sweep_le, spar_front, spar_rear):
         self.b = b
         self.cr = cr
         self.ct = ct
         self.sweep_le = sweep_le
+        self.spar_dif = spar_rear - spar_front
 
     def area(self):
         """
@@ -66,11 +67,18 @@ class Planform:
         sweep = 2 * c_percent
         return sweep
 
+    def box_width(self, y):
+        return self.cr - 2 * y * (self.cr - self.ct) / self.b * self.spar_dif
+
+    def box_height(self, y):
+        return 0.1296 * self.box_width(self,y)
 
 # same as the planform and material such for wingbox geometry
 class WingBox:
-    def __init__(self):
+    def __init__(self,t,n):
         self.a = 0
+        self.thickness = t
+        self.n_stringers = n
 
 
 # function definition list
