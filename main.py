@@ -215,10 +215,12 @@ class WingBox:
                + stringer_area + (2 * self.height(planform, x) + 2 * self.width(planform, x)) \
                * 1.816 * (8 / 10000)
 
-    def mass_distribution(self, x):
+    def mass_distribution(self, planform, x):
         """
         This function returns the mass per unit length (kilograms per meter) a given distance (in meters) away from the root
         This also includes the weight of the rest of the aircraft at the root of the wing
+        :param planform: wing planform dimensions
+        :type planform: Planform
         :param x: Distance away from the root [m]
         :type x: float
         :return: Mass per unit length [kg/m]
