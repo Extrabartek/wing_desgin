@@ -34,11 +34,26 @@ class Material:
 
 class Planform:
     # if any parameters need to be added follow the method for the already added parameters
-    def __init__(self, b, cr, ct, sweep_le):
+    def __init__(self, b, cr, ct, sweep_le,spar_rear,spar_front):
+        """
+        Initiate variable of type planform
+        :param b: Wingspan of the planform [m]
+        :type b: float
+        :param cr: Cord at the root [m]
+        :type cr: float
+        :param ct: Cord at the tip [m]
+        :type ct: float
+        :param sweep_le: Leading edge sweep [rad]
+        :param spar_rear: The percentage of the cord where the rear spar is
+        :type spar_rear: float
+        :param spar_front: he percentage of the cord where the front spar is
+        :type spar_front: float
+        """
         self.b = b
         self.cr = cr
         self.ct = ct
         self.sweep_le = sweep_le
+        self.spar_dif = spar_rear - spar_front
 
     def area(self):
         """
@@ -73,7 +88,16 @@ class Planform:
 
 # same as the planform and material such for wingbox geometry
 class WingBox:
-    def __init__(self,t,n,spar_dif):
+    def __init__(self,t,n, stringer):
+        """
+        Initiate variable of type wingbox
+        :param t: Thickness of the sheets used [m]
+        :type t: float
+        :param n: Number of stringer (min is 4)
+        :type n: int
+        :param stringer: The stringer type used
+        :type stringer: Stringer
+        """
         self.a = 0
         self.thickness = t
         self.n_stringers = n # Minimum possible number is 4
@@ -178,6 +202,7 @@ def lift_distribution(x):
 
 
 
+
 def bending_moment(x):
     """
     This function returns the bending moment (in newton meter) a given distance (in meters) away from the root
@@ -193,11 +218,17 @@ def bending_moment(x):
     moment = 0
     return moment
 
+# deflection profiles
+def lateral_deflection(moment): # dv/dy
+    integrate.dblquad()
+
+
+
 
 # finish this
-def second_moment_of_inertia(x):
-    moment_of_inertia = 0
-    return moment_of_inertia
+#def second_moment_of_inertia(x):
+#    moment_of_inertia = 0
+#    return moment_of_inertia
 
 # def bending_moment(L, x, a):
 #   M = L * (x - a)
