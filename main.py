@@ -85,6 +85,39 @@ class Planform:
         """
         return self.cr - 2 * y * (self.cr - self.ct) / self.b
 
+class Stringer:
+    def __init__(self, t, w, h, material):
+        """
+        Initiate variable of type stringer.
+        :param t: Thickness of stringer in [m]
+        :type t: float
+        :param w: Width of stringer in [m]
+        :type w: float
+        :param h: Height of stringer in [m]
+        :type h: float
+        :param material: The material of the stringer
+        :type material: Material
+        """
+        self.t = t
+        self.w = w
+        self.h = h
+        self.material = material
+
+    def area(self):
+        """
+        This function calculates the cross-sectional area of the stringer.
+        :return: Cross-sectional area of the stringer [m^2]
+        :rtype: float
+        """
+        return self.h * self.t + self.w * self.t - self.t * self.t
+
+    def mass(self):
+        """
+        :return: Mass per unit length of the stringer [kg/m]
+        :rtype: float
+        """
+        return self.material.rho * self.area()
+
 
 # same as the planform and material such for wingbox geometry
 class WingBox:
