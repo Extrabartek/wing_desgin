@@ -6,15 +6,17 @@ g = 9.81
 
 # class definition list
 class Material:
-    """
-    This is a class that will make the base for all the materials that will be used in the project
-    :param self.rho: Density of the material [kg/m^3]
-    :param self.sig_yld: Yield strength of the material [N/m^2]
-    :param self.sig_ult: Ultimate strength of the material [N/m^2]
-    """
-
     # if any parameters need to be added follow the method for the already added parameters
     def __init__(self, rho, sig_yld, sig_ult):
+        """
+        Initiate variable of type material.
+        :param rho: Density of the material [kg/m^3]
+        :type rho: float
+        :param sig_yld: Yield strength of the material [N/m^2]
+        :type sig_yld: float
+        :param sig_ult: Ultimate strength of the material [N/m^2]
+        :type sig_ult: float
+        """
         self.rho = rho
         self.sig_yld = sig_yld
         self.sig_ult = sig_ult
@@ -31,14 +33,6 @@ class Material:
 
 
 class Planform:
-    """
-    This is a class that will make the base for all the planforms that will be used in the project
-    :param self.b: The wingspan [m^2]
-    :param self.cr: The cord at the root [m]
-    :param self.ct: The cord at the tip [m]
-    :param self.sweep_le: Sweep at the leading edge [rad]
-    """
-
     # if any parameters need to be added follow the method for the already added parameters
     def __init__(self, b, cr, ct, sweep_le):
         self.b = b
@@ -67,6 +61,13 @@ class Planform:
         return sweep
 
     def chord(self, y):
+        """
+        This function returns the cord of the planform at any given distance away form the root
+        :param y: Distance away from the root [m]
+        :type y: float
+        :return: Cord length [m]
+        :rtype: float
+        """
         return self.cr - 2 * y * (self.cr - self.ct) / self.b
 
 
@@ -75,12 +76,87 @@ class WingBox:
     def __init__(self,t,n,spar_dif):
         self.a = 0
         self.thickness = t
-        self.n_stringers = n
+        self.n_stringers = n # Minimum possible number is 4
+        self.stringer = stringer
+        self.Wp = (10220.5 / 1.3) * g
 
-    def box_width(self,):
-        Planform.chord(y) * spar_dif
 
-    box_height = 0.1296 * Planform.chord(y)
+    def width(self, planform, y):
+        """
+        This function returns the wingbox width from the wing geometry at any given distance from the root
+        :param planform: The planform used
+        :type planform: Planform
+        :param y: Distance away from root [m]
+        :type y: float
+        :return: Wingbox width [m]
+        :rtype: float
+        """
+        return planform.chord(y) * planform.spar_dif
+
+    def height(self, planform, y):
+        """
+        This function returns the wingbox height from the wing geometry at any given distance from the root
+        :param planform: The planform used
+        :type planform: Planform
+        :param y: The distance away from the root [m]
+        :type y: float
+        :return: Wingbox height [m]
+        :rtype: float
+        """
+        return 0.1296 * planform.chord(y)
+
+    def moment_of_inertia(self, stringer, y):
+        """
+        This function returns the moment of inertia for the wingbox at given distance from root with given stringers
+        :param stringer: The stringer used
+        :type stringer: Stringer
+        :param y: The distance away from the root [m]
+        :type y: float
+        :return: Wingbox moment of inertia [m^4]
+        :rtype: float
+        """
+        return 2 * self.width(y) * self.thickness * self.height(y) ** 2 + self.thickness * 8 * self.height(y) ** 3 / 6 + self.n_stringers * stringer.area() * self.height(y) ** 2
+
+    def torsional_constant(self, y):
+        """
+        This function returns the torsional constant J for the wingbox at given distance from root
+        :param y: The distance away from the root [m]
+        :type y: float
+        :return: The torsional constant [m^4]
+        :rtype: float
+        """
+        return 4 * (2 * self.width(y) * self.height(y)) ** 2 / (2*self.width(y)/self.thickness + 4*self.height(y)/self.thickness)
+
+    def cross_section(self, planform, x):
+        """
+        This function calculates the cross-section of the wingbox
+        :param planform: The planform used
+        :type planform: Planform
+        :param x: distance from the root [m]
+        :type x: float
+        :return: cross-sectional area of the wingbox in [m^2]
+        :rtype: float
+        """
+        return 2 * self.height(planform, x) * self.thickness + 2 * self.width(planform, x) * self.thickness + self.stringer.area() * self.n_stringers
+
+
+    def mass_distribution(self, x):
+        """
+        This function returns the mass per unit length (kilograms per meter) a given distance (in meters) away from the root
+        This also includes the weight of the rest of the aircraft at the root of the wing
+        :param x: Distance away from the root [m]
+        :type x: float
+        :return: Mass per unit length [kg/m]
+        :rtype: float
+        """
+
+
+
+        # This function has to be decided on, but the "sliced" approached should make pretty easy to combine with the
+        # lift distribution
+
+        mass = 0
+        return mass
 
 # function definition list
 
@@ -99,21 +175,7 @@ def lift_distribution(x):
     return lift
 
 
-def mass_distribution(x):
-    """
-    This function returns the mass per unit length (kilograms per meter) a given distance (in meters) away from the root
-    This also includes the weight of the rest of the aircraft at the root of the wing
-    :param x: Distance away from the root [m]
-    :type x: float
-    :return: Mass per unit length [kg/m]
-    :rtype: float
-    """
 
-    # This function has to be decided on, but the "sliced" approached should make pretty easy to combine with the
-    # lift distribution
-
-    mass = 0
-    return mass
 
 
 def bending_moment(x):
