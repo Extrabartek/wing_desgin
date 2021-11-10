@@ -208,8 +208,12 @@ class WingBox:
         :return: cross-sectional area of the wingbox in [m^2]
         :rtype: float
         """
-        return 2 * self.height(planform, x) * self.thickness + 2 * self.width(planform,
-                                                                              x) * self.thickness + self.stringer.area() * self.n_stringers
+        stringer_area = 0
+        for stringer in self.stringers:
+            stringer_area += (x < stringer.x_stop) * stringer.area()
+        return 2 * self.height(planform, x) * self.thickness + 2 * self.width(planform, x) * self.thickness \
+               + stringer_area + (2 * self.height(planform, x) + 2 * self.width(planform, x)) \
+               * 1.816 * (8 / 10000)
 
     def mass_distribution(self, x):
         """
@@ -220,12 +224,7 @@ class WingBox:
         :return: Mass per unit length [kg/m]
         :rtype: float
         """
-
-        # This function has to be decided on, but the "sliced" approached should make pretty easy to combine with the
-        # lift distribution
-
-        mass = 0
-        return mass
+        return self.cross_section(planform, x) * self.material.rho + (x < 1.3) * self.planemass
 
 
 # function definition list
@@ -258,11 +257,13 @@ def bending_moment(x, wingbox, planform):
     :type planform: Planform
     """
 
+
+
     # According to the Mechanics of Materials the bending moment should be a double integral of the distributed load
     # intensity (lift_distribution - g*(mass_distribution)). Should discuss that in the session
 
-    moment = 0
-    return moment
+    moment = integrate.nquad(lambda a: (lift_distribution(a)-g*wingbox.mass_distribution(planform, a)), [[x, planform.b/2],  [x, planform.b/2]])
+    return -moment  # minus sign is included for coordinates
 
 
 # deflection profiles
