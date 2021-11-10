@@ -72,12 +72,15 @@ class Planform:
 
 # same as the planform and material such for wingbox geometry
 class WingBox:
-    def __init__(self,t,n,spar_dif,y):
+    def __init__(self,t,n,spar_dif):
         self.a = 0
         self.thickness = t
         self.n_stringers = n
-        self.box_width = Planform.chord(y) * spar_dif
-        self.box_height = 0.1296 * Planform.chord(y)
+
+    def box_width(self,):
+        Planform.chord(y) * spar_dif
+
+    box_height = 0.1296 * Planform.chord(y)
 
 # function definition list
 
