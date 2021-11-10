@@ -34,7 +34,7 @@ class Material:
 
 class Planform:
     # if any parameters need to be added follow the method for the already added parameters
-    def __init__(self, b, cr, ct, sweep_le,spar_rear,spar_front):
+    def __init__(self, b, cr, ct, sweep_le, spar_rear, spar_front):
         """
         Initiate variable of type planform
         :param b: Wingspan of the planform [m]
@@ -85,6 +85,7 @@ class Planform:
         """
         return self.cr - 2 * y * (self.cr - self.ct) / self.b
 
+
 class Stringer:
     def __init__(self, t, w, h, material):
         """
@@ -121,7 +122,7 @@ class Stringer:
 
 # same as the planform and material such for wingbox geometry
 class WingBox:
-    def __init__(self,t,n, stringer):
+    def __init__(self, t, n, stringer):
         """
         Initiate variable of type wingbox
         :param t: Thickness of the sheets used [m]
@@ -133,10 +134,9 @@ class WingBox:
         """
         self.a = 0
         self.thickness = t
-        self.n_stringers = n # Minimum possible number is 4
+        self.n_stringers = n  # Minimum possible number is 4
         self.stringer = stringer
         self.Wp = (10220.5 / 1.3) * g
-
 
     def width(self, planform, y):
         """
@@ -172,7 +172,8 @@ class WingBox:
         :return: Wingbox moment of inertia [m^4]
         :rtype: float
         """
-        return 2 * self.width(y) * self.thickness * self.height(y) ** 2 + self.thickness * 8 * self.height(y) ** 3 / 6 + self.n_stringers * stringer.area() * self.height(y) ** 2
+        return 2 * self.width(y) * self.thickness * self.height(y) ** 2 + self.thickness * 8 * self.height(
+            y) ** 3 / 6 + self.n_stringers * stringer.area() * self.height(y) ** 2
 
     def torsional_constant(self, y):
         """
@@ -182,7 +183,8 @@ class WingBox:
         :return: The torsional constant [m^4]
         :rtype: float
         """
-        return 4 * (2 * self.width(y) * self.height(y)) ** 2 / (2*self.width(y)/self.thickness + 4*self.height(y)/self.thickness)
+        return 4 * (2 * self.width(y) * self.height(y)) ** 2 / (
+                    2 * self.width(y) / self.thickness + 4 * self.height(y) / self.thickness)
 
     def cross_section(self, planform, x):
         """
@@ -194,8 +196,8 @@ class WingBox:
         :return: cross-sectional area of the wingbox in [m^2]
         :rtype: float
         """
-        return 2 * self.height(planform, x) * self.thickness + 2 * self.width(planform, x) * self.thickness + self.stringer.area() * self.n_stringers
-
+        return 2 * self.height(planform, x) * self.thickness + 2 * self.width(planform,
+                                                                              x) * self.thickness + self.stringer.area() * self.n_stringers
 
     def mass_distribution(self, x):
         """
@@ -207,13 +209,12 @@ class WingBox:
         :rtype: float
         """
 
-
-
         # This function has to be decided on, but the "sliced" approached should make pretty easy to combine with the
         # lift distribution
 
         mass = 0
         return mass
+
 
 # function definition list
 
@@ -232,10 +233,6 @@ def lift_distribution(x):
     return lift
 
 
-
-
-
-
 def bending_moment(x):
     """
     This function returns the bending moment (in newton meter) a given distance (in meters) away from the root
@@ -251,15 +248,13 @@ def bending_moment(x):
     moment = 0
     return moment
 
+
 # deflection profiles
-def lateral_deflection(moment): # dv/dy
+def lateral_deflection(moment):  # dv/dy
     integrate.dblquad()
 
-
-
-
 # finish this
-#def second_moment_of_inertia(x):
+# def second_moment_of_inertia(x):
 #    moment_of_inertia = 0
 #    return moment_of_inertia
 
