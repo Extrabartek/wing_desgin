@@ -7,19 +7,25 @@ g = 9.81
 # class definition list
 class Material:
     # if any parameters need to be added follow the method for the already added parameters
-    def __init__(self, rho, sig_yld, sig_ult):
+    def __init__(self, rho, sig_yld, sig_ult, E, G):
         """
-        Initiate variable of type material.
+        Initiate variable of type material
         :param rho: Density of the material [kg/m^3]
         :type rho: float
         :param sig_yld: Yield strength of the material [N/m^2]
         :type sig_yld: float
         :param sig_ult: Ultimate strength of the material [N/m^2]
         :type sig_ult: float
+        :param E: The elastic modules [N/m^2]
+        :type E: float
+        :param G: Shear modules [N/m^2]
+        :type G: float
         """
         self.rho = rho
         self.sig_yld = sig_yld
         self.sig_ult = sig_ult
+        self.E = E
+        self.G = G
 
     def mass(self, volume):
         """
@@ -87,7 +93,7 @@ class Planform:
 
 
 class Stringer:
-    def __init__(self, t, w, h, material):
+    def __init__(self, t, w, h, x_stop, material):
         """
         Initiate variable of type stringer.
         :param t: Thickness of stringer in [m]
@@ -98,8 +104,11 @@ class Stringer:
         :type h: float
         :param material: The material of the stringer
         :type material: Material
+        :param x_stop: The distance form the root at which the stringer ends
+        :type x_stop: float
         """
         self.t = t
+        self.x_stop = x_stop
         self.w = w
         self.h = h
         self.material = material
@@ -122,21 +131,23 @@ class Stringer:
 
 # same as the planform and material such for wingbox geometry
 class WingBox:
-    def __init__(self, t, n, stringer):
+    def __init__(self, t, stringers, material):
         """
         Initiate variable of type wingbox
         :param t: Thickness of the sheets used [m]
         :type t: float
         :param n: Number of stringer (min is 4)
         :type n: int
-        :param stringer: The stringer type used
-        :type stringer: Stringer
+        :param stringers: The list of stringers used
+        :type stringers: list of Stringer
+        :param material: material of wingbox
+        :type material: Material
         """
         self.a = 0
         self.thickness = t
-        self.n_stringers = n  # Minimum possible number is 4
-        self.stringer = stringer
-        self.Wp = (10220.5 / 1.3) * g
+        self.stringers = stringers
+        self.planemass = (10220.5 / 1.3)
+        self.material = material
 
     def width(self, planform, y):
         """
@@ -162,18 +173,19 @@ class WingBox:
         """
         return 0.1296 * planform.chord(y)
 
-    def moment_of_inertia(self, stringer, y):
+    def moment_of_inertia(self, y):
         """
         This function returns the moment of inertia for the wingbox at given distance from root with given stringers
-        :param stringer: The stringer used
-        :type stringer: Stringer
         :param y: The distance away from the root [m]
         :type y: float
         :return: Wingbox moment of inertia [m^4]
         :rtype: float
         """
+        stringer_moment = 0
+        for stringer in self.stringers:
+            stringer_moment += (y < x_stop)*(stringer.area() * self.height(y) ** 2)
         return 2 * self.width(y) * self.thickness * self.height(y) ** 2 + self.thickness * 8 * self.height(
-            y) ** 3 / 6 + self.n_stringers * stringer.area() * self.height(y) ** 2
+            y) ** 3 / 6 + stringer_moment
 
     def torsional_constant(self, y):
         """
@@ -184,7 +196,7 @@ class WingBox:
         :rtype: float
         """
         return 4 * (2 * self.width(y) * self.height(y)) ** 2 / (
-                    2 * self.width(y) / self.thickness + 4 * self.height(y) / self.thickness)
+                2 * self.width(y) / self.thickness + 4 * self.height(y) / self.thickness)
 
     def cross_section(self, planform, x):
         """
@@ -229,17 +241,21 @@ def lift_distribution(x):
 
     # This function is to be writen by the team responsible for the data collection
 
-    lift = 0
+    lift = 7319.5
     return lift
 
 
-def bending_moment(x):
+def bending_moment(x, wingbox, planform):
     """
     This function returns the bending moment (in newton meter) a given distance (in meters) away from the root
     :param x: Distance away from the root [m]
     :type x: float
     :return: Bending moment [Nm]
     :rtype: float
+    :param wingbox: The wingbox used
+    :type wingbox: WingBox
+    :param planform: The planform used
+    :type planform: Planform
     """
 
     # According to the Mechanics of Materials the bending moment should be a double integral of the distributed load
