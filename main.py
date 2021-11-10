@@ -40,12 +40,11 @@ class Planform:
     """
 
     # if any parameters need to be added follow the method for the already added parameters
-    def __init__(self, b, cr, ct, sweep_le, spar_front, spar_rear):
+    def __init__(self, b, cr, ct, sweep_le):
         self.b = b
         self.cr = cr
         self.ct = ct
         self.sweep_le = sweep_le
-        self.spar_dif = spar_rear - spar_front
 
     def area(self):
         """
@@ -67,21 +66,21 @@ class Planform:
         sweep = 2 * c_percent
         return sweep
 
-    def box_width(self, y):
-        return self.cr - 2 * y * (self.cr - self.ct) / self.b * self.spar_dif
+    def chord(self, y):
+        return self.cr - 2 * y * (self.cr - self.ct) / self.b
 
-    def box_height(self, y):
-        return 0.1296 * self.box_width(self,y)
 
 # same as the planform and material such for wingbox geometry
 class WingBox:
-    def __init__(self,t,n):
+    def __init__(self,t,n,spar_dif,y):
         self.a = 0
         self.thickness = t
         self.n_stringers = n
-
+        self.box_width = Planform.chord(y) * spar_dif
+        self.box_height = 0.1296 * Planform.chord(y)
 
 # function definition list
+
 def lift_distribution(x):
     """
     This function returns the lift per unit length (in newton per meter) a given distance (in meters) away from the root
