@@ -289,8 +289,8 @@ def twist_angle(y,torsion,wingbox,material):
     :param y: Distance away from the root [m]
     :type y: float
     :param torsion: The torsion function
-    :typetor
-    :param wingbox:
+    :type torsion: float
+    :param wingbox:Type o
     :param material:
     :return:
     """
