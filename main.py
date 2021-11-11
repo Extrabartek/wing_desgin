@@ -298,7 +298,7 @@ def twist_angle(y, torsion, wingbox, material):  # lower limit must be set for t
     :param y: Distance away from the root [m]
     :type y: float
     :param torsion: The torsion function
-    :type torsion: float
+    :type torsion: function
     :param wingbox: The wingbox used
     :type wingbox: WingBox
     :param material: The material used
