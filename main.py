@@ -227,7 +227,7 @@ class WingBox:
         :return: Mass per unit length [kg/m]
         :rtype: float
         """
-        return self.cross_section(planform, x) * self.material.rho + (x < 1.3) * self.planemass
+        return self.cross_section(planform, x) * self.material.rho + (x == 0) * self.planemass + (x == 2) * 1000 #+ (4 < x < 5) * 10000
 
 
 # function definition list
@@ -242,7 +242,7 @@ def lift_distribution(x):
     """
 
     # This function is to be writen by the team responsible for the data collection
-    lift = 10*(math.sqrt(1-((2*x/34)**2)))
+    lift = 1000*math.sqrt(1-(2*x/34)**2)
     # lift = 7319.5
     return lift
 

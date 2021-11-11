@@ -12,11 +12,11 @@ for x in range(4):
 wingbox = fn.WingBox(0.005, list_stringers, aluminum)
 
 bending_list = []
-for x in range(0, int(4*planform.b / 2)):
+for x in range(0, int(100*planform.b / 2)):
     start = time.time()
-    number = fn.bending_moment(x/4, wingbox, planform)
+    number = fn.shear_force(x/100, wingbox, planform)
     end = time.time()
-    print("The force and ... ", number, x/4, (end-start))
-    bending_list.append(fn.bending_moment(x, wingbox, planform))
-plt.plot(range(0, int(4*planform.b / 2)), bending_list)
+    # print("The force and ... ", number, x/100, (end-start))
+    bending_list.append(number)
+plt.plot(range(0, int(100*planform.b / 2)), bending_list)
 plt.show()
