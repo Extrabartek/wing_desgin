@@ -188,16 +188,17 @@ class WingBox:
         return 2 * self.width(y) * self.thickness * self.height(y) ** 2 + self.thickness * 8 * self.height(
             y) ** 3 / 6 + stringer_moment
 
-    def torsional_constant(self, y):
+    def torsional_constant(self, y, planform):
         """
         This function returns the torsional constant J for the wingbox at given distance from root
+        :param planform: The planform used
+        :type planform: Planform
         :param y: The distance away from the root [m]
         :type y: float
         :return: The torsional constant [m^4]
         :rtype: float
         """
-        return 4 * (2 * self.width(y) * self.height(y)) ** 2 / (
-                2 * self.width(y) / self.thickness + 4 * self.height(y) / self.thickness)
+        return 4 * (2 * self.width(planform, y) * self.height(planform, y)) ** 2 / (2 * self.width(planform, y) / self.thickness + 4 * self.height(planform, y) / self.thickness)
 
     def cross_section(self, planform, x):
         """
@@ -227,7 +228,8 @@ class WingBox:
         :return: Mass per unit length [kg/m]
         :rtype: float
         """
-        return self.cross_section(planform, x) * self.material.rho + (x == 0) * self.planemass + (x == 2) * 1000 #+ (4 < x < 5) * 10000
+        return self.cross_section(planform, x) * self.material.rho + (x == 0) * self.planemass + (
+                    x == 2) * 1000  # + (4 < x < 5) * 10000
 
 
 # function definition list
@@ -242,8 +244,8 @@ def lift_distribution(x):
     """
 
     # This function is to be writen by the team responsible for the data collection
-    lift = 1000*math.sqrt(1-(2*x/34)**2)
-    # lift = 7319.5
+    #lift = 1000 * math.sqrt(1 - (2 * x / 34) ** 2)
+    lift = 7319.5
     return lift
 
 
@@ -273,6 +275,7 @@ def bending_moment(x, wingbox, planform):
     moment = integrate.quad(lambda a: shear_force(a, wingbox, planform), x, planform.b / 2)[0]
     return -moment  # minus sign is included for coordinates
 
+
 def torsion(x, planform):
     """
     This function returns the torsion per unit area at any distance from the root chord
@@ -283,6 +286,7 @@ def torsion(x, planform):
     :param planform: The planform used
     """
     return (1 / 8) * planform.chord(x) * lift_distribution(x)
+
 
 # deflection profiles
 def lateral_deflection(y, moment, material, wingbox):  # dv/dy , E modulus is for one material (can be improved later)
@@ -307,8 +311,6 @@ def twist_angle(y, torsion, wingbox, material):  # lower limit must be set for t
     This function returns the twist angle at y distance away from the root chord
     :param y: Distance away from the root [m]
     :type y: float
-    :param torsion: The torsion function
-    :type torsion: function
     :param wingbox: The wingbox used
     :type wingbox: WingBox
     :param material: The material used
