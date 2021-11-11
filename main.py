@@ -1,4 +1,5 @@
 import scipy.integrate as integrate
+import math
 
 # global constant
 g = 9.81
@@ -183,7 +184,7 @@ class WingBox:
         """
         stringer_moment = 0
         for stringer in self.stringers:
-            stringer_moment += (y < x_stop)*(stringer.area() * self.height(y) ** 2)
+            stringer_moment += (y < stringer.x_stop) * (stringer.area() * self.height(y) ** 2)
         return 2 * self.width(y) * self.thickness * self.height(y) ** 2 + self.thickness * 8 * self.height(
             y) ** 3 / 6 + stringer_moment
 
@@ -241,9 +242,16 @@ def lift_distribution(x):
     """
 
     # This function is to be writen by the team responsible for the data collection
-
-    lift = 7319.5
+    lift = 10*(math.sqrt(1-((2*x/34)**2)))
+    # lift = 7319.5
     return lift
+
+
+def shear_force(x, wingbox, planform):
+    shear = \
+        integrate.quad(lambda b: lift_distribution(b) - g * wingbox.mass_distribution(planform, b), x, planform.b / 2)[
+            0]
+    return shear
 
 
 def bending_moment(x, wingbox, planform):
@@ -259,17 +267,15 @@ def bending_moment(x, wingbox, planform):
     :type planform: Planform
     """
 
-
-
     # According to the Mechanics of Materials the bending moment should be a double integral of the distributed load
     # intensity (lift_distribution - g*(mass_distribution)). Should discuss that in the session
 
-    moment = integrate.nquad(lambda a: (lift_distribution(a)-g*wingbox.mass_distribution(planform, a)), [x, planform.b/2])[0]
+    moment = integrate.quad(lambda a: shear_force(a, wingbox, planform), x, planform.b / 2)[0]
     return -moment  # minus sign is included for coordinates
 
 
 # deflection profiles
-def lateral_deflection(y,moment, material, wingbox):  # dv/dy , E modulus is for one material (can be improved later)
+def lateral_deflection(y, moment, material, wingbox):  # dv/dy , E modulus is for one material (can be improved later)
     """
     This function returns the lateral deflection (v) at y distance away from the root chord,
     :param y: Distance away from the root [m]
@@ -285,7 +291,8 @@ def lateral_deflection(y,moment, material, wingbox):  # dv/dy , E modulus is for
     """
     return -1 * integrate.dblquad(moment / (material.E * wingbox.moment_of_inertia), 0, y, 0, y)
 
-def twist_angle(y,torsion,wingbox,material): # lower limit must be set for the fuselage
+
+def twist_angle(y, torsion, wingbox, material):  # lower limit must be set for the fuselage
     """
     This function returns the twist angle at y distance away from the root chord
     :param y: Distance away from the root [m]
@@ -299,7 +306,7 @@ def twist_angle(y,torsion,wingbox,material): # lower limit must be set for the f
     :return: Twist angle [rad]
     :rtype: float
     """
-    return integrate.quad(torsion/(wingbox.torsional_constant * material.G),0,y)
+    return integrate.quad(torsion / (wingbox.torsional_constant * material.G), 0, y)
 
 # finish this
 # def second_moment_of_inertia(x):
