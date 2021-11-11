@@ -318,7 +318,8 @@ def twist_angle(x, wingbox, material, planform):  # lower limit must be set for 
     :return: Twist angle [rad]
     :rtype: float
     """
-    return integrate.quad(torsion(a) / (wingbox.torsional_constant(a) * material.G), 0, y)
+    return \
+    integrate.quad(lambda a: torsion(a, planform) / (wingbox.torsional_constant(a, planform) * material.G), 0, x)[0]
 
 # finish this
 # def second_moment_of_inertia(x):
