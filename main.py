@@ -273,6 +273,16 @@ def bending_moment(x, wingbox, planform):
     moment = integrate.quad(lambda a: shear_force(a, wingbox, planform), x, planform.b / 2)[0]
     return -moment  # minus sign is included for coordinates
 
+def torsion(x, planform):
+    """
+    This function returns the torsion per unit area at any distance from the root chord
+    :param x: Distance away from the root [m]
+    :type x: float
+    :return: Torsion per unit area
+    :rtype: float
+    :param planform: The planform used
+    """
+    return (1 / 8) * planform.chord(x) * lift_distribution(x)
 
 # deflection profiles
 def lateral_deflection(y, moment, material, wingbox):  # dv/dy , E modulus is for one material (can be improved later)
@@ -306,7 +316,7 @@ def twist_angle(y, torsion, wingbox, material):  # lower limit must be set for t
     :return: Twist angle [rad]
     :rtype: float
     """
-    return integrate.quad(torsion / (wingbox.torsional_constant * material.G), 0, y)
+    return integrate.quad(torsion(a) / (wingbox.torsional_constant(a) * material.G), 0, y)
 
 # finish this
 # def second_moment_of_inertia(x):
