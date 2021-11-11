@@ -21,3 +21,12 @@ wingbox = fn.WingBox(0.005, list_stringers, aluminum)
     #bending_list.append(number)
 #plt.plot(range(0, int(100*planform.b / 2)), bending_list)
 #plt.show()
+
+print(fn.twist_angle(planform.b/2, wingbox, aluminum, planform)*(180/math.pi))
+
+torsion_list = []
+for x in range(0, int(1000*planform.b/2)):
+    torsion_list.append(fn.torsion(x/1000, planform))
+
+plt.plot(range(0, int(1000*planform.b / 2)), torsion_list)
+plt.show()

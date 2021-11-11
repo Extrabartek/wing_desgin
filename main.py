@@ -306,7 +306,7 @@ def lateral_deflection(y, moment, material, wingbox):  # dv/dy , E modulus is fo
     return -1 * integrate.dblquad(moment / (material.E * wingbox.moment_of_inertia), 0, y, 0, y)
 
 
-def twist_angle(y, torsion, wingbox, material):  # lower limit must be set for the fuselage
+def twist_angle(x, wingbox, material, planform):  # lower limit must be set for the fuselage
     """
     This function returns the twist angle at y distance away from the root chord
     :param y: Distance away from the root [m]
