@@ -231,10 +231,8 @@ def wy0(y):
     return Ny(0) - weight(y)
 def wy10(y):
     return Ny(10) - weight(y)
-
 wy0inter = sp.interpolate.interp1d(list(range), list(wy0(range)), kind='cubic', fill_value="extrapolate")
 wy10inter = sp.interpolate.interp1d(list(range), list(wy10(range)), kind='cubic', fill_value="extrapolate")
-
 def wtotfunc(y):
     return wy10inter(y)
 
@@ -250,14 +248,13 @@ plt.show()
 plt.plot(range, wy10inter(range))
 plt.title('Interpolated Wy10')
 plt.show()
-#print(wy0(range))
 '''
 
 # -------------------------------CHANGE THIS CODE A LITTLE BIT, COPIED FROM INTERNET ---------------------------------
 def V0(y):
     res = np.zeros_like(y)
     for i,val in enumerate(y):
-        V0,err = integrate.quad(wtotfunc,0,val)
+        [V0, err] = sp.integrate.quad(wtotfunc, 0, val)
         res[i]=V0
     return res
 # -------------------------------CHANGE THIS CODE A LITTLE BIT, COPIED FROM INTERNET ---------------------------------
@@ -278,6 +275,5 @@ A(y) = P*t
 
 Problems:
 Shear force reaction force at root not included --> starts at 0 goes to max
-solve by subtracting by total shear? gives negative shear, but it should be positive.
-
+Solve by subtracting by total shear? gives negative shear, but it should be positive.
 '''
