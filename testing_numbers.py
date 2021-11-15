@@ -30,7 +30,11 @@ print(fn.twist_angle(planform.b/2, wingbox, aluminum, planform)*(180/math.pi))
 torque_list = []
 #lift_list = []
 for x in range(0, int(10*planform.b/2)):
+    start = time.time()
+    number = fn.bending_moment(x/10, wingbox, planform)
     torque_list.append(fn.bending_moment(x/10, wingbox, planform))
+    end = time.time()
+    print("Value .. ", number, "Time... ", end-start)
     #lift_list.append(WP41.Ny(10, x))
 
 plt.plot(range(0, int(10*planform.b / 2)), torque_list)
