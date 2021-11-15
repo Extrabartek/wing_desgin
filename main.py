@@ -1,3 +1,4 @@
+import numpy as np
 import scipy.integrate as integrate
 import math
 import WP_41 as WP41
