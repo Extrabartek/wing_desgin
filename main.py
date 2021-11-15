@@ -2,7 +2,8 @@ import scipy.integrate as integrate
 import math
 
 # global constant
-g = 9.81
+g = 9.80665
+AoA = 10 #Degrees
 
 
 # class definition list
@@ -302,7 +303,7 @@ def torsion(x, planform):
     :rtype: float
     :param planform: The planform used
     """
-    return (1 / 8) * planform.chord(x) * lift_distribution(x)
+    return (1 / 8) * planform.chord(x) * WP41.Ndis0(x)
 
 
 # deflection profiles
