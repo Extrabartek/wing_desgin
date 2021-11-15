@@ -4,7 +4,6 @@ from scipy import interpolate
 from scipy import integrate
 import numpy as np
 from io import StringIO
-#import matplotlib.pyplot as plt
 
 # ----------------Constants------------------
 cr = 6.46
@@ -19,8 +18,6 @@ data1 = "MainWing_a=0.00_v=10.00ms.txt"
 data2 = "MainWing_a=10.00_v=10.00ms.txt"
 list1 = np.genfromtxt(data1, dtype='float', skip_header=40, skip_footer=1029, usecols=(0, 3, 5, 7))
 list2 = np.genfromtxt(data2, dtype='float', skip_header=40, skip_footer=1029, usecols=(0, 3, 5, 7))
-#print(list1)
-#print(list2)
 
 # Making individual lists for y, cl, cd, cm
 y = []
@@ -39,14 +36,8 @@ for i in range(19):
     cd2.append(list2[i][2])
     cm2.append(list2[i][3])
 
-
-#print(y, cl1, cd1, cm1)
-
 cltot1 = sum(cl1)
 cltot2 = sum(cl2)
-print("CLtot1 = ", cltot1)
-print("CLtot2 = ", cltot2)
-
 
 # Interpolating cl, cd, cm
 cly1 = sp.interpolate.interp1d(y, cl1, kind='cubic', fill_value="extrapolate")
@@ -56,11 +47,6 @@ cmy1 = sp.interpolate.interp1d(y, cm1, kind='cubic', fill_value="extrapolate")
 cly2 = sp.interpolate.interp1d(y, cl2, kind='cubic', fill_value="extrapolate")
 cdy2 = sp.interpolate.interp1d(y, cd2, kind='cubic', fill_value="extrapolate")
 cmy2 = sp.interpolate.interp1d(y, cm2, kind='cubic', fill_value="extrapolate")
-
-#print(cly(9.028))
-
-#x = np.linspace(0, 15.55, 500)
-#b = cly(x)
 
 # -----------------Functions-------------------
 def c(y):
@@ -117,20 +103,17 @@ plt.ylabel("CM")
 plt.show()
 
 # --------- Effect of velocity and angle of attack----------
+# From MainWing_a=0.00_v=10.00ms.txt
+# From MainWing_a=10.00_v=10.00ms.txt
 CL0 = 0.176815
 CL10 = 0.970715
-
 CD0 = 0.001319
 CD10 = 0.038922
-
 CM0 = -0.267948
 CM10 = -1.16705
 
-#CLd = float(input("What is the desired lift coefficient? "))
 CLd = 1
-#CDd = float(input("What is the desired drag coefficient? "))
 CDd= 0.035
-#CMd = float(input("What is the desired moment coefficient? "))
 CMd = 0.00000005
 
 def CLdy(y): # y here would be the wingspan, "range"
@@ -145,11 +128,10 @@ def CMdy(y): # y here would be the wingspan, "range"
     CMdyvalue = cmy1(y) + (CMd - CM0)/(CM10 - CM0) * (cmy2(y) - cmy1(y))
     return CMdyvalue
 
-def alphad():
+def alphad(): # Design angle of attack
     alphadvalue = np.degrees(np.arcsin((CLd - CL0)/(CL10 - CL0) * np.sin(np.radians(10))))
     return alphadvalue
 
-#print(CLdy(range))
 print("Design angle of attack = ", alphad())
 
 
@@ -172,7 +154,6 @@ plt.show()
 # ---------------------Shear moment and bending diagrams-----------------------
 
 def Ny(AoA):
-
     if AoA == 0:
         L = L1
         D = D1
@@ -180,7 +161,6 @@ def Ny(AoA):
         L = L2
         D = D2
     return np.cos(np.radians(AoA)) * L + np.sin(np.radians(AoA)) * D
-
 
 def Ty(AoA):
     """ # Example:
@@ -209,15 +189,15 @@ plt.title("Tangential force distribution at 0 deg")
 plt.show()
 
 plt.plot(range, Ny(10))
-plt.title("Normal force distribuiton at 10 deg")
+plt.title("Normal force distribution at 10 deg")
 plt.show()
 
 plt.plot(range, Ty(10))
 plt.title("Tangential force distribution at 10 deg")
 
 # -----------Shear force diagram------------
-# S(x) = integral(Lift) + integral(Weight)
 
+#Previously used method to calculate A(y):
 #def Ay(y):
 #    return (0.03345 * y**2 - 0.729 * y + 0.3654)
 
@@ -225,7 +205,6 @@ def Ay(y):
     t = 0.0005
     return c(y) * 2.0580 *t
 
-# Fuel density = 800 kg/m3 (refer to WP 1)
 def weight(y):
     '''
 
@@ -233,18 +212,20 @@ def weight(y):
     :return:
     '''
     [Vtot, Verr] = sp.integrate.quad(Ay, 0, 15.55)
-    Vfuel = 29174/(800 * 2)
+    Vfuel = 29174/(800 * 2) # Fuel density is 800 kg/m^3 as per WP 1
     mwing = 1980/2
+
     # rho = a * rho_fuel + b * rho_wing, a + b = 1
     a = Vfuel/Vtot
     b = 1 - a
-    rhofuel = 800 #kg/m^3
-    rhowing = 2700 #kg/m^3
+    rhofuel = 800 # kg/m^3
+    rhowing = 2700 # kg/m^3
     rhotot = a * rhofuel + b * rhowing
 
     Wy = rhotot * Ay(range) * 9.81
-    return Wy # Return a y from a function in the shape of "y=5*x+10"
+    return Wy # Return a single value from a function in the shape of "y=5*x+10"
 
+# -------------------- Total weight --------------------
 def wy0(y):
     return Ny(0) - weight(y)
 def wy10(y):
@@ -255,8 +236,8 @@ wy10inter = sp.interpolate.interp1d(list(range), list(wy10(range)), kind='cubic'
 
 def wtotfunc(y):
     return wy10inter(y)
-#print(wy0inter(10))
 
+'''
 plt.plot(range, wy0inter(range))
 plt.title('Interpolated wy0')
 plt.show()
@@ -269,6 +250,7 @@ plt.plot(range, wy10inter(range))
 plt.title('Interpolated wy10')
 plt.show()
 #print(wy0(range))
+'''
 
 # -------------------------------CHANGE THIS CODE A LITTLE BIT, COPIED FROM INTERNET ---------------------------------
 def V0(y):
@@ -279,9 +261,7 @@ def V0(y):
     return res
 # -------------------------------CHANGE THIS CODE A LITTLE BIT, COPIED FROM INTERNET ---------------------------------
 
-#[V0, V0err] = sp.integrate.quad(wtotfunc, 0, 15.55)
-#[V10, V10err] = sp.integrate.quad(wtotfunc, 0, 15.55)
-#print(type(V10))
+'''
 plt.plot(range, V0(range))
 plt.title('Shear force')
 plt.show()
@@ -289,12 +269,7 @@ plt.show()
 plt.plot(range, weight(range))
 plt.title("Weight diagrams")
 plt.show()
-
-
-
-#estimateN, errorN = sp.integrate.quad(normalforce, 0, 40)
-#estimateW, errorW = sp.integrate.quad(weight, 0, 40)
-
+'''
 
 '''
 Assumptions in this model:
@@ -304,7 +279,4 @@ Problems:
 Shear force reaction force at root not included --> starts at 0 goes to max
 solve by subtracting by total shear? gives negative shear, but it should be positive.
 
-
-
 '''
-
