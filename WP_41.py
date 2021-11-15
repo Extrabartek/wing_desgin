@@ -200,11 +200,7 @@ plt.plot(range, Ty(10))
 plt.title("Tangential force distribution at 10 deg")
 plt.show()
 
-# -----------Shear force diagram------------
-
-#Previously used method to calculate A(y):
-#def Ay(y):
-#    return (0.03345 * y**2 - 0.729 * y + 0.3654)
+# ----------- Shear force diagram------------
 
 def Ay(y):
     t = 0.0005
