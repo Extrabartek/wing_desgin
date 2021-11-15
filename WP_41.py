@@ -102,6 +102,11 @@ def Mdis(y, AoA):
 
 
 def Ndis0(y):
+    '''
+
+    :param y:
+    :return:
+    '''
     Ndis = Ldis(y, cly1) * np.cos(np.radians(0)) + Ddis(y, cdy1) * np.sin(np.radians(0))
     return Ndis
 
@@ -138,8 +143,7 @@ plt.show()
 '''
 
 # --------- Effect of velocity and angle of attack----------
-# From MainWing_a=0.00_v=10.00ms.txt
-# From MainWing_a=10.00_v=10.00ms.txt
+# From MainWing_a=0.00_v=10.00ms.txt, MainWing_a=10.00_v=10.00ms.txt
 CL0 = 0.176815
 CL10 = 0.970715
 CD0 = 0.001319
@@ -209,8 +213,12 @@ plt.show()
 '''
 
 # ---------------------Shear moment and bending diagrams-----------------------
-
 def Ny(AoA):
+    '''
+
+    :param AoA:
+    :return:
+    '''
     if AoA == 0:
         L = L1
         D = D1
@@ -255,7 +263,6 @@ plt.title("Tangential force distribution at 10 deg")
 
 '''
 # ----------- Shear force diagram ------------
-
 def Ay(y):
     t = 0.0005
     return c(y) * 2.0580 * t
