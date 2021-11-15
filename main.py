@@ -187,7 +187,9 @@ class WingBox:
         stringer_moment = 0
         for stringer in self.stringers:
             stringer_moment += (y < stringer.x_stop) * (stringer.area() * self.height(planform, y) ** 2)
-        return 2 * self.width(planform, y) * self.thickness * self.height(planform, y) ** 2 + self.thickness * 8 * self.height(planform,
+        return 2 * self.width(planform, y) * self.thickness * self.height(planform,
+                                                                          y) ** 2 + self.thickness * 8 * self.height(
+            planform,
             y) ** 3 / 6 + stringer_moment
 
     def torsional_constant(self, y, planform):
@@ -200,7 +202,8 @@ class WingBox:
         :return: The torsional constant [m^4]
         :rtype: float
         """
-        return 4 * (2 * self.width(planform, y) * self.height(planform, y)) ** 2 / (2 * self.width(planform, y) / self.thickness + 4 * self.height(planform, y) / self.thickness)
+        return 4 * (2 * self.width(planform, y) * self.height(planform, y)) ** 2 / (
+                2 * self.width(planform, y) / self.thickness + 4 * self.height(planform, y) / self.thickness)
 
     def cross_section(self, planform, x):
         """
@@ -230,8 +233,8 @@ class WingBox:
         :return: Mass per unit length [kg/m]
         :rtype: float
         """
-        return self.cross_section(planform, x) * self.material.rho + (x == 0) * self.planemass + (
-                    x == 2) * 1000  # + (4 < x < 5) * 10000
+        return self.cross_section(planform, x) * self.material.rho + self.height(planform, x) * self.width(planform,
+                                                                                                           x) * 800  # (x == 0) * self.planemass
 
 
 # function definition list
@@ -246,12 +249,24 @@ def lift_distribution(x):
     """
 
     # This function is to be writen by the team responsible for the data collection
-    #lift = 1000 * math.sqrt(1 - (2 * x / 34) ** 2)
+    # lift = 1000 * math.sqrt(1 - (2 * x / 34) ** 2)
     lift = 7319.5
     return lift
 
 
 def shear_force(x, wingbox, planform):
+    """
+    This function returns the values of the shear per unit length (in newton per meter) at a given distance (in meters)
+    from the root
+    :param x: The distance away from the root [m]
+    :type x: float
+    :param wingbox: The wingbox used for the calculation
+    :type wingbox: WingBox
+    :param planform: The planform used for the calculation
+    :type planform: Planform
+    :return: The shear force per unit length [N/m]
+    :rtype: float
+    """
     shear = \
         integrate.quad(lambda b: lift_distribution(b) - g * wingbox.mass_distribution(planform, b), x, planform.b / 2)[
             0]
@@ -321,7 +336,7 @@ def twist_angle(x, wingbox, material, planform):  # lower limit must be set for 
     :rtype: float
     """
     return \
-    integrate.quad(lambda a: torsion(a, planform) / (wingbox.torsional_constant(a, planform) * material.G), 0, x)[0]
+        integrate.quad(lambda a: torsion(a, planform) / (wingbox.torsional_constant(a, planform) * material.G), 0, x)[0]
 
 # finish this
 # def second_moment_of_inertia(x):

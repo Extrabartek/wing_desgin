@@ -1,8 +1,11 @@
 import math
 import time
 
+import WP_41
+import WP_41 as WP41
 import main as fn
 import matplotlib.pyplot as plt
+
 
 aluminum = fn.Material(2700, 276 * 10 ** 6, 310 * 10 ** 6, 68.9 * 10 ** 9, 26 * 10 ** 9)
 planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
@@ -11,6 +14,7 @@ list_stringers = []
 for x in range(4):
     list_stringers.append(stringer)
 wingbox = fn.WingBox(0.005, list_stringers, aluminum)
+print(WP41.Ndis0(0))
 
 #bending_list = []
 #for x in range(0, int(100*planform.b / 2)):
@@ -23,10 +27,11 @@ wingbox = fn.WingBox(0.005, list_stringers, aluminum)
 #plt.show()
 
 print(fn.twist_angle(planform.b/2, wingbox, aluminum, planform)*(180/math.pi))
+torque_list = []
+#lift_list = []
+for x in range(0, int(10*planform.b/2)):
+    torque_list.append(fn.bending_moment(x/10, wingbox, planform))
+    #lift_list.append(WP41.Ny(10, x))
 
-torsion_list = []
-for x in range(0, int(1000*planform.b/2)):
-    torsion_list.append(fn.torsion(x/1000, planform))
-
-plt.plot(range(0, int(1000*planform.b / 2)), torsion_list)
+plt.plot(range(0, int(10*planform.b / 2)), torque_list)
 plt.show()
