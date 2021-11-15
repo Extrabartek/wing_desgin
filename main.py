@@ -174,18 +174,20 @@ class WingBox:
         """
         return 0.1296 * planform.chord(y)
 
-    def moment_of_inertia(self, y):
+    def moment_of_inertia(self, planform, y):
         """
         This function returns the moment of inertia for the wingbox at given distance from root with given stringers
         :param y: The distance away from the root [m]
         :type y: float
+        :param planform: Planform used
+        :type planform: Planform
         :return: Wingbox moment of inertia [m^4]
         :rtype: float
         """
         stringer_moment = 0
         for stringer in self.stringers:
-            stringer_moment += (y < stringer.x_stop) * (stringer.area() * self.height(y) ** 2)
-        return 2 * self.width(y) * self.thickness * self.height(y) ** 2 + self.thickness * 8 * self.height(
+            stringer_moment += (y < stringer.x_stop) * (stringer.area() * self.height(planform, y) ** 2)
+        return 2 * self.width(planform, y) * self.thickness * self.height(planform, y) ** 2 + self.thickness * 8 * self.height(planform,
             y) ** 3 / 6 + stringer_moment
 
     def torsional_constant(self, y, planform):
