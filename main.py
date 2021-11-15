@@ -205,8 +205,12 @@ class WingBox:
         :return: The torsional constant [m^4]
         :rtype: float
         """
-        return 4 * (2 * self.width(planform, y) * self.height(planform, y)) ** 2 / (
-                2 * self.width(planform, y) / self.thickness + 4 * self.height(planform, y) / self.thickness)
+        a = self.height(planform, y)
+        b = self.width(planform, y)
+        t = self.thickness
+        #return (4 * (self.width(planform, y) * self.height(planform, y)) ** 2) / (
+         #   (2 * self.width(planform, y) / self.thickness) + (4 * self.height(planform, y) / self.thickness))
+        return ((2*t**2)*((b-t)**2)*((a-t)**2))/(a*t+b*t-2*t**2)
 
     def cross_section(self, planform, x):
         """
@@ -305,11 +309,11 @@ def torsion(x, planform):
     :rtype: float
     :param planform: The planform used
     """
-    return (1 / 8) * planform.chord(x) * WP41.Ndis0(x)
+    return (1 / 8) * planform.chord(x) * WP41.Ndis0(x) + WP41.Mdis(x, AoA)
 
 
 # deflection profiles
-def lateral_deflection(y, moment, material, wingbox):  # dv/dy , E modulus is for one material (can be improved later)
+def lateral_deflection(y, material, wingbox, planform):  # dv/dy , E modulus is for one material (can be improved later)
     """
     This function returns the lateral deflection (v) at y distance away from the root chord,
     :param y: Distance away from the root [m]
@@ -323,12 +327,14 @@ def lateral_deflection(y, moment, material, wingbox):  # dv/dy , E modulus is fo
     :return: Lateral deflection [m]
     :type: float
     """
-    return -1 * integrate.dblquad(moment / (material.E * wingbox.moment_of_inertia), 0, y, 0, y)
+    return -1 * integrate.quad(lambda a: integrate.quad(lambda b: bending_moment(b, wingbox, planform) / (wingbox.moment_of_inertia(planform, b)*material.E), y, planform.b/2)[0], y, planform.b/2)[0]
 
 
 def twist_angle(x, wingbox, material, planform):  # lower limit must be set for the fuselage
     """
     This function returns the twist angle at y distance away from the root chord
+    :param planform: The planform used for the calculations
+    :type planform: Planform
     :param y: Distance away from the root [m]
     :type y: float
     :param wingbox: The wingbox used
@@ -339,7 +345,7 @@ def twist_angle(x, wingbox, material, planform):  # lower limit must be set for 
     :rtype: float
     """
     return \
-        integrate.quad(lambda a: torsion(a, planform) / (wingbox.torsional_constant(a, planform) * material.G), 0, x)[0]
+        integrate.quad(lambda a: (torsion(a, planform) / (wingbox.torsional_constant(a, planform) * material.G)), 0, x)[0]
 
 # finish this
 # def second_moment_of_inertia(x):
