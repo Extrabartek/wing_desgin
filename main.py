@@ -1,5 +1,6 @@
 import scipy.integrate as integrate
 import math
+import WP_41 as WP41
 
 # global constant
 g = 9.80665
@@ -269,7 +270,7 @@ def shear_force(x, wingbox, planform):
     :rtype: float
     """
     shear = \
-        integrate.quad(lambda b: lift_distribution(b) - g * wingbox.mass_distribution(planform, b), x, planform.b / 2)[
+        integrate.quad(lambda a: WP41.Ndis0(a) - g * np.cos(np.degrees(AoA)) * wingbox.mass_distribution(planform, a), x, planform.b / 2)[
             0]
     return shear
 

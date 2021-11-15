@@ -10,7 +10,7 @@ cr = 6.46
 ct = 1.83464
 b = 31.1
 rho = 1.225
-V = 10
+V = 256
 q = 0.5*rho*V**2
 
 # Reading file and making an array with columns y, cl, cd, cm
@@ -63,6 +63,8 @@ def Ldis(y,cly):
     Ldis = c(y) * q * cly(y)
     return Ldis
 
+print(Ldis(5, cly1)) # Del later
+
 def Ddis(y,cdy):
     Ddis = c(y) * q * cdy(y)
     return Ddis
@@ -71,7 +73,9 @@ def Mdis(y,cmy):
     Mdis = c(y) * q * cmy(y)
     return Mdis
 
-#print(c(15.55))
+def Ndis0(y):
+    Ndis = Ldis(y, cly1) * np.cos(np.radians(0)) + Ddis(y, cdy1) * np.sin(np.radians(0))
+    return Ndis
 
 # -------------------Distribution calculations------------------
 range = np.linspace(0, 15.55, 500)
@@ -84,6 +88,7 @@ D2 = Ddis(range, cdy2)
 M2 = Mdis(range, cmy2)
 
 # ---------------------Plots------------------
+'''
 plt.plot(range, L1)
 plt.plot(range, L2)
 plt.xlabel("Wingspan")
@@ -101,6 +106,7 @@ plt.plot(range, M2)
 plt.xlabel("Wingspan")
 plt.ylabel("CM")
 plt.show()
+'''
 
 # --------- Effect of velocity and angle of attack----------
 # From MainWing_a=0.00_v=10.00ms.txt
@@ -137,7 +143,7 @@ print("Design angle of attack = ", alphad())
 
 
 # -----------------Plotting lift distribution----------------------
-
+'''
 plt.plot(range, CLdy(range))
 plt.title("Wingspan vs. CLd(y)")
 plt.show()
@@ -149,7 +155,7 @@ plt.show()
 plt.plot(range, CMdy(range))
 plt.title("Wingspan vs. CMd(y)")
 plt.show()
-
+'''
 
 # ---------------------Shear moment and bending diagrams-----------------------
 
@@ -178,8 +184,6 @@ def Ty(AoA):
         D = D2
     return np.sin(np.radians(AoA)) * L + np.cos(np.radians(AoA)) * D
 
-#print("Normal force distribution @ 0 [deg]", Ny(0))
-#print("Normal force distribution @ 10 [deg]", Ny(10))
 plt.plot(range, Ny(0))
 plt.title("Normal force distribution at 0 deg")
 plt.show()
@@ -194,6 +198,7 @@ plt.show()
 
 plt.plot(range, Ty(10))
 plt.title("Tangential force distribution at 10 deg")
+plt.show()
 
 # -----------Shear force diagram------------
 

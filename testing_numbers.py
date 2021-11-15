@@ -35,3 +35,4 @@ for x in range(0, int(10*planform.b/2)):
 
 plt.plot(range(0, int(10*planform.b / 2)), torque_list)
 plt.show()
+
