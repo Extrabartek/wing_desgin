@@ -240,7 +240,7 @@ def wtotfunc(y):
 
 '''
 plt.plot(range, wy0inter(range))
-plt.title('Interpolated wy0')
+plt.title('Interpolated Wy0')
 plt.show()
 
 plt.plot(range, Ay(range))
@@ -248,7 +248,7 @@ plt.title('Airfoil Area')
 plt.show()
 
 plt.plot(range, wy10inter(range))
-plt.title('Interpolated wy10')
+plt.title('Interpolated Wy10')
 plt.show()
 #print(wy0(range))
 '''
