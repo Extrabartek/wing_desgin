@@ -355,3 +355,4 @@ def twist_angle(x, wingbox, material, planform):  # lower limit must be set for 
 # def bending_moment(L, x, a):
 #   M = L * (x - a)
 #  return M
+
