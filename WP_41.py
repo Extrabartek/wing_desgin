@@ -244,6 +244,7 @@ def Ty(AoA):
         D = D2
     return np.sin(np.radians(AoA)) * L + np.cos(np.radians(AoA)) * D
 
+'''
 plt.plot(range, Ny(0))
 plt.title("Normal force distribution at 0 deg")
 # plt.show()
@@ -269,11 +270,11 @@ def Ay(y):
 
 
 def weight(y):
-    '''
+    
 
     :param y:
     :return:
-    '''
+    
     [Vtot, Verr] = sp.integrate.quad(Ay, 0, 15.55)
     Vfuel = 29174 / (800 * 2)  # Fuel density is 800 kg/m^3 as per WP 1
     mwing = 1980 / 2
@@ -318,7 +319,7 @@ plt.show()
 plt.plot(range, wy10inter(range))
 plt.title('Interpolated Wy10')
 plt.show()
-'''
+
 
 
 # -------------------------------CHANGE THIS CODE A LITTLE BIT, COPIED FROM INTERNET ---------------------------------
