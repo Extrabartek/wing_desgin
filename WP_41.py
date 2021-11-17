@@ -13,6 +13,8 @@ rho = 1.225
 V = 256
 q = 0.5 * rho * V ** 2
 
+
+
 # Reading file and making an array with columns y, cl, cd, cm
 data1 = "MainWing_a=0.00_v=10.00ms.txt"
 data2 = "MainWing_a=10.00_v=10.00ms.txt"
@@ -72,7 +74,7 @@ def Ldis(y, cly):
     return Ldis
 
 
-print(Ldis(5, cly1))  # Del later
+#print(Ldis(5, cly1))  # Del later
 
 
 def Ddis(y, cdy):

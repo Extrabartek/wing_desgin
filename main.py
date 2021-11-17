@@ -5,7 +5,8 @@ import WP_41 as WP41
 
 # global constant
 g = 9.80665
-AoA = 10 #Degrees
+AoA = 0  # Degrees
+load_factor = 1
 
 
 # class definition list
@@ -56,7 +57,7 @@ class Planform:
         :param sweep_le: Leading edge sweep [rad]
         :param spar_rear: The percentage of the cord where the rear spar is
         :type spar_rear: float
-        :param spar_front: he percentage of the cord where the front spar is
+        :param spar_front: The percentage of the cord where the front spar is
         :type spar_front: float
         """
         self.b = b
@@ -167,15 +168,15 @@ class WingBox:
 
     def height(self, planform, y):
         """
-        This function returns the wingbox height from the wing geometry at any given distance from the root
+        This function returns the wingbox half-height from the wing geometry at any given distance from the root
         :param planform: The planform used
         :type planform: Planform
         :param y: The distance away from the root [m]
         :type y: float
-        :return: Wingbox height [m]
+        :return: Wingbox half-height [m]
         :rtype: float
         """
-        return 0.1296 * planform.chord(y)
+        return 0.1296 * self.width(planform, y)
 
     def moment_of_inertia(self, planform, y):
         """
@@ -205,12 +206,9 @@ class WingBox:
         :return: The torsional constant [m^4]
         :rtype: float
         """
-        a = self.height(planform, y)
-        b = self.width(planform, y)
-        t = self.thickness
-        #return (4 * (self.width(planform, y) * self.height(planform, y)) ** 2) / (
-         #   (2 * self.width(planform, y) / self.thickness) + (4 * self.height(planform, y) / self.thickness))
-        return ((2*t**2)*((b-t)**2)*((a-t)**2))/(a*t+b*t-2*t**2)
+
+        return (4 * (self.width(planform, y) * 2 * self.height(planform, y)) ** 2) / (
+                (2 * self.width(planform, y) / self.thickness) + (4 * self.height(planform, y) / self.thickness))
 
     def cross_section(self, planform, x):
         """
@@ -225,13 +223,14 @@ class WingBox:
         stringer_area = 0
         for stringer in self.stringers:
             stringer_area += (x < stringer.x_stop) * stringer.area()
-        return 2 * self.height(planform, x) * self.thickness + 2 * self.width(planform, x) * self.thickness \
-               + stringer_area + (2 * self.height(planform, x) + 2 * self.width(planform, x)) \
+        return 4 * self.height(planform, x) * self.thickness + 2 * self.width(planform, x) * self.thickness \
+               + stringer_area + (4 * self.height(planform, x) + 2 * self.width(planform, x)) \
                * 1.816 * (8 / 10000)
 
     def mass_distribution(self, planform, x):
         """
-        This function returns the mass per unit length (kilograms per meter) a given distance (in meters) away from the root
+        This function returns the mass per unit length (kilograms per meter) a given distance (in meters) away from the
+        root
         This also includes the weight of the rest of the aircraft at the root of the wing
         :param planform: wing planform dimensions
         :type planform: Planform
@@ -240,8 +239,9 @@ class WingBox:
         :return: Mass per unit length [kg/m]
         :rtype: float
         """
-        return self.cross_section(planform, x) * self.material.rho + self.height(planform, x) * self.width(planform,
-                                                                                                           x) * 800  # (x == 0) * self.planemass
+        return self.cross_section(planform, x) * self.material.rho + 2 * (
+                self.height(planform, x) * self.width(planform,
+                                                      x) * 800)  # (x == 0) * self.planemass
 
 
 # function definition list
@@ -275,9 +275,30 @@ def shear_force(x, wingbox, planform):
     :rtype: float
     """
     shear = \
-        integrate.quad(lambda a: WP41.Ndis0(a) - g * np.cos(np.degrees(AoA)) * wingbox.mass_distribution(planform, a), x, planform.b / 2)[
-            0]
+        integrate.quad(lambda a: WP41.Ndis0(a)*load_factor - g * np.cos(np.degrees(AoA)) * wingbox.mass_distribution(planform, a),
+                       x, planform.b / 2, epsabs=0.3, epsrel=0.3)[0]
     return shear
+
+
+'''
+def test_shear_force(x, wingbox, planform):
+    """
+    This function returns the values of the shear per unit length (in newton per meter) at a given distance (in meters)
+    from the root
+    :param x: The distance away from the root [m]
+    :type x: float
+    :param wingbox: The wingbox used for the calculation
+    :type wingbox: WingBox
+    :param planform: The planform used for the calculation
+    :type planform: Planform
+    :return: The shear force per unit length [N/m]
+    :rtype: float
+    """
+    shear = \
+        integrate.quad(lambda a: WP41.Ndis0(a) - g * np.cos(np.degrees(AoA)) * wingbox.mass_distribution(planform, a),
+                       x, planform.b / 2, epsrel=0.3, epsabs=0.3)[0]
+    return shear
+'''
 
 
 def bending_moment(x, wingbox, planform):
@@ -296,7 +317,7 @@ def bending_moment(x, wingbox, planform):
     # According to the Mechanics of Materials the bending moment should be a double integral of the distributed load
     # intensity (lift_distribution - g*(mass_distribution)). Should discuss that in the session
 
-    moment = integrate.quad(lambda a: shear_force(a, wingbox, planform), x, planform.b / 2)[0]
+    moment = integrate.quad(lambda a: shear_force(a, wingbox, planform), x, planform.b / 2, epsrel=0.5, epsabs=0.5)[0]
     return -moment  # minus sign is included for coordinates
 
 
@@ -309,17 +330,17 @@ def torsion(x, planform):
     :rtype: float
     :param planform: The planform used
     """
-    return (1 / 8) * planform.chord(x) * WP41.Ndis0(x) + WP41.Mdis(x, AoA)
+    return (1 / 8) * planform.chord(x) * WP41.Ndis0(x) + WP41.Mdis(x, AoA)*load_factor
 
 
 # deflection profiles
-def lateral_deflection(y, material, wingbox, planform):  # dv/dy , E modulus is for one material (can be improved later)
+def slope_deflection(y, material, wingbox, planform):  # dv/dy , E modulus is for one material (can be improved later)
     """
     This function returns the lateral deflection (v) at y distance away from the root chord,
+    :param planform: Planform used
+    :type planform: Planform
     :param y: Distance away from the root [m]
     :type y: float
-    :param moment: The bending moment function
-    :type moment: function
     :param material: Type of material used
     :type: Material
     :param wingbox: The wingbox used
@@ -327,7 +348,29 @@ def lateral_deflection(y, material, wingbox, planform):  # dv/dy , E modulus is 
     :return: Lateral deflection [m]
     :type: float
     """
-    return -1 * integrate.quad(lambda a: integrate.quad(lambda b: bending_moment(b, wingbox, planform) / (wingbox.moment_of_inertia(planform, b)*material.E), y, planform.b/2)[0], y, planform.b/2)[0]
+    return -1 * integrate.quad(
+        lambda b: bending_moment(b, wingbox, planform)/wingbox.moment_of_inertia(planform, b), 0, y,
+        epsabs=0.5, epsrel=0.5)[0]
+
+
+def vertical_deflection(y, material, wingbox, planform):
+    """
+    This function calculates the vertical deflection in m at a certain distance from the root.
+    :param y: distance from root [m]
+    :type y: float
+    :param material: the material the thing is made of
+    :type material: Material
+    :param wingbox: the wingbox used
+    :type wingbox: WingBox
+    :param planform: the planform used
+    :type planform: Planform
+    :return: the vertical deflection in [m]
+    :rtype: float
+    """
+
+    return -1 / material.E * integrate.quad(
+        lambda b: integrate.quad(lambda a: bending_moment(a, wingbox, planform)/wingbox.moment_of_inertia(planform, a), 0, b, epsabs=0.5, epsrel=0.5)[0], 0, y,
+        epsabs=0.5, epsrel=0.5)[0]
 
 
 def twist_angle(x, wingbox, material, planform):  # lower limit must be set for the fuselage
@@ -345,7 +388,8 @@ def twist_angle(x, wingbox, material, planform):  # lower limit must be set for 
     :rtype: float
     """
     return \
-        integrate.quad(lambda a: (torsion(a, planform) / (wingbox.torsional_constant(a, planform) * material.G)), 0, x)[0]
+        integrate.quad(lambda a: (torsion(a, planform) / (wingbox.torsional_constant(a, planform) * material.G)), 0, x)[
+            0]
 
 # finish this
 # def second_moment_of_inertia(x):
@@ -355,4 +399,3 @@ def twist_angle(x, wingbox, material, planform):  # lower limit must be set for 
 # def bending_moment(L, x, a):
 #   M = L * (x - a)
 #  return M
-
