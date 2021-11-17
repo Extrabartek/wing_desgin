@@ -197,7 +197,7 @@ def alphad():  # Design angle of attack
     return alphadvalue
 
 
-print("Design angle of attack = ", alphad())
+#print("Design angle of attack = ", alphad())
 
 # -----------------Plotting lift distribution----------------------
 '''

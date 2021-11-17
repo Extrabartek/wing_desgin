@@ -78,7 +78,7 @@ for x in rangy_range:
     #bending_list.append(number_4)
     #end = time.time()
     #print("Value .. ", number_4, "Time... ", end-start)
-    # lift_list.append(WP41.Ny(10, x))
+    lift_list.append(WP41.Ndis0(x / accuracy_thing))
 
 #plt.plot(rangy_range, torsion_list)
 plt.plot(rangy_range, lift_list)
