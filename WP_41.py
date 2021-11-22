@@ -159,9 +159,10 @@ CD10 = 0.038922
 CM0 = -0.267948
 CM10 = -1.16705
 
-# Common values used for CL, CD, CM
-CLd = 1
-CDd = 0.035
+# CLd, CDd are design lift and drag coefficients as found in  Work Package 3, \
+# CMd is a commonly used value for the design moment coefficient
+CLd = 1.42
+CDd = 0.0211
 CMd = 0.00000005
 
 
