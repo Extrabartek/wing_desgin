@@ -18,10 +18,12 @@ q = 0.5 * rho * V ** 2
 # Reading file and making an array with columns y, cl, cd, cm
 data1 = "MainWing_a=0.00_v=10.00ms.txt"
 data2 = "MainWing_a=10.00_v=10.00ms.txt"
+data3 = "MainWing_a=-10.00_v=10.00ms.txt"
 list1 = np.genfromtxt(data1, dtype='float', skip_header=40, skip_footer=1029, usecols=(0, 3, 5, 7))
 list2 = np.genfromtxt(data2, dtype='float', skip_header=40, skip_footer=1029, usecols=(0, 3, 5, 7))
+list3 = np.genfromtxt(data3, dtype='float', skip_header=40, skip_footer=1029, usecols=(0, 3, 5, 7))
 
-# Making individual lists for y, cl, cd, cm
+# Making individual lists for values of y, cl, cd, cm
 y = []
 cl1 = []
 cd1 = []
@@ -29,6 +31,10 @@ cm1 = []
 cl2 = []
 cd2 = []
 cm2 = []
+cl3 = []
+cd3 = []
+cm3 = []
+
 for i in range(19):
     y.append(list1[i][0])
     cl1.append(list1[i][1])
@@ -38,8 +44,6 @@ for i in range(19):
     cd2.append(list2[i][2])
     cm2.append(list2[i][3])
 
-cltot1 = sum(cl1)
-cltot2 = sum(cl2)
 
 # Interpolating cl, cd, cm
 cly1 = sp.interpolate.interp1d(y, cl1, kind='cubic', fill_value="extrapolate")
@@ -52,7 +56,8 @@ cmy2 = sp.interpolate.interp1d(y, cm2, kind='cubic', fill_value="extrapolate")
 
 
 # -----------------Functions-------------------
-def c(y):
+
+def c(y): # function describing the variation of the chord along the wingspan
     '''
 
     :param y: y distance along the wingspan starting from root
@@ -63,7 +68,7 @@ def c(y):
     return c
 
 
-def Ldis(y, cly):
+def Ldis(y, cly): # function describing the lift distribution
     '''
 
     :param y:
@@ -77,7 +82,7 @@ def Ldis(y, cly):
 #print(Ldis(5, cly1))  # Del later
 
 
-def Ddis(y, cdy):
+def Ddis(y, cdy): # function describing the drag distribution
     '''
 
     :param y:
@@ -88,7 +93,7 @@ def Ddis(y, cdy):
     return Ddis
 
 
-def Mdis(y, AoA):
+def Mdis(y, AoA):# function describing the moment distribution
     '''
 
     :param y:
@@ -103,7 +108,7 @@ def Mdis(y, AoA):
     return Mdis
 
 
-def Ndis0(y):
+def Ndis0(y): # function describing the normal force distribution (contribution of lift and drag at an angle)
     '''
 
     :param y:
