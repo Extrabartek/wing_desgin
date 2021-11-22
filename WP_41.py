@@ -3,7 +3,6 @@ import scipy as sp
 from scipy import interpolate
 from scipy import integrate
 import numpy as np
-from io import StringIO
 
 # ----------------Constants------------------
 cr = 6.46
@@ -12,8 +11,6 @@ b = 31.1
 rho = 1.225
 V = 256
 q = 0.5 * rho * V ** 2
-
-
 
 # Reading file and making an array with columns y, cl, cd, cm
 data1 = "MainWing_a=0.00_v=10.00ms.txt"
@@ -77,9 +74,6 @@ def Ldis(y, cly): # function describing the lift distribution
     '''
     Ldis = c(y) * q * cly(y)
     return Ldis
-
-
-#print(Ldis(5, cly1))  # Del later
 
 
 def Ddis(y, cdy): # function describing the drag distribution
@@ -158,6 +152,7 @@ CD10 = 0.038922
 CM0 = -0.267948
 CM10 = -1.16705
 
+# Common values used for CL, CD, CM
 CLd = 1
 CDd = 0.035
 CMd = 0.00000005
@@ -196,13 +191,12 @@ def CMdy(y):  # y here would be the wingspan, "range"
 def alphad():  # Design angle of attack
     '''
 
+    :param y:
     :return:
     '''
     alphadvalue = np.degrees(np.arcsin((CLd - CL0) / (CL10 - CL0) * np.sin(np.radians(10))))
     return alphadvalue
 
-
-#print("Design angle of attack = ", alphad())
 
 # -----------------Plotting lift distribution----------------------
 '''
@@ -326,17 +320,6 @@ plt.show()
 plt.plot(range, wy10inter(range))
 plt.title('Interpolated Wy10')
 plt.show()
-
-
-
-# -------------------------------CHANGE THIS CODE A LITTLE BIT, COPIED FROM INTERNET ---------------------------------
-def V0(y):
-    res = np.zeros_like(y)
-    for i, val in enumerate(y):
-        [V0, err] = sp.integrate.quad(wtotfunc, 0, val)
-        res[i] = V0
-    return res
-# -------------------------------CHANGE THIS CODE A LITTLE BIT, COPIED FROM INTERNET ---------------------------------
 '''
 
 '''
