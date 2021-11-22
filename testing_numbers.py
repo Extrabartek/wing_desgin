@@ -9,12 +9,12 @@ import main as fn
 
 aluminum = fn.Material(2700, 276 * 10 ** 6, 310 * 10 ** 6, 68.9 * 10 ** 9, 26 * 10 ** 9)
 planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
-stringer = fn.Stringer(0.005, 0.08, 0.08, planform.b / 2, aluminum)
+stringer = fn.Stringer(0.007, 0.15, 0.15, planform.b / 2, aluminum)
 weight_final = 26299
 list_stringers = []
 for x in range(4):
     list_stringers.append(stringer)
-wingbox = fn.WingBox(0.00075, list_stringers, aluminum)
+wingbox = fn.WingBox(0.001, list_stringers, aluminum)
 WP41.b = planform.b
 WP41.cr = planform.cr
 WP41.ct = planform.ct

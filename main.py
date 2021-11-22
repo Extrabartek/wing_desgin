@@ -133,6 +133,14 @@ class Stringer:
         """
         return self.material.rho * self.area()
 
+    def centroid(self):
+        """
+        This function calculates the vertical centroid position of an L-stringer
+        :return: Distance of the centroid from the attached flange
+        :rtype: float
+        """
+        return (self.h / 2 * self.h * self.t)/(self.t * (self.h + self.w))
+
 
 # same as the planform and material such for wingbox geometry
 class WingBox:
