@@ -5,8 +5,8 @@ import WP_41 as WP41
 
 # global constant
 g = 9.80665
-AoA = 0  # Degrees
-load_factor = 1
+AoA = 10  # Degrees
+load_factor = 2.5
 
 
 # class definition list
@@ -239,9 +239,24 @@ class WingBox:
         :return: Mass per unit length [kg/m]
         :rtype: float
         """
-        return self.cross_section(planform, x) * self.material.rho + 2 * (
-                self.height(planform, x) * self.width(planform,
-                                                      x) * 800)  # (x == 0) * self.planemass
+        return self.cross_section(planform, x) * self.material.rho  # + 2 * (
+        # self.height(planform, x) * self.width(planform,
+        # x) * 800)  # (x == 0) * self.planemass
+
+    def Q(self, planform, x):
+        """
+        This function calculates the first moment of area
+        :param planform: The planform used
+        :type planform: Planform
+        :param x: The distance from the root [m]
+        :type x: float
+        :return: This function returns the first moment of area in [m^3]
+        :rtype: float
+        """
+        q = self.height(planform, x) ** 2 * self.thickness + self.height(planform, x) * self.width(planform, x) * self.thickness
+        for stringer in self.stringers:
+            q += stringer.area() * (self.height(planform, x) - stringer.centroid())
+        return q
 
 
 # function definition list
@@ -275,8 +290,10 @@ def shear_force(x, wingbox, planform):
     :rtype: float
     """
     shear = \
-        integrate.quad(lambda a: WP41.Ndis0(a)*load_factor - g * np.cos(np.degrees(AoA)) * wingbox.mass_distribution(planform, a),
-                       x, planform.b / 2, epsabs=0.3, epsrel=0.3)[0]
+        integrate.quad(
+            lambda a: WP41.Ndis0(a, AoA) * load_factor - g * np.cos(np.degrees(AoA)) * wingbox.mass_distribution(planform,
+                                                                                                            a),
+            x, planform.b / 2, epsabs=0.3, epsrel=0.3)[0]
     return shear
 
 
@@ -330,7 +347,7 @@ def torsion(x, planform):
     :rtype: float
     :param planform: The planform used
     """
-    return (1 / 8) * planform.chord(x) * WP41.Ndis0(x) + WP41.Mdis(x, AoA)*load_factor
+    return (1 / 8) * planform.chord(x) * WP41.Ndis0(x, AoA) + WP41.Mdis(x, AoA) * load_factor
 
 
 # deflection profiles
@@ -349,7 +366,7 @@ def slope_deflection(y, material, wingbox, planform):  # dv/dy , E modulus is fo
     :type: float
     """
     return -1 * integrate.quad(
-        lambda b: bending_moment(b, wingbox, planform)/wingbox.moment_of_inertia(planform, b), 0, y,
+        lambda b: bending_moment(b, wingbox, planform) / wingbox.moment_of_inertia(planform, b), 0, y,
         epsabs=0.5, epsrel=0.5)[0]
 
 
@@ -369,7 +386,9 @@ def vertical_deflection(y, material, wingbox, planform):
     """
 
     return -1 / material.E * integrate.quad(
-        lambda b: integrate.quad(lambda a: bending_moment(a, wingbox, planform)/wingbox.moment_of_inertia(planform, a), 0, b, epsabs=0.5, epsrel=0.5)[0], 0, y,
+        lambda b:
+        integrate.quad(lambda a: bending_moment(a, wingbox, planform) / wingbox.moment_of_inertia(planform, a), 0, b,
+                       epsabs=0.5, epsrel=0.5)[0], 0, y,
         epsabs=0.5, epsrel=0.5)[0]
 
 
@@ -391,11 +410,35 @@ def twist_angle(x, wingbox, material, planform):  # lower limit must be set for 
         integrate.quad(lambda a: (torsion(a, planform) / (wingbox.torsional_constant(a, planform) * material.G)), 0, x)[
             0]
 
-# finish this
-# def second_moment_of_inertia(x):
-#    moment_of_inertia = 0
-#    return moment_of_inertia
 
-# def bending_moment(L, x, a):
-#   M = L * (x - a)
-#  return M
+def normal_stress(x, wingbox, planform):
+    """
+    This function returns the maximum normal stress (in Pascal) at a given distance away from the root (in meters)
+    :param x: Distance from the root [m]
+    :type x: float
+    :param wingbox: The wingbox used
+    :type wingbox: WingBox
+    :param planform: The planform used
+    :type planform: Planform
+    :return: The maximum normal stress at a given distance [Pa]
+    """
+    return bending_moment(x, wingbox, planform) * wingbox.height(planform, x) / (wingbox.moment_of_inertia(planform, x))
+
+
+def shear_stress(x, wingbox, planform):
+    """
+    This function calculates the shear stress due to torsion
+    :param x:distance from root
+    :type x: float
+    :param wingbox: The wingbox used
+    :type wingbox: WingBox
+    :param planform: the planform used
+    :type planform: Planform
+    :return: The shear stress in [N/m^2]
+    :rtype: float
+    """
+    point_1 = torsion(x, planform) / (2 * wingbox.thickness * (2 * wingbox.height(planform, x) * wingbox.width(planform, x))) \
+           + shear_force(x, wingbox, planform) * wingbox.Q(planform, x) / (2 * wingbox.moment_of_inertia(planform, x) * wingbox.thickness)
+    point_2 = torsion(x, planform) / (2 * wingbox.thickness * (2 * wingbox.height(planform, x) * wingbox.width(planform, x))) \
+           - shear_force(x, wingbox, planform) * wingbox.Q(planform, x) / (2 * wingbox.moment_of_inertia(planform, x) * wingbox.thickness)
+    return max(abs(point_1), abs(point_2))

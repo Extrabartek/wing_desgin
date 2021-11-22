@@ -51,6 +51,10 @@ cly2 = sp.interpolate.interp1d(y, cl2, kind='cubic', fill_value="extrapolate")
 cdy2 = sp.interpolate.interp1d(y, cd2, kind='cubic', fill_value="extrapolate")
 cmy2 = sp.interpolate.interp1d(y, cm2, kind='cubic', fill_value="extrapolate")
 
+cly3 = sp.interpolate.interp1d(y, cl3, kind='cubic', fill_value="extrapolate")
+cdy3 = sp.interpolate.interp1d(y, cd3, kind='cubic', fill_value="extrapolate")
+cmy3 = sp.interpolate.interp1d(y, cm3, kind='cubic', fill_value="extrapolate")
+
 
 # -----------------Functions-------------------
 
@@ -99,16 +103,28 @@ def Mdis(y, AoA):# function describing the moment distribution
         Mdis = (c(y)) **2 * q * cmy1(y)
     if AoA == 10:
         Mdis = (c(y)) **2 * q * cmy2(y)
+    if AoA == -10:
+        Mdis = (c(y) **2 * q * cmy3(y))
     return Mdis
 
 
-def Ndis0(y): # function describing the normal force distribution (contribution of lift and drag at an angle)
-    '''
-
-    :param y:
-    :return:
-    '''
-    Ndis = Ldis(y, cly1) * np.cos(np.radians(0)) + Ddis(y, cdy1) * np.sin(np.radians(0))
+def Ndis0(y, AoA):
+    """
+    This function describes the normal force distribution (contribution of lift and drag at an angle)
+    :param y: Wing span [m]
+    :type y: float
+    :param AoA: Angle of attack [deg]
+    :type AoA: float
+    :return: Normal force distribution at a certain point along the wing span, based upon the angle of attack
+    :rtype: array
+    """
+    Ndis = 0
+    if AoA == 0:
+        Ndis = Ldis(y, cly1) * np.cos(np.radians(0)) + Ddis(y, cdy1) * np.sin(np.radians(0))
+    if AoA == 10:
+        Ndis = Ldis(y, cly2) * np.cos(np.radians(10)) + Ddis(y, cdy2) * np.sin(np.radians(10))
+    if AoA == -10:
+        Ndis = Ndis = Ldis(y, cly3) * np.cos(np.radians(-10)) + Ddis(y, cdy3) * np.sin(np.radians(-10))
     return Ndis
 
 
@@ -118,30 +134,13 @@ L1 = Ldis(range, cly1)
 D1 = Ddis(range, cdy1)
 M1 = Mdis(range, cmy1)
 
-L2 = Ldis(range, cly2)
-D2 = Ddis(range, cdy2)
-M2 = Mdis(range, cmy2)
+L1 = Ldis(range, cly1)              # Lift distribution at AoA of 0 [deg]
+D1 = Ddis(range, cdy1)              # Drag distribution at AoA of 0 [deg]
+M1 = Mdis(range, cmy1)              # Moment distribution at AoA of 0 [deg]
 
-# ---------------------Plots------------------
-'''
-plt.plot(range, L1)
-plt.plot(range, L2)
-plt.xlabel("Wingspan")
-plt.ylabel("CL")
-plt.show()
-
-plt.plot(range, D1)
-plt.plot(range, D2)
-plt.xlabel("Wingspan")
-plt.ylabel("Cd")
-plt.show()
-
-plt.plot(range, M1)
-plt.plot(range, M2)
-plt.xlabel("Wingspan")
-plt.ylabel("CM")
-plt.show()
-'''
+L2 = Ldis(range, cly2)              # Lift distribution at AoA of 10 [deg]
+D2 = Ddis(range, cdy2)              # Drag distribution at AoA of 10 [deg]
+M2 = Mdis(range, cmy2)              # Moment distribution at AoA of 10 [deg]
 
 # --------- Effect of velocity and angle of attack----------
 # From MainWing_a=0.00_v=10.00ms.txt, MainWing_a=10.00_v=10.00ms.txt
@@ -197,23 +196,8 @@ def alphad():  # Design angle of attack
     alphadvalue = np.degrees(np.arcsin((CLd - CL0) / (CL10 - CL0) * np.sin(np.radians(10))))
     return alphadvalue
 
-
-# -----------------Plotting lift distribution----------------------
 '''
-plt.plot(range, CLdy(range))
-plt.title("Wingspan vs. CLd(y)")
-plt.show()
-
-plt.plot(range, CDdy(range))
-plt.title("Wingspan vs. CDd(y)")
-plt.show()
-
-plt.plot(range, CMdy(range))
-plt.title("Wingspan vs. CMd(y)")
-plt.show()
-'''
-
-# ---------------------Shear moment and bending diagrams-----------------------
+# --------------------- Shear moment and bending diagrams -----------------------
 def Ny(AoA):
     '''
 
