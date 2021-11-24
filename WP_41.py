@@ -165,7 +165,6 @@ CLd = 1.42
 CDd = 0.0211
 CMd = 0.00000005
 
-
 def CLdy(y):
     '''
     :param y: Wing span [m]
@@ -207,6 +206,7 @@ def alphad():
     '''
     alphadvalue = np.degrees(np.arcsin((CLd - CL0) / (CL10 - CL0) * np.sin(np.radians(10))))
     return alphadvalue
+
 
 '''
 # --------------------- Shear moment and bending diagrams -----------------------
