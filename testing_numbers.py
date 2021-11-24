@@ -7,6 +7,10 @@ import scipy.integrate as integrate
 import WP_41 as WP41
 import main as fn
 
+'''
+Parameter input 
+'''
+
 aluminum = fn.Material(2700, 276 * 10 ** 6, 310 * 10 ** 6, 68.9 * 10 ** 9, 26 * 10 ** 9)
 planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
 stringer_full = fn.Stringer(0.007, 0.15, 0.15, planform.b / 2, aluminum)
