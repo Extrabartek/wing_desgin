@@ -106,7 +106,7 @@ class Planform:
 
 
 class Stringer:
-    def __init__(self, t, w, h, x_stop, material):
+    def __init__(self, t, base, flange, x_stop, material):
         """
         Initiate variable of type stringer.
 
@@ -123,8 +123,8 @@ class Stringer:
         """
         self.t = t
         self.x_stop = x_stop
-        self.w = w
-        self.h = h
+        self.base = base
+        self.flange = flange
         self.material = material
 
     def area(self):
@@ -152,7 +152,18 @@ class Stringer:
         :return: Distance of the centroid from the attached flange
         :rtype: float
         """
-        return (self.h / 2 * self.h * self.t) / (self.t * (self.h + self.w))
+        return ((self.flange / 2) * self.flange * self.t + (self.t / 2) * self.base * self.t) / (
+                self.t * (self.flange + self.base))
+
+    def moment_inertia(self):
+        """
+        This function returns the moment of inertia of the stringers
+        :return: moment of inertia of the stringer in m^4
+        :rtype: float
+        """
+
+        return (self.t * self.flange ** 3) / 12 + self.t * self.flange * (
+                self.flange / 2 - self.centroid()) ** 2 + self.base * self.t * self.centroid() ** 2
 
 
 # same as the planform and material such for wingbox geometry
@@ -215,7 +226,8 @@ class WingBox:
         """
         stringer_moment = 0
         for stringer in self.stringers:
-            stringer_moment += (y < stringer.x_stop) * (stringer.area() * self.height(planform, y) ** 2)
+            stringer_moment += (y < stringer.x_stop) * ((stringer.area() * (
+                    self.height(planform, y) - stringer.centroid()) ** 2) + stringer.moment_inertia())
         return 2 * self.width(planform, y) * self.thickness * self.height(planform,
                                                                           y) ** 2 + self.thickness * 8 * self.height(
             planform,
