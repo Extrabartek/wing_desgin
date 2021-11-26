@@ -1,3 +1,4 @@
+import logging
 import math
 import time
 
@@ -22,27 +23,17 @@ wingbox = fn.WingBox(0.0095, list_stringers, aluminum)
 WP41.b = planform.b
 WP41.cr = planform.cr
 WP41.ct = planform.ct
-WP41.q = fn.load_factor * fn.g * (weight_final/2 + integrate.quad(lambda a: wingbox.mass_distribution(planform, a), 0, planform.b/2)[0])/(integrate.quad(lambda a: WP41.c(a) * ((fn.AoA == 0) * WP41.cly1(a) + (fn.AoA == 10) * WP41.cly2(a)) + (fn.AoA == -10) * WP41.cly3(a), 0, planform.b/2)[0])
-#print(WP41.q)
+WP41.q = fn.load_factor * fn.g * (
+        weight_final / 2 + integrate.quad(lambda a: wingbox.mass_distribution(planform, a), 0, planform.b / 2)[
+    0]) / (integrate.quad(
+    lambda a: WP41.c(a) * ((fn.AoA == 0) * WP41.cly1(a) + (fn.AoA == 10) * WP41.cly2(a)) + (fn.AoA == -10) * WP41.cly3(
+        a), 0, planform.b / 2)[0])
 
-# print(WP41.Ndis0(0))
-
-# bending_list = []
-# for x in range(0, int(100*planform.b / 2)):
-#   start = time.time()
-#  number = fn.shear_force(x/100, wingbox, planform)
-# end = time.time()
-# print("The force and ... ", number, x/100, (end-start))
-# bending_list.append(number)
-# plt.plot(range(0, int(100*planform.b / 2)), bending_list)
-# plt.show()
-
-#print(fn.twist_angle(planform.b / 2, wingbox, aluminum, planform) * (180 / math.pi))
 twist_list = []
 g_list = []
 torsion_list = []
-accuracy_thing = 5
-rangy_range = range(0, accuracy_thing*int(planform.b/2))
+step_size = 0.05
+rangy_range = np.arange(0, planform.b / 2, step_size)
 lift_list = []
 bending_list = []
 shear_list = []
@@ -50,114 +41,67 @@ deflection_list = []
 normal_stress_list = []
 shear_stress_list = []
 number_of_strigers_list = []
-span_list = []
+stringer_len = []
+list_of_box_thickness = np.arange(0.0151, 0.01511, 0.00100)
+list_of_stringer_thickness = np.arange(0.001, 0.005, 0.101)
+list_of_base_len = np.arange(0.05, 0.1, 0.125)
+list_of_flange_len = np.arange(0.05, 0.1, 0.125)
+list_of_combinations = []
+i = 0
 
-#start = time.perf_counter()
-#number = fn.shear_force(planform.b/4, wingbox, planform)
-#end = time.perf_counter()
+for t_b in list_of_box_thickness:
+    print(f"I'm doing wingbox thickness {1000 * t_b: 0.3f} mm. We at i = {i}")
+    for t_s in list_of_stringer_thickness:
+        print(f"We at i = {i}")
+        for s_b in list_of_base_len:
+            for s_f in list_of_flange_len:
+                number_of_strigers_list = []
+                i += 1
+                test_stringer = fn.Stringer(t_s, s_b, s_f, planform.b / 2, aluminum)
+                test_list_of_stringer = []
+                stringer_len = []
+                for u in range(4):
+                    test_list_of_stringer.append(test_stringer)
+                test_wing = fn.WingBox(t_b, test_list_of_stringer, aluminum)
 
-#print(f"The value {number} and compute time {end - start}")
-'''
-start_test = time.time()
-for x in rangy_range:
-    test_shear_list.append(fn.test_shear_force(x / accuracy_thing, wingbox, planform))
-end_test = time.time()
-'''
-'''
-for x in rangy_range:
-    #bending_list.append(fn.bending_moment(x / accuracy_thing, wingbox, planform))
-    start = time.time()
-    number = fn.vertical_deflection(x / accuracy_thing, aluminum, wingbox, planform)
-    deflection_list.append(number)
-    end = time.time()
-    print("Value: ", number, "Time: ", end-start)
-'''
+                number = [0, True]
 
-#print(f"Deflection {fn.vertical_deflection(planform.b/2, aluminum, wingbox, planform)}")
+                for x in rangy_range:
+                    number = fn.optimize_stringers(x, test_wing, planform)
+                    if not number[1]:
+                        break
+                    else:
+                        number_of_strigers_list.append(number[0])
+                if not number[1]:
+                    break
+                stringer_len = fn.stringer_length_conversion(number_of_strigers_list, test_stringer, step_size,
+                                                             rangy_range)
+                wingbox.stringers = stringer_len
+                len_list = []
+                for stringer in wingbox.stringers:
+                    len_list.append(stringer.x_stop)
 
-#print(number, "Time to execute:", end-start, "s")
-
-
-for x in rangy_range:
-    number_5 = fn.tau_max(x / accuracy_thing, wingbox, planform)
-
-    while number_5 * 1.2 > (aluminum.sig_yld / 2) and len(list_stringers) < 20:
-        number_5 = fn.tau_max(x / accuracy_thing, wingbox, planform)
-        for a in range(2):
-            list_stringers.append(stringer_full)
-        wingbox.stringers = list_stringers
-    number_of_strigers_list.append(len(list_stringers))
-    print(number_of_strigers_list[-1])
-    list_stringers = []
-    for a in range(4):
-        list_stringers.append(stringer_full)
-    wingbox.stringers = list_stringers
-
-    span_list.append((planform.b/2)/len(rangy_range) * x)
-    #start = time.time()
-    #number = fn.twist_angle(x / accuracy_thing, wingbox, aluminum, planform)
-    #number_1 = wingbox.torsional_constant(x / accuracy_thing, planform)
-    #number_2 = fn.torsion(x / accuracy_thing, planform)
-    #number_3 = fn.shear_force(x / accuracy_thing, wingbox, planform)
-    #number_4 = fn.normal_stress(x /accuracy_thing, wingbox, planform)
-
-    #number_6 = fn.bending_moment(x / accuracy_thing, wingbox, planform)
-    #normal_stress_list.append(number_4)
-    shear_stress_list.append(number_5)
-    #twist_list.append(np.degrees(number))
-    #g_list.append(number_1)
-    #torsion_list.append(number_2)
-    #shear_list.append(number_3)
-    #bending_list.append(number_6)
-    #number_4 = fn.bending_moment(x, wingbox, planform)
-    #bending_list.append(number_4)
-    #end = time.time()
-    #print("Value .. ", number_4, "Time... ", end-start)
-    #lift_list.append(WP41.Ndis0(x / accuracy_thing))
-
-#plt.plot(rangy_range, torsion_list)
-#plt.plot(rangy_range, normal_stress_list)
-#plt.show()
-sig_yield_list = []
-for x in rangy_range:
-    sig_yield_list.append(aluminum.sig_yld / (2 * 1.2))
-plt.plot(span_list, shear_stress_list)
-plt.plot(span_list, sig_yield_list)
-plt.show()
+                try:
+                    if wingbox.total_weight(planform) < list_of_combinations[0][1]:
+                        print(
+                            f"Wingbox number {i} is completed with weight {wingbox.total_weight(planform):.3f} kg, wingbox thickness {1000 * t_b:.3f} mm, stringer "
+                            f"thickness {1000 * t_s:.3f} mm, base length {100 * s_b:.3f} cm, flange height {100 * s_f:.3f} cm, number of stri"
+                            f"ngers {len(wingbox.stringers):.3f}, distribution {len_list}")
+                        plt.plot(rangy_range, number_of_strigers_list)
+                        plt.show()
+                except LookupError:
+                    print(f"First wingbox")
+                    print(
+                        f"Wingbox number {i} is completed with weight {wingbox.total_weight(planform):.3f} kg, wingbox thickness {1000 * t_b:.3f} mm, stringer "
+                        f"thickness {1000 * t_s:.3f} mm, base length {100 * s_b:.3f} cm, flange height {100 * s_f:.3f} cm, number of stri"
+                        f"ngers {len(wingbox.stringers):.3f}, distribution {len_list}")
+                    plt.plot(rangy_range, number_of_strigers_list)
+                    plt.show()
+                    fn.load_factor = 4.6
+                    print(fn.vertical_deflection(planform.b/ 2, aluminum, wingbox, planform))
+                list_of_combinations.append([wingbox, wingbox.total_weight(planform)])
+                list_of_combinations = sorted(list_of_combinations, key=lambda u: u[1])
 
 
-#plt.plot(span_list, sig_yield_list)
-#plt.show()
-
-#plt.plot(rangy_range, shear_list)
-#plt.show()
-
-plt.plot(span_list, number_of_strigers_list)
-plt.show()
-print(f"Q {wingbox.Q(planform, 0)}")
-print(f"Width {wingbox.width(planform, 0)}")
-print(f"Height {wingbox.height(planform, 0)}")
-print(f"Thickness {wingbox.thickness}")
-print(f"Moment of inertia {wingbox.moment_of_inertia(planform, 0)}")
-#plt.plot(rangy_range, shear_list)
-#plt.show()
-#plt.plot(rangy_range, twist_list)
-#plt.show()
-
-#print("test speed", end_test-start_test)
-
-#print(shear_list[0])
-#print(shear_list[-1])
-
-#print("Actual tip:", fn.shear_force(planform.b/2, wingbox, planform))
-
-
-#plt.plot(rangy_range, bending_list)
-#plt.show()
-
-print(f"Total mass {integrate.quad(lambda a: wingbox.mass_distribution(planform, a), 0, planform.b / 2)[0]}")
-
-
-
-
+# 2872.467 kg
 

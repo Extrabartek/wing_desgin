@@ -15,6 +15,7 @@ class Material:
     def __init__(self, rho, sig_yld, sig_ult, E, G):
         """
         Initiate variable of type material
+
         :param rho: Density of the material [kg/m^3]
         :type rho: float
         :param sig_yld: Yield strength of the material [N/m^2]
@@ -35,6 +36,7 @@ class Material:
     def mass(self, volume):
         """
         This function will return the mass (in kilograms) of an object given its volume (in meters cubed)
+
         :param volume: The object's volume [m^3]
         :type volume: float
         :return: The mass of the object [kg]
@@ -48,6 +50,7 @@ class Planform:
     def __init__(self, b, cr, ct, sweep_le, spar_rear, spar_front):
         """
         Initiate variable of type planform
+
         :param b: Wingspan of the planform [m]
         :type b: float
         :param cr: Cord at the root [m]
@@ -64,11 +67,14 @@ class Planform:
         self.cr = cr
         self.ct = ct
         self.sweep_le = sweep_le
+        self.spar_rear = spar_rear
+        self.spar_front = spar_front
         self.spar_dif = spar_rear - spar_front
 
     def area(self):
         """
         This function returns the area (in m^2) of the planform
+
         :return: Area of the planform [m^2]
         :rtype: float
         """
@@ -77,6 +83,7 @@ class Planform:
     def sweep(self, c_percent):
         """
         This function returns the sweep of the planform at any given percentage of the cord
+
         :param c_percent: The percent of the cord (range from 0 to 1)
         :type c_percent: float
         :return: The sweep of the planform at a percentage of the cord [rad]
@@ -89,6 +96,7 @@ class Planform:
     def chord(self, y):
         """
         This function returns the cord of the planform at any given distance away form the root
+
         :param y: Distance away from the root [m]
         :type y: float
         :return: Cord length [m]
@@ -101,6 +109,7 @@ class Stringer:
     def __init__(self, t, w, h, x_stop, material):
         """
         Initiate variable of type stringer.
+
         :param t: Thickness of stringer in [m]
         :type t: float
         :param w: Width of stringer in [m]
@@ -121,13 +130,16 @@ class Stringer:
     def area(self):
         """
         This function calculates the cross-sectional area of the stringer.
+
         :return: Cross-sectional area of the stringer [m^2]
         :rtype: float
         """
-        return self.h * self.t + self.w * self.t - self.t * self.t
+        return self.flange * self.t + self.base * self.t - self.t * self.t
 
     def mass(self):
         """
+        This function calculates the mass per unit (in kilograms per meter) length of a stringer
+
         :return: Mass per unit length of the stringer [kg/m]
         :rtype: float
         """
@@ -136,6 +148,7 @@ class Stringer:
     def centroid(self):
         """
         This function calculates the vertical centroid position of an L-stringer
+
         :return: Distance of the centroid from the attached flange
         :rtype: float
         """
@@ -147,6 +160,7 @@ class WingBox:
     def __init__(self, t, stringers, material):
         """
         Initiate variable of type wingbox
+
         :param t: Thickness of the sheets used [m]
         :type t: float
         :param n: Number of stringer (min is 4)
@@ -165,6 +179,7 @@ class WingBox:
     def width(self, planform, y):
         """
         This function returns the wingbox width from the wing geometry at any given distance from the root
+
         :param planform: The planform used
         :type planform: Planform
         :param y: Distance away from root [m]
@@ -177,6 +192,7 @@ class WingBox:
     def height(self, planform, y):
         """
         This function returns the wingbox half-height from the wing geometry at any given distance from the root
+
         :param planform: The planform used
         :type planform: Planform
         :param y: The distance away from the root [m]
@@ -189,6 +205,7 @@ class WingBox:
     def moment_of_inertia(self, planform, y):
         """
         This function returns the moment of inertia for the wingbox at given distance from root with given stringers
+
         :param y: The distance away from the root [m]
         :type y: float
         :param planform: Planform used
@@ -207,6 +224,7 @@ class WingBox:
     def torsional_constant(self, y, planform):
         """
         This function returns the torsional constant J for the wingbox at given distance from root
+
         :param planform: The planform used
         :type planform: Planform
         :param y: The distance away from the root [m]
@@ -221,6 +239,7 @@ class WingBox:
     def cross_section(self, planform, x):
         """
         This function calculates the cross-section of the wingbox
+
         :param planform: The planform used
         :type planform: Planform
         :param x: distance from the root [m]
@@ -239,7 +258,7 @@ class WingBox:
         """
         This function returns the mass per unit length (kilograms per meter) a given distance (in meters) away from the
         root
-        This also includes the weight of the rest of the aircraft at the root of the wing
+
         :param planform: wing planform dimensions
         :type planform: Planform
         :param x: Distance away from the root [m]
@@ -248,14 +267,12 @@ class WingBox:
         :rtype: float
         """
         mass = self.cross_section(planform, x) * self.material.rho
-
-        for stringer in self.stringers:
-            mass += (stringer.x_stop > x) * stringer.area() * stringer.material.rho
         return mass
 
     def Q(self, planform, x):
         """
         This function calculates the first moment of area
+
         :param planform: The planform used
         :type planform: Planform
         :param x: The distance from the root [m]
@@ -266,8 +283,12 @@ class WingBox:
         q = self.height(planform, x) ** 2 * self.thickness + self.height(planform, x) * self.width(planform,
                                                                                                    x) * self.thickness
         for stringer in self.stringers:
-            q += stringer.area() * (self.height(planform, x) - stringer.centroid())
+            q += stringer.area() * (self.height(planform, x) - stringer.centroid()) * (stringer.x_stop > x)
         return q
+
+    def total_weight(self, planform):
+        return integrate.quad(lambda a: self.mass_distribution(planform, a), 0, planform.b / 2, epsrel=0.3, epsabs=0.3)[
+            0]
 
 
 # function definition list
@@ -275,6 +296,7 @@ class WingBox:
 def lift_distribution(x):
     """
     This function returns the lift per unit length (in newton per meter) a given distance (in meters) away from the root
+
     :param x: Distance away from the root [m]
     :type x: float
     :return: A lift force per unit length [N/m]
@@ -291,6 +313,7 @@ def shear_force(x, wingbox, planform):
     """
     This function returns the values of the shear per unit length (in newton per meter) at a given distance (in meters)
     from the root
+
     :param x: The distance away from the root [m]
     :type x: float
     :param wingbox: The wingbox used for the calculation
@@ -312,6 +335,7 @@ def shear_force(x, wingbox, planform):
 def bending_moment(x, wingbox, planform):
     """
     This function returns the bending moment (in newton meter) a given distance (in meters) away from the root
+
     :param x: Distance away from the root [m]
     :type x: float
     :return: Bending moment [Nm]
@@ -332,6 +356,7 @@ def bending_moment(x, wingbox, planform):
 def torsion(x, planform):
     """
     This function returns the torsion per unit area at any distance from the root chord
+
     :param x: Distance away from the root [m]
     :type x: float
     :return: Torsion per unit area
@@ -345,6 +370,7 @@ def torsion(x, planform):
 def slope_deflection(y, material, wingbox, planform):  # dv/dy , E modulus is for one material (can be improved later)
     """
     This function returns the lateral deflection (v) at y distance away from the root chord,
+
     :param planform: Planform used
     :type planform: Planform
     :param y: Distance away from the root [m]
@@ -364,6 +390,7 @@ def slope_deflection(y, material, wingbox, planform):  # dv/dy , E modulus is fo
 def vertical_deflection(y, material, wingbox, planform):
     """
     This function calculates the vertical deflection in m at a certain distance from the root.
+
     :param y: distance from root [m]
     :type y: float
     :param material: the material the thing is made of
@@ -386,6 +413,7 @@ def vertical_deflection(y, material, wingbox, planform):
 def twist_angle(x, wingbox, material, planform):  # lower limit must be set for the fuselage
     """
     This function returns the twist angle at y distance away from the root chord
+
     :param planform: The planform used for the calculations
     :type planform: Planform
     :param x: Distance away from the root [m]
@@ -405,6 +433,7 @@ def twist_angle(x, wingbox, material, planform):  # lower limit must be set for 
 def normal_stress(x, wingbox, planform):
     """
     This function returns the maximum normal stress (in Pascal) at a given distance away from the root (in meters)
+
     :param x: Distance from the root [m]
     :type x: float
     :param wingbox: The wingbox used
@@ -419,6 +448,7 @@ def normal_stress(x, wingbox, planform):
 def shear_stress(x, wingbox, planform):
     """
     This function calculates the shear stress due to torsion
+
     :param x:distance from root
     :type x: float
     :param wingbox: The wingbox used
@@ -430,31 +460,101 @@ def shear_stress(x, wingbox, planform):
     """
     point_edge_1 = (shear_force(x, wingbox, planform) * wingbox.width(planform, x) * wingbox.height(planform, x)) / \
                    wingbox.moment_of_inertia(planform, x) - torsion(x, planform) / (
-                               2 * wingbox.thickness * (2 * wingbox.height(planform, x) * wingbox.width(planform, x)))
+                           2 * wingbox.thickness * (2 * wingbox.height(planform, x) * wingbox.width(planform, x)))
     point_edge_2 = (shear_force(x, wingbox, planform) * wingbox.width(planform, x) * wingbox.height(planform, x)) / \
                    wingbox.moment_of_inertia(planform, x) + torsion(x, planform) / (
-                               2 * wingbox.thickness * (2 * wingbox.height(planform, x) * wingbox.width(planform, x)))
+                           2 * wingbox.thickness * (2 * wingbox.height(planform, x) * wingbox.width(planform, x)))
     point_mid_1 = -1 * torsion(x, planform) / (
-                2 * wingbox.thickness * (2 * wingbox.height(planform, x) * wingbox.width(planform, x))) \
+            2 * wingbox.thickness * (2 * wingbox.height(planform, x) * wingbox.width(planform, x))) \
                   + (shear_force(x, wingbox, planform) * wingbox.Q(planform, x)) / (
-                              2 * wingbox.moment_of_inertia(planform, x) * wingbox.thickness)
+                          2 * wingbox.moment_of_inertia(planform, x) * wingbox.thickness)
     point_mid_2 = torsion(x, planform) / (
-                2 * wingbox.thickness * (2 * wingbox.height(planform, x) * wingbox.width(planform, x))) \
+            2 * wingbox.thickness * (2 * wingbox.height(planform, x) * wingbox.width(planform, x))) \
                   + (shear_force(x, wingbox, planform) * wingbox.Q(planform, x)) / (
-                              2 * wingbox.moment_of_inertia(planform, x) * wingbox.thickness)
+                          2 * wingbox.moment_of_inertia(planform, x) * wingbox.thickness)
     return point_mid_1, point_mid_2, point_edge_1, point_edge_2
 
 
 def tau_max(x, wingbox, planform):
     """
+    This function will return the maximum shear stress (according to the Mohr's circle) at a given distance away from
+    the root (in meters)
 
-    :param x:
-    :type x:
-    :param wingbox:
-    :type wingbox:
-    :param planform:
-    :type planform:
-    :return:
-    :rtype:
+    :param x: Distance away from the root [m]
+    :type x: float
+    :param wingbox: The wingbox used
+    :type wingbox: WingBox
+    :param planform: The planform used
+    :type planform: Planform
+    :return: The maximum shear stress [N/m^2]
+    :rtype: float
     """
     return math.sqrt((normal_stress(x, wingbox, planform) / 2) ** 2 + (max(shear_stress(x, wingbox, planform))) ** 2)
+
+
+def optimize_stringers(x, wingbox1, planform1):
+    """
+    This function will optimize the number of stringers (find the minimal safe number) at a given distance away from the
+    root (in meters)
+
+    :param x: Distance away from the root [m]
+    :type x: float
+    :param wingbox1: The wingbox used
+    :type wingbox1: WingBox
+    :param planform1: The planform used
+    :type planform1: Planform
+    :return: Returns the minimal safe number of stringers
+    :rtype: list
+    """
+
+    stringer_used = wingbox1.stringers[0]
+    stringer_list = []
+    wingbox_cal = WingBox(wingbox1.thickness, wingbox1.stringers, wingbox1.material)
+    planform_cal = Planform(planform1.b, planform1.cr, planform1.ct, planform1.sweep_le, planform1.spar_rear,
+                            planform1.spar_front)
+    # The following part is to make sure that only 4 full length stringer exist
+    for a in range(4):
+        stringer_list.append(stringer_used)
+
+    wingbox_cal.stringers = stringer_list
+    done = True
+
+    stress = tau_max(x, wingbox_cal, planform_cal)
+    while stress > (wingbox_cal.material.sig_yld / 2) * 0.8:
+        if len(stringer_list) * stringer_used.base > wingbox_cal.width(planform_cal, 0) or len(stringer_list) > 60:
+            done = False
+            break
+        for b in range(2):
+            stringer_list.append(stringer_used)
+        wingbox_cal.stringers = stringer_list
+        stress = tau_max(x, wingbox_cal, planform_cal)
+
+    return len(wingbox_cal.stringers), done
+
+
+def stringer_length_conversion(number_of_stringer_list, stringer, step_size, rangy):
+    """
+    This function will create a list of stringers that can be used to crate a wingbox
+
+    :param rangy: The rage used for the calculations
+    :type rangy: list
+    :param number_of_stringer_list: List of the number of stringers at a given distance
+    :type number_of_stringer_list: list of float
+    :param stringer: The stringers used
+    :type stringer: Stringer
+    :param step_size: A step size for the calculations
+    :type step_size: float
+    :return: A list of stringers
+    :rtype: list of Stringer
+    """
+
+    list_stringers = []
+
+    for a in range(int(max(number_of_stringer_list))):
+        list_stringers.append(Stringer(stringer.t, stringer.base, stringer.flange, 0, stringer.material))
+
+    for x in rangy:
+        for a in range(int(number_of_stringer_list[int(x / step_size)])):
+            list_stringers[a].x_stop = x + step_size
+
+    return list_stringers
