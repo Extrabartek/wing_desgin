@@ -5,9 +5,10 @@ import WP_41 as WP41
 
 # global constant
 g = 9.80665
-AoA = 10  # Degrees
-load_factor = 2.5
-
+AoA = 0  # Degrees
+load_factor = 1
+rho_fuel = 800 #kg/m^3
+fuel = 0
 
 # class definition list
 class Material:
@@ -278,7 +279,7 @@ class WingBox:
         :return: Mass per unit length [kg/m]
         :rtype: float
         """
-        mass = self.cross_section(planform, x) * self.material.rho
+        mass = self.cross_section(planform, x) * self.material.rho + (fuel == 1) * 2 * self.height(planform, x) * self.width(planform, x) * rho_fuel
         return mass
 
     def Q(self, planform, x):
@@ -337,7 +338,7 @@ def shear_force(x, wingbox, planform):
     """
     shear = \
         integrate.quad(
-            lambda a: WP41.Ndis0(a, AoA) * load_factor - g * np.cos(np.degrees(AoA)) * wingbox.mass_distribution(
+            lambda a: WP41.Ndis0(a, AoA) - g * np.cos(np.radians(AoA)) * wingbox.mass_distribution(
                 planform,
                 a),
             x, planform.b / 2, epsabs=0.3, epsrel=0.3)[0]
@@ -375,7 +376,7 @@ def torsion(x, planform):
     :rtype: float
     :param planform: The planform used
     """
-    return (1 / 8) * planform.chord(x) * WP41.Ndis0(x, AoA) * load_factor + WP41.Mdis(x, AoA)
+    return (1 / 8) * planform.chord(x) * WP41.Ndis0(x, AoA) + WP41.Mdis(x, AoA)
 
 
 # deflection profiles
