@@ -46,6 +46,12 @@ list_of_flange_len = np.arange(0.05, 0.16, 0.05)
 list_of_combinations = []
 i = 0
 
+fn.load_factor = 2.5
+fn.AoA = 0
+fn.fuel = 1
+WP41.q = fn.dynamic_pressure(wingbox, planform)
+print(f"Total lift {(integrate.quad(lambda a: WP41.Ndis0(a, fn.AoA), 0, planform.b /2)[0] - fn.g * (wingbox.total_weight(planform)))/((fn.weight_final / 2) * fn.load_factor * fn.g)}")
+print(f"Weight of the rest of the aircraft {(fn.weight_final / 2) * fn.load_factor * fn.g}")
 
 #Optimisation
 #"""
