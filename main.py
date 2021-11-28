@@ -5,8 +5,8 @@ import WP_41 as WP41
 
 # global constant
 g = 9.80665
-AoA = 0  # Degrees
-load_factor = 1
+AoA = 10  # Degrees
+load_factor = 2.5
 rho_fuel = 800 #kg/m^3
 fuel = 0
 
@@ -265,7 +265,7 @@ class WingBox:
             stringer_area += (x < stringer.x_stop) * stringer.area()
         return 4 * self.height(planform, x) * self.thickness + 2 * self.width(planform, x) * self.thickness \
                + stringer_area + (4 * self.height(planform, x) + 2 * self.width(planform, x)) \
-               * 1.816 * (8 / 10000)
+               * 1.816 * (1 / 1000)
 
     def mass_distribution(self, planform, x):
         """
