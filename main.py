@@ -83,19 +83,6 @@ class Planform:
         """
         return self.b * (self.cr + self.ct) * 0.5
 
-    def sweep(self, c_percent):
-        """
-        This function returns the sweep of the planform at any given percentage of the cord
-
-        :param c_percent: The percent of the cord (range from 0 to 1)
-        :type c_percent: float
-        :return: The sweep of the planform at a percentage of the cord [rad]
-        :rtype: float
-        """
-        # need to actually write the function
-        sweep = 2 * c_percent
-        return sweep
-
     def chord(self, y):
         """
         This function returns the cord of the planform at any given distance away form the root
@@ -115,10 +102,10 @@ class Stringer:
 
         :param t: Thickness of stringer in [m]
         :type t: float
-        :param w: Width of stringer in [m]
-        :type w: float
-        :param h: Height of stringer in [m]
-        :type h: float
+        :param base: Width of stringer in [m]
+        :type base: float
+        :param flange: Height of stringer in [m]
+        :type flange: float
         :param material: The material of the stringer
         :type material: Material
         :param x_stop: The distance form the root at which the stringer ends
@@ -177,8 +164,6 @@ class WingBox:
 
         :param t: Thickness of the sheets used [m]
         :type t: float
-        :param n: Number of stringer (min is 4)
-        :type n: int
         :param stringers: The list of stringers used
         :type stringers: list of Stringer
         :param material: material of wingbox

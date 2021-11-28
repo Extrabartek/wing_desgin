@@ -121,8 +121,8 @@ for t_b in list_of_box_thickness:
 
 
 # analysis
-t_w = 0.004
-t_s = 0.003
+t_w = 0.005
+t_s = 0.001
 b = 0.05
 f = 0.05
 
@@ -335,7 +335,7 @@ plt.show()
 plt.plot(rangy_range, deflection_list[0], label="Load factor: 2.5")
 plt.plot(rangy_range, deflection_list[1], label="Load factor: -1")
 plt.axis([0, planform.b / 2, min(min(deflection_list[0]), min(deflection_list[1])) * 1.1, max(max(deflection_list[0]), max(deflection_list[1])) * 1.1])
-plt.title("Design Option 1: Vertical deflection Distribution")
+plt.title("Design Option 3: Vertical deflection Distribution")
 plt.xlabel("Distance from root [m]")
 plt.ylabel("Vertical deflection [m]")
 plt.legend()
