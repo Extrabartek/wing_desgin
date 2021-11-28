@@ -24,10 +24,9 @@ WP41.b = planform.b
 WP41.cr = planform.cr
 WP41.ct = planform.ct
 
-twist_list = []
-g_list = []
-torsion_list = []
-step_size = 0.01
+twist_list = [[], []]
+torsion_list = [[], []]
+step_size = 0.2
 rangy_range = np.arange(0, planform.b / 2, step_size)
 lift_list = [[], []]
 bending_list = [[], []]
@@ -46,8 +45,8 @@ list_of_flange_len = np.arange(0.05, 0.16, 0.05)
 list_of_combinations = []
 i = 0
 
-#Optimisation
-#"""
+# Optimisation
+"""
 for t_b in list_of_box_thickness:
     print(f"I'm doing wingbox thickness {1000 * t_b: 0.3f} mm. We at i = {i}")
     for t_s in list_of_stringer_thickness:
@@ -70,11 +69,6 @@ for t_b in list_of_box_thickness:
                 fn.AoA = 10
                 fn.fuel = 1
                 WP41.q = fn.dynamic_pressure(wingbox, planform)
-                print(WP41.q)
-                for x in rangy_range:
-                    shear_list.append(fn.shear_force(x, wingbox, planform))
-                plt.plot(rangy_range, shear_list)
-                plt.show()
                 for x in rangy_range:
                     number = fn.optimize_stringers(x, test_wing, planform)
                     if not number[1]:
@@ -111,70 +105,65 @@ for t_b in list_of_box_thickness:
                             f"Wingbox number {i} is completed with weight {wingbox.total_weight(planform):.3f} kg, wingbox thickness {1000 * t_b:.3f} mm, stringer "
                             f"thickness {1000 * t_s:.3f} mm, base length {100 * s_b:.3f} cm, flange height {100 * s_f:.3f} cm, number of stri"
                             f"ngers {len(wingbox.stringers):.3f}, distribution {len_list}")
-                        plt.plot(rangy_range, number_of_strigers_list)
-                        plt.show()
-                        fn.load_factor = 2.5
-                        fn.AoA = 10
-                        fn.fuel = 0
-                        deflection1 = fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)
-                        fn.load_factor = -1
-                        fn.AoA = -10
-                        fn.fuel = 1
-                        deflection2 = fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)
-                        print(f"The maximum vertical deflection is {max(abs(deflection1), abs(deflection2))} m, allowed is 4.7 m")
                 except LookupError:
                     print(f"First wingbox")
                     print(
                         f"Wingbox number {i} is completed with weight {wingbox.total_weight(planform):.3f} kg, wingbox thickness {1000 * t_b:.3f} mm, stringer "
                         f"thickness {1000 * t_s:.3f} mm, base length {100 * s_b:.3f} cm, flange height {100 * s_f:.3f} cm, number of stri"
                         f"ngers {len(wingbox.stringers):.3f}, distribution {len_list}")
-                    plt.plot(rangy_range, number_of_strigers_list)
-                    plt.show()
-                    fn.load_factor = 2.5
-                    fn.AoA = 10
-                    fn.fuel = 0
-                    deflection1 = fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)
-                    fn.load_factor = -1
-                    fn.AoA = -10
-                    fn.fuel = 1
-                    deflection2 = fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)
-                    print(f"The maximum vertical deflection is {max(abs(deflection1), abs(deflection2))} m, allowed is 4.7 m")
                 list_of_combinations.append([wingbox, wingbox.total_weight(planform)])
                 list_of_combinations = sorted(list_of_combinations, key=lambda u: u[1])
 
 """
-#analysis
-t_w = 0.013
+# analysis
+t_w = 0.004
 t_s = 0.003
 b = 0.05
 f = 0.05
 
-#Make wingbox
-print(WP41.q)
-print(WP41.q * (integrate.quad(
-    lambda a: WP41.c(a) * ((fn.AoA == 0) * WP41.cly1(a) + (fn.AoA == 10) * WP41.cly2(a)) + (fn.AoA == -10) * WP41.cly3(
-        a), 0, planform.b / 2)[0]))
-number_of_stringers_list = []
+# Make wingbox
+number_of_strigers_list = []
+number_of_strigers_list1 = []
+number_of_strigers_list2 = []
 test_stringer = fn.Stringer(t_s, b, f, planform.b / 2, aluminum)
 test_list_of_stringer = []
 stringer_len = []
 for u in range(4):
     test_list_of_stringer.append(test_stringer)
 test_wing = fn.WingBox(t_w, test_list_of_stringer, aluminum)
-number = [0, True]
 
+number = [0, True]
+fn.load_factor = 2.5
+fn.AoA = 10
+fn.fuel = 1
+WP41.q = fn.dynamic_pressure(wingbox, planform)
 for x in rangy_range:
     number = fn.optimize_stringers(x, test_wing, planform)
     if not number[1]:
         break
     else:
-        number_of_strigers_list.append(number[0])
+        number_of_strigers_list1.append(number[0])
+
+number = [0, True]
+fn.load_factor = -1
+fn.AoA = -10
+fn.fuel = 1
+WP41.q = fn.dynamic_pressure(wingbox, planform)
+for x in rangy_range:
+    number = fn.optimize_stringers(x, test_wing, planform)
+    if not number[1]:
+        break
+    else:
+        number_of_strigers_list2.append(number[0])
+
+number_of_strigers_list = list(map(max, number_of_strigers_list1, number_of_strigers_list2))
 stringer_len = fn.stringer_length_conversion(number_of_strigers_list, test_stringer, step_size, rangy_range)
 wingbox.stringers = stringer_len
+wingbox.thickness = t_w
 len_list = []
 for stringer in wingbox.stringers:
     len_list.append(stringer.x_stop)
-
+fn.fuel = 0
 print(
     f"Wingbox is completed with weight {wingbox.total_weight(planform):.3f} kg, wingbox thickness {1000 * t_w:.3f} mm, stringer "
     f"thickness {1000 * t_s:.3f} mm, base length {100 * b:.3f} cm, flange height {100 * f:.3f} cm, number of stri"
@@ -182,13 +171,18 @@ print(
 
 # Analysis plots
 plt.plot(rangy_range, number_of_strigers_list)
+plt.axis([0, planform.b / 2, 0, int(max(number_of_strigers_list) * 1.1)])
+plt.grid()
+plt.title("Design Option 1: Stringer Distribution")
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Number of stringers")
+plt.tight_layout()
 plt.show()
 
-fn.load_factor = 1
-fn.AoA = 0
-fn.fuel = 0
-print(f"The maximum vertical deflection is {fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)} m, allowed is 4.7 m")
-print(f"The twist angle at the tip is {np.degrees(fn.twist_angle(planform.b/2, wingbox, aluminum, planform))} degrees")
+fn.load_factor = 2.5
+fn.AoA = 10
+fn.fuel = 1
+WP41.q = fn.dynamic_pressure(wingbox, planform)
 for x in rangy_range:
     lift_list[0].append(WP41.Ndis0(x, fn.AoA))
     torsion_list[0].append(fn.torsion(x, planform))
@@ -245,7 +239,16 @@ plt.tight_layout()
 plt.grid()
 plt.legend()
 plt.show()
-plt.plot(rangy_range, bending_list)
+
+plt.plot(rangy_range, bending_list[0], label="Load factor: 2.5")
+plt.plot(rangy_range, bending_list[1], label="Load factor: -1")
+plt.axis([0, planform.b / 2, int(min(min(bending_list[0]), min(bending_list[1])) * 1.1), int(max(max(bending_list[0]), max(bending_list[1])) * 1.1)])
+plt.title("Design Option 1: Internal Bending Moment Distribution")
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Internal bending moment [Nm]")
+plt.tight_layout()
+plt.grid()
+plt.legend()
 plt.show()
 plt.plot(rangy_range, shear_list)
 plt.show()
@@ -262,10 +265,49 @@ plt.tight_layout()
 plt.grid()
 plt.legend()
 plt.show()
+
 plt.plot(rangy_range, mass_list)
+plt.axis([0, planform.b / 2, 0, int(max(mass_list) * 1.1)])
+plt.title("Design Option 1: Mass Distribution")
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Mass per unit area [kg/m]")
+plt.tight_layout()
+plt.grid()
 plt.show()
+
 plt.plot(rangy_range, MMOI_list)
+plt.axis([0, planform.b / 2, 0, float(max(MMOI_list)) * 1.1])
+plt.title("Design Option 1: Moment of Inertia Distribution")
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Moment of inertia [$m^4$]")
+plt.tight_layout()
+plt.grid()
 plt.show()
+
 plt.plot(rangy_range, torsional_list)
+plt.axis([0, planform.b / 2, 0, float(max(torsional_list)) * 1.1])
+plt.title("Design Option 1: Torsional Constant Distribution")
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Torsional Constant [$m^4$]")
+plt.tight_layout()
+plt.grid()
 plt.show()
-"""
+
+# plt.plot(rangy_range, deflection_list[0], label="Load factor: 2.5")
+# plt.plot(rangy_range, deflection_list[1])
+# plt.axis([0, planform.b / 2, min(min(deflection_list[0]), min(deflection_list[1])) * 1.1, max(max(deflaction_list[0]), max(deflaction_list[1])) * 1.1)])
+# plt.legend()
+# plt.show()
+
+plt.plot(rangy_range, twist_list[0], label="Load factor: 2.5")
+plt.plot(rangy_range, twist_list[1], label="Load factor: -1")
+plt.axis([0, planform.b / 2, min(min(twist_list[0]), min(twist_list[1])) * 1.1, max(max(twist_list[0]), max(twist_list[1])) * 1.1])
+plt.title("Design Option 1: Wing twist Angle Distribution")
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Twist angle [deg]")
+plt.tight_layout()
+plt.grid()
+plt.legend()
+plt.show()
+
+

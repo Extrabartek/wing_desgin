@@ -340,10 +340,10 @@ def shear_force(x, wingbox, planform):
     :return: The shear force per unit length [N/m]
     :rtype: float
     """
-    shear = \
-        integrate.quad(
-            lambda a: (WP41.Ndis0(a, AoA) - g * np.cos(np.radians(AoA)) * wingbox.mass_distribution(planform, a)), x,
-            planform.b / 2, epsabs=0.3, epsrel=0.3)[0]
+    shear = integrate.quad(lambda a: (WP41.Ndis0(a, AoA)), x, planform.b / 2, epsabs=0.3, epsrel=0.3)[0] - \
+            g * np.cos(np.radians(AoA)) * load_factor * \
+            integrate.quad(lambda a: wingbox.mass_distribution(planform, a), x, planform.b / 2, epsabs=0.3, epsrel=0.3)[
+                0]
     return shear
 
 
