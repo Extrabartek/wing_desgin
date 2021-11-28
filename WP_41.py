@@ -135,7 +135,7 @@ def Ndis0(y, AoA):
     if AoA == 10:
         Ndis = Ldis(y, cly2) * np.cos(np.radians(10)) + Ddis(y, cdy2) * np.sin(np.radians(10))
     if AoA == -10:
-        Ndis = Ndis = Ldis(y, cly3) * np.cos(np.radians(-10)) + Ddis(y, cdy3) * np.sin(np.radians(-10))
+        Ndis = Ldis(y, cly3) * np.cos(np.radians(-10)) + Ddis(y, cdy3) * np.sin(np.radians(-10))
     return Ndis
 
 

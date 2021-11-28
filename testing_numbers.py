@@ -15,7 +15,6 @@ Parameter input
 aluminum = fn.Material(2700, 276 * (10 ** 6), 310 * (10 ** 6), 68.9 * (10 ** 9), 26 * (10 ** 9))
 planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
 stringer_full = fn.Stringer(0.007, 0.15, 0.15, planform.b / 2, aluminum)
-weight_final = 23528
 list_stringers = []
 for x in range(4):
     list_stringers.append(stringer_full)
@@ -23,16 +22,11 @@ wingbox = fn.WingBox(0.005, list_stringers, aluminum)
 WP41.b = planform.b
 WP41.cr = planform.cr
 WP41.ct = planform.ct
-WP41.q = fn.load_factor * fn.g * (
-        weight_final / 2 + integrate.quad(lambda a: wingbox.mass_distribution(planform, a), 0, planform.b / 2)[
-    0]) / (integrate.quad(
-    lambda a: WP41.c(a) * ((fn.AoA == 0) * WP41.cly1(a) + (fn.AoA == 10) * WP41.cly2(a)) + (fn.AoA == -10) * WP41.cly3(
-        a), 0, planform.b / 2)[0])
 
 twist_list = []
 g_list = []
 torsion_list = []
-step_size = 0.2
+step_size = 0.01
 rangy_range = np.arange(0, planform.b / 2, step_size)
 lift_list = []
 bending_list = []
@@ -45,7 +39,7 @@ MMOI_list = []
 torsional_list = []
 number_of_strigers_list = []
 stringer_len = []
-list_of_box_thickness = np.arange(0.004, 0.010, 0.001)
+list_of_box_thickness = np.arange(0.004, 0.012, 0.001)
 list_of_stringer_thickness = np.arange(0.001, 0.004, 0.001)
 list_of_base_len = np.arange(0.05, 0.16, 0.05)
 list_of_flange_len = np.arange(0.05, 0.16, 0.05)
@@ -74,7 +68,13 @@ for t_b in list_of_box_thickness:
                 number = [0, True]
                 fn.load_factor = 2.5
                 fn.AoA = 10
-                fn.fuel = 0
+                fn.fuel = 1
+                WP41.q = fn.dynamic_pressure(wingbox, planform)
+                print(WP41.q)
+                for x in rangy_range:
+                    shear_list.append(fn.shear_force(x, wingbox, planform))
+                plt.plot(rangy_range, shear_list)
+                plt.show()
                 for x in rangy_range:
                     number = fn.optimize_stringers(x, test_wing, planform)
                     if not number[1]:
@@ -88,6 +88,7 @@ for t_b in list_of_box_thickness:
                 fn.load_factor = -1
                 fn.AoA = -10
                 fn.fuel = 1
+                WP41.q = fn.dynamic_pressure(wingbox, planform)
                 for x in rangy_range:
                     number = fn.optimize_stringers(x, test_wing, planform)
                     if not number[1]:
@@ -96,7 +97,6 @@ for t_b in list_of_box_thickness:
                         number_of_strigers_list2.append(number[0])
                 if not number[1]:
                     break
-
                 number_of_strigers_list = list(map(max, number_of_strigers_list1, number_of_strigers_list2))
                 stringer_len = fn.stringer_length_conversion(number_of_strigers_list, test_stringer, step_size, rangy_range)
                 wingbox.stringers = stringer_len
@@ -113,7 +113,15 @@ for t_b in list_of_box_thickness:
                             f"ngers {len(wingbox.stringers):.3f}, distribution {len_list}")
                         plt.plot(rangy_range, number_of_strigers_list)
                         plt.show()
-                        print(f"The maximum vertical deflection is {fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)} m, allowed is 4.7 m")
+                        fn.load_factor = 2.5
+                        fn.AoA = 10
+                        fn.fuel = 0
+                        deflection1 = fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)
+                        fn.load_factor = -1
+                        fn.AoA = -10
+                        fn.fuel = 1
+                        deflection2 = fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)
+                        print(f"The maximum vertical deflection is {max(abs(deflection1), abs(deflection2))} m, allowed is 4.7 m")
                 except LookupError:
                     print(f"First wingbox")
                     print(
@@ -122,7 +130,15 @@ for t_b in list_of_box_thickness:
                         f"ngers {len(wingbox.stringers):.3f}, distribution {len_list}")
                     plt.plot(rangy_range, number_of_strigers_list)
                     plt.show()
-                    print(f"The maximum vertical deflection is {fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)} m, allowed is 4.7 m")
+                    fn.load_factor = 2.5
+                    fn.AoA = 10
+                    fn.fuel = 0
+                    deflection1 = fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)
+                    fn.load_factor = -1
+                    fn.AoA = -10
+                    fn.fuel = 1
+                    deflection2 = fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)
+                    print(f"The maximum vertical deflection is {max(abs(deflection1), abs(deflection2))} m, allowed is 4.7 m")
                 list_of_combinations.append([wingbox, wingbox.total_weight(planform)])
                 list_of_combinations = sorted(list_of_combinations, key=lambda u: u[1])
 

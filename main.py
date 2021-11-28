@@ -9,6 +9,7 @@ AoA = 10  # Degrees
 load_factor = 2.5
 rho_fuel = 800 #kg/m^3
 fuel = 0
+weight_final = 23528
 
 # class definition list
 class Material:
@@ -337,11 +338,7 @@ def shear_force(x, wingbox, planform):
     :rtype: float
     """
     shear = \
-        integrate.quad(
-            lambda a: WP41.Ndis0(a, AoA) - g * np.cos(np.radians(AoA)) * wingbox.mass_distribution(
-                planform,
-                a),
-            x, planform.b / 2, epsabs=0.3, epsrel=0.3)[0]
+        integrate.quad(lambda a: (WP41.Ndis0(a, AoA) - g * np.cos(np.radians(AoA)) * wingbox.mass_distribution(planform, a)), x, planform.b / 2, epsabs=0.3, epsrel=0.3)[0]
     return shear
 
 
@@ -571,3 +568,10 @@ def stringer_length_conversion(number_of_stringer_list, stringer, step_size, ran
             list_stringers[a].x_stop = x + step_size
 
     return list_stringers
+
+def dynamic_pressure(wingbox, planform):
+
+    q = load_factor * g * ((weight_final / 2) + integrate.quad(lambda a: wingbox.mass_distribution(planform, a), 0, planform.b / 2)[0]) / \
+        (integrate.quad(lambda a: WP41.c(a) * ((AoA == 0) * WP41.cly1(a) + (AoA == 10) * WP41.cly2(a) + (AoA == -10) * WP41.cly3(a)), 0, planform.b / 2)[0])
+
+    return q
