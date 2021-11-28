@@ -504,7 +504,15 @@ def tau_max(x, wingbox, planform):
     :return: The maximum shear stress [N/m^2]
     :rtype: float
     """
-    return math.sqrt((normal_stress(x, wingbox, planform) / 2) ** 2 + (max(shear_stress(x, wingbox, planform))) ** 2)
+    # zero line
+    point1 = math.sqrt(shear_stress(x, wingbox, planform)[2] ** 2)
+    point2 = math.sqrt(shear_stress(x, wingbox, planform)[3] ** 2)
+
+    # edge
+    point3 = math.sqrt(shear_stress(x, wingbox, planform)[1] ** 2 + (normal_stress(x, wingbox, planform) / 2) ** 2)
+    point4 = math.sqrt(shear_stress(x, wingbox, planform)[1] ** 2 + (normal_stress(x, wingbox, planform) / 2) ** 2)
+
+    return max(point1, point2, point3, point4)
 
 
 def optimize_stringers(x, wingbox1, planform1):
@@ -585,9 +593,10 @@ def dynamic_pressure(wingbox, planform):
     :return: The dynamic pressure in [kg/m^3 * (m/s)]
     """
     q = load_factor * g * ((weight_final / 2)
-                          + integrate.quad(lambda a: wingbox.mass_distribution(planform, a), 0, planform.b / 2)[0]) / \
+                           + integrate.quad(lambda a: wingbox.mass_distribution(planform, a), 0, planform.b / 2,
+                                            epsrel=0.1, epsabs=0.1)[0]) / \
         (integrate.quad(lambda a: WP41.c(a) * (
-                    (AoA == 0) * WP41.cly1(a) + (AoA == 10) * WP41.cly2(a) + (AoA == -10) * WP41.cly3(a)), 0,
+                (AoA == 0) * WP41.cly1(a) + (AoA == 10) * WP41.cly2(a) + (AoA == -10) * WP41.cly3(a)), 0,
                         planform.b / 2)[0])
 
     return q

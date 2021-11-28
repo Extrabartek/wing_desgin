@@ -8,6 +8,7 @@ import scipy.integrate as integrate
 import WP_41 as WP41
 import main as fn
 
+
 '''
 Parameter input 
 '''
@@ -28,12 +29,11 @@ g_list = []
 torsion_list = []
 step_size = 0.01
 rangy_range = np.arange(0, planform.b / 2, step_size)
-lift_list = []
-bending_list = []
-shear_list = []
-deflection_list = []
-normal_stress_list = []
-shear_stress_list = []
+lift_list = [[], []]
+bending_list = [[], []]
+shear_list = [[], []]
+deflection_list = [[], []]
+tau_max_list = [[], []]
 mass_list = []
 MMOI_list = []
 torsional_list = []
@@ -46,13 +46,6 @@ list_of_flange_len = np.arange(0.05, 0.16, 0.05)
 list_of_combinations = []
 i = 0
 
-fn.load_factor = 2.5
-fn.AoA = 0
-fn.fuel = 1
-WP41.q = fn.dynamic_pressure(wingbox, planform)
-print(f"Total lift {(integrate.quad(lambda a: WP41.Ndis0(a, fn.AoA), 0, planform.b /2)[0] - fn.g * (wingbox.total_weight(planform)))/((fn.weight_final / 2) * fn.load_factor * fn.g)}")
-print(f"Weight of the rest of the aircraft {(fn.weight_final / 2) * fn.load_factor * fn.g}")
-
 #Optimisation
 #"""
 for t_b in list_of_box_thickness:
@@ -60,6 +53,7 @@ for t_b in list_of_box_thickness:
     for t_s in list_of_stringer_thickness:
         for s_b in list_of_base_len:
             for s_f in list_of_flange_len:
+                print(f"We are at iteration = {i}")
                 number_of_strigers_list = []
                 number_of_strigers_list1 = []
                 number_of_strigers_list2 = []
@@ -196,24 +190,77 @@ fn.fuel = 0
 print(f"The maximum vertical deflection is {fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)} m, allowed is 4.7 m")
 print(f"The twist angle at the tip is {np.degrees(fn.twist_angle(planform.b/2, wingbox, aluminum, planform))} degrees")
 for x in rangy_range:
-    lift_list.append(WP41.Ndis0(x, fn.AoA))
-    torsion_list.append(fn.torsion(x, planform))
-    bending_list.append(fn.bending_moment(x, wingbox, planform))
-    shear_list.append(fn.shear_force(x, wingbox, planform))
-    shear_stress_list.append(fn.shear_stress(x, wingbox, planform))
+    lift_list[0].append(WP41.Ndis0(x, fn.AoA))
+    torsion_list[0].append(fn.torsion(x, planform))
+    bending_list[0].append(fn.bending_moment(x, wingbox, planform))
+    shear_list[0].append(fn.shear_force(x, wingbox, planform))
+    tau_max_list[0].append(fn.tau_max(x, wingbox, planform))
     mass_list.append(wingbox.mass_distribution(planform, x))
     MMOI_list.append(wingbox.moment_of_inertia(planform, x))
     torsional_list.append(wingbox.torsional_constant(x, planform))
+    twist_list[0].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
+    # deflection_list[0].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
 
-plt.plot(rangy_range, lift_list)
+fn.load_factor = -1
+fn.AoA = -10
+fn.fuel = 1
+WP41.q = fn.dynamic_pressure(wingbox, planform)
+for x in rangy_range:
+    lift_list[1].append(WP41.Ndis0(x, fn.AoA))
+    torsion_list[1].append(fn.torsion(x, planform))
+    bending_list[1].append(fn.bending_moment(x, wingbox, planform))
+    shear_list[1].append(fn.shear_force(x, wingbox, planform))
+    tau_max_list[1].append(fn.tau_max(x, wingbox, planform))
+    twist_list[1].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
+    # deflection_list[1].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
+
+# print(f"The maximum vertical deflection is {max(abs(deflection_list[0][-1]), abs(deflection_list[1][-1]))} m, allowed is 4.7 m")
+# print(f"The twist angle at the tip is {max(abs(twist_list[0][-1]), abs(twist_list[1][-1]))} degrees")
+
+#creating lines for the tau_max graph
+yid_list = []
+proc80_yid_list = []
+for x in rangy_range:
+    yid_list.append(aluminum.sig_yld / 2)
+    proc80_yid_list.append((aluminum.sig_yld / 2) * 0.8)
+
+plt.plot(rangy_range, lift_list[0], label="Load factor: 2.5")
+plt.plot(rangy_range, lift_list[1], label="Load factor: -1")
+plt.axis([0, planform.b / 2, int(min(min(lift_list[0]), min(lift_list[1])) * 1.1), int(max(max(lift_list[0]), max(lift_list[1])) * 1.1)])
+plt.title("Design Option 1: Lift Distribution")
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Lift per unit length[N/m]")
+plt.tight_layout()
+plt.grid()
+plt.legend()
 plt.show()
-plt.plot(rangy_range, torsion_list)
+
+plt.plot(rangy_range, torsion_list[0], label="Load factor: 2.5")
+plt.plot(rangy_range, torsion_list[1], label="Load factor: -1")
+plt.axis([0, planform.b / 2, int(min(min(torsion_list[0]), min(torsion_list[1])) * 1.1), int(max(max(torsion_list[0]), max(torsion_list[1])) * 1.1)])
+plt.title("Design Option 1: Internal Torque Distribution")
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Torque per unit length [Nm/m]")
+plt.tight_layout()
+plt.grid()
+plt.legend()
 plt.show()
 plt.plot(rangy_range, bending_list)
 plt.show()
 plt.plot(rangy_range, shear_list)
 plt.show()
-plt.plot(rangy_range, shear_stress_list)
+
+plt.plot(rangy_range, tau_max_list[0], label="Load factor: 2.5")
+plt.plot(rangy_range, tau_max_list[1], label="Load factor: -1")
+plt.axis([0, planform.b / 2, int(min(min(tau_max_list[0]), min(tau_max_list[1])) * 1.1), int(yid_list[0] * 1.1)])
+plt.plot(rangy_range, yid_list, label="Half yield stress")
+plt.plot(rangy_range, proc80_yid_list, label="80% of half yield stress")
+plt.title("Design Option 1: Maximum Shear Stress Distribution")
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Shear stress [Pa]")
+plt.tight_layout()
+plt.grid()
+plt.legend()
 plt.show()
 plt.plot(rangy_range, mass_list)
 plt.show()
