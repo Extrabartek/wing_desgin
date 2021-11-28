@@ -26,7 +26,7 @@ WP41.ct = planform.ct
 
 twist_list = [[], []]
 torsion_list = [[], []]
-step_size = 0.1
+step_size = 0.25
 rangy_range = np.arange(0, planform.b / 2, step_size)
 lift_list = [[], []]
 bending_list = [[], []]
@@ -123,8 +123,8 @@ for t_b in list_of_box_thickness:
 # analysis
 t_w = 0.004
 t_s = 0.003
-b = 0.15
-f = 0.15
+b = 0.05
+f = 0.05
 
 # Make wingbox
 number_of_strigers_list = []
@@ -175,6 +175,7 @@ print(
     f"ngers {len(wingbox.stringers):.3f}, distribution {len_list}")
 
 # Analysis plots
+'''
 plt.plot(rangy_range, number_of_strigers_list)
 plt.axis([0, planform.b / 2, 0, int(max(number_of_strigers_list) * 1.1)])
 plt.grid()
@@ -183,40 +184,46 @@ plt.xlabel("Distance from root [m]")
 plt.ylabel("Number of stringers")
 plt.tight_layout()
 plt.show()
+'''
+
+step_size = 0.5
+rangy_range = np.arange(0, planform.b / 2, step_size)
 
 fn.load_factor = 2.5
 fn.AoA = 10
 fn.fuel = 1
 WP41.q = fn.dynamic_pressure(wingbox, planform)
 for x in rangy_range:
-    lift_list[0].append(WP41.Ndis0(x, fn.AoA))
-    torsion_list[0].append(fn.torsion(x, planform))
-    bending_list[0].append(fn.bending_moment(x, wingbox, planform))
-    shear_list[0].append(fn.shear_force(x, wingbox, planform))
-    tau_max_list[0].append(fn.tau_max(x, wingbox, planform))
-    mass_list.append(wingbox.mass_distribution(planform, x))
-    MMOI_list.append(wingbox.moment_of_inertia(planform, x))
-    torsional_list.append(wingbox.torsional_constant(x, planform))
-    twist_list[0].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
-    # deflection_list[0].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
+    # lift_list[0].append(WP41.Ndis0(x, fn.AoA))
+    # torsion_list[0].append(fn.torsion(x, planform))
+    # bending_list[0].append(fn.bending_moment(x, wingbox, planform))
+    # shear_list[0].append(fn.shear_force(x, wingbox, planform))
+    # tau_max_list[0].append(fn.tau_max(x, wingbox, planform))
+    # mass_list.append(wingbox.mass_distribution(planform, x))
+    # MMOI_list.append(wingbox.moment_of_inertia(planform, x))
+    # torsional_list.append(wingbox.torsional_constant(x, planform))
+    # twist_list[0].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
+    deflection_list[0].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
+    print("dome")
 
 fn.load_factor = -1
 fn.AoA = -10
 fn.fuel = 1
 WP41.q = fn.dynamic_pressure(wingbox, planform)
 for x in rangy_range:
-    lift_list[1].append(WP41.Ndis0(x, fn.AoA))
-    torsion_list[1].append(fn.torsion(x, planform))
-    bending_list[1].append(fn.bending_moment(x, wingbox, planform))
-    shear_list[1].append(fn.shear_force(x, wingbox, planform))
-    tau_max_list[1].append(fn.tau_max(x, wingbox, planform))
-    twist_list[1].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
-    # deflection_list[1].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
-
+    # lift_list[1].append(WP41.Ndis0(x, fn.AoA))
+    # torsion_list[1].append(fn.torsion(x, planform))
+    # bending_list[1].append(fn.bending_moment(x, wingbox, planform))
+    # shear_list[1].append(fn.shear_force(x, wingbox, planform))
+    # tau_max_list[1].append(fn.tau_max(x, wingbox, planform))
+    # twist_list[1].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
+    deflection_list[1].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
+    print("dome")
 # print(f"The maximum vertical deflection is {max(abs(deflection_list[0][-1]), abs(deflection_list[1][-1]))} m, allowed is 4.7 m")
 # print(f"The twist angle at the tip is {max(abs(twist_list[0][-1]), abs(twist_list[1][-1]))} degrees")
 
 #creating lines for the tau_max graph
+'''
 yid_list = []
 proc80_yid_list = []
 for x in rangy_range:
@@ -323,5 +330,14 @@ plt.tight_layout()
 plt.grid()
 plt.legend()
 plt.show()
+'''
 
-
+plt.plot(rangy_range, deflection_list[0], label="Load factor: 2.5")
+plt.plot(rangy_range, deflection_list[1], label="Load factor: -1")
+plt.axis([0, planform.b / 2, min(min(deflection_list[0]), min(deflection_list[1])) * 1.1, max(max(deflection_list[0]), max(deflection_list[1])) * 1.1])
+plt.title("Design Option 1: Vertical deflection Distribution")
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Vertical deflection [m]")
+plt.legend()
+plt.grid()
+plt.show()
