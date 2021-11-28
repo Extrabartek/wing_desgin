@@ -26,7 +26,7 @@ WP41.ct = planform.ct
 
 twist_list = [[], []]
 torsion_list = [[], []]
-step_size = 0.2
+step_size = 0.1
 rangy_range = np.arange(0, planform.b / 2, step_size)
 lift_list = [[], []]
 bending_list = [[], []]
@@ -114,11 +114,11 @@ for t_b in list_of_box_thickness:
                 list_of_combinations.append([wingbox, wingbox.total_weight(planform)])
                 list_of_combinations = sorted(list_of_combinations, key=lambda u: u[1])
 
-"""
+
 # analysis
 t_w = 0.004
 t_s = 0.003
-b = 0.05
+b = 0.15
 f = 0.05
 
 # Make wingbox
@@ -173,7 +173,7 @@ print(
 plt.plot(rangy_range, number_of_strigers_list)
 plt.axis([0, planform.b / 2, 0, int(max(number_of_strigers_list) * 1.1)])
 plt.grid()
-plt.title("Design Option 1: Stringer Distribution")
+plt.title("Design Option 2: Stringer Distribution")
 plt.xlabel("Distance from root [m]")
 plt.ylabel("Number of stringers")
 plt.tight_layout()
@@ -221,7 +221,7 @@ for x in rangy_range:
 plt.plot(rangy_range, lift_list[0], label="Load factor: 2.5")
 plt.plot(rangy_range, lift_list[1], label="Load factor: -1")
 plt.axis([0, planform.b / 2, int(min(min(lift_list[0]), min(lift_list[1])) * 1.1), int(max(max(lift_list[0]), max(lift_list[1])) * 1.1)])
-plt.title("Design Option 1: Lift Distribution")
+plt.title("Design Option 2: Lift Distribution")
 plt.xlabel("Distance from root [m]")
 plt.ylabel("Lift per unit length[N/m]")
 plt.tight_layout()
@@ -232,7 +232,7 @@ plt.show()
 plt.plot(rangy_range, torsion_list[0], label="Load factor: 2.5")
 plt.plot(rangy_range, torsion_list[1], label="Load factor: -1")
 plt.axis([0, planform.b / 2, int(min(min(torsion_list[0]), min(torsion_list[1])) * 1.1), int(max(max(torsion_list[0]), max(torsion_list[1])) * 1.1)])
-plt.title("Design Option 1: Internal Torque Distribution")
+plt.title("Design Option 2: Internal Torque Distribution")
 plt.xlabel("Distance from root [m]")
 plt.ylabel("Torque per unit length [Nm/m]")
 plt.tight_layout()
@@ -243,7 +243,7 @@ plt.show()
 plt.plot(rangy_range, bending_list[0], label="Load factor: 2.5")
 plt.plot(rangy_range, bending_list[1], label="Load factor: -1")
 plt.axis([0, planform.b / 2, int(min(min(bending_list[0]), min(bending_list[1])) * 1.1), int(max(max(bending_list[0]), max(bending_list[1])) * 1.1)])
-plt.title("Design Option 1: Internal Bending Moment Distribution")
+plt.title("Design Option 2: Internal Bending Moment Distribution")
 plt.xlabel("Distance from root [m]")
 plt.ylabel("Internal bending moment [Nm]")
 plt.tight_layout()
@@ -254,7 +254,7 @@ plt.show()
 plt.plot(rangy_range, shear_list[0], label="Load factor: 2.5")
 plt.plot(rangy_range, shear_list[1], label="Load factor: -1")
 plt.axis([0, planform.b / 2, int(min(min(shear_list[0]), min(shear_list[1])) * 1.1), int(max(max(shear_list[0]), max(shear_list[1])) * 1.1)])
-plt.title("Design Option 1: Internal Shear Force Distribution")
+plt.title("Design Option 2: Internal Shear Force Distribution")
 plt.xlabel("Distance from root [m]")
 plt.ylabel("Internal shear force [N]")
 plt.tight_layout()
@@ -267,7 +267,7 @@ plt.plot(rangy_range, tau_max_list[1], label="Load factor: -1")
 plt.axis([0, planform.b / 2, int(min(min(tau_max_list[0]), min(tau_max_list[1])) * 1.1), int(yid_list[0] * 1.1)])
 plt.plot(rangy_range, yid_list, label="Half yield stress")
 plt.plot(rangy_range, proc80_yid_list, label="80% of half yield stress")
-plt.title("Design Option 1: Maximum Shear Stress Distribution")
+plt.title("Design Option 2: Maximum Shear Stress Distribution")
 plt.xlabel("Distance from root [m]")
 plt.ylabel("Shear stress [Pa]")
 plt.tight_layout()
@@ -277,7 +277,7 @@ plt.show()
 
 plt.plot(rangy_range, mass_list)
 plt.axis([0, planform.b / 2, 0, int(max(mass_list) * 1.1)])
-plt.title("Design Option 1: Mass Distribution")
+plt.title("Design Option 2: Mass Distribution")
 plt.xlabel("Distance from root [m]")
 plt.ylabel("Mass per unit area [kg/m]")
 plt.tight_layout()
