@@ -115,7 +115,7 @@ for t_b in list_of_box_thickness:
                 list_of_combinations = sorted(list_of_combinations, key=lambda u: u[1])
 """
 # t_w = 0.004, t_s = 0.003, b = 0.05, f = 0.05 stringers 34 (max 60) done
-# t_w = 0.004, t_s = 0.003, b = 0.15, f = 0.05 max 20
+# t_w = 0.004, t_s = 0.003, b = 0.15, f = 0.05 max 20 done
 # t_W = 0.005, t_s = 0.001, b = 0.05, f = 0.05 max 8
 # t_w = 0.004, t_s = 0.003, b = 0.15, f = 0.15 max 20
 
@@ -124,7 +124,7 @@ for t_b in list_of_box_thickness:
 t_w = 0.004
 t_s = 0.003
 b = 0.15
-f = 0.05
+f = 0.15
 
 # Make wingbox
 number_of_strigers_list = []
