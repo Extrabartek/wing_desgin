@@ -7,9 +7,10 @@ import WP_41 as WP41
 g = 9.80665
 AoA = 10  # Degrees
 load_factor = 2.5
-rho_fuel = 800 #kg/m^3
+rho_fuel = 800  # kg/m^3
 fuel = 0
 weight_final = 23528
+
 
 # class definition list
 class Material:
@@ -280,7 +281,9 @@ class WingBox:
         :return: Mass per unit length [kg/m]
         :rtype: float
         """
-        mass = self.cross_section(planform, x) * self.material.rho + (fuel == 1) * 2 * self.height(planform, x) * self.width(planform, x) * rho_fuel
+        mass = self.cross_section(planform, x) * self.material.rho + (fuel == 1) * 2 * self.height(planform,
+                                                                                                   x) * self.width(
+            planform, x) * rho_fuel
         return mass
 
     def Q(self, planform, x):
@@ -338,7 +341,9 @@ def shear_force(x, wingbox, planform):
     :rtype: float
     """
     shear = \
-        integrate.quad(lambda a: (WP41.Ndis0(a, AoA) - g * np.cos(np.radians(AoA)) * wingbox.mass_distribution(planform, a)), x, planform.b / 2, epsabs=0.3, epsrel=0.3)[0]
+        integrate.quad(
+            lambda a: (WP41.Ndis0(a, AoA) - g * np.cos(np.radians(AoA)) * wingbox.mass_distribution(planform, a)), x,
+            planform.b / 2, epsabs=0.3, epsrel=0.3)[0]
     return shear
 
 
@@ -569,9 +574,20 @@ def stringer_length_conversion(number_of_stringer_list, stringer, step_size, ran
 
     return list_stringers
 
-def dynamic_pressure(wingbox, planform):
 
-    q = load_factor * g * ((weight_final / 2) + integrate.quad(lambda a: wingbox.mass_distribution(planform, a), 0, planform.b / 2)[0]) / \
-        (integrate.quad(lambda a: WP41.c(a) * ((AoA == 0) * WP41.cly1(a) + (AoA == 10) * WP41.cly2(a) + (AoA == -10) * WP41.cly3(a)), 0, planform.b / 2)[0])
+def dynamic_pressure(wingbox, planform):
+    """
+    This function calculates the dynamic pressure needed for a certain load factor
+    :param wingbox: The wingbox used
+    :type wingbox: WingBox
+    :param planform: The planform used
+    :type planform: Planform
+    :return: The dynamic pressure in [kg/m^3 * (m/s)]
+    """
+    q = load_factor * g * ((weight_final / 2)
+                          + integrate.quad(lambda a: wingbox.mass_distribution(planform, a), 0, planform.b / 2)[0]) / \
+        (integrate.quad(lambda a: WP41.c(a) * (
+                    (AoA == 0) * WP41.cly1(a) + (AoA == 10) * WP41.cly2(a) + (AoA == -10) * WP41.cly3(a)), 0,
+                        planform.b / 2)[0])
 
     return q
