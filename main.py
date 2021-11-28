@@ -590,7 +590,7 @@ def dynamic_pressure(wingbox, planform):
     :type wingbox: WingBox
     :param planform: The planform used
     :type planform: Planform
-    :return: The dynamic pressure in [kg/m^3 * (m/s)]
+    :return: The dynamic pressure in [kg/m*s^2]
     """
     q = load_factor * g * ((weight_final / 2)
                            + integrate.quad(lambda a: wingbox.mass_distribution(planform, a), 0, planform.b / 2,
