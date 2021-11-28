@@ -544,7 +544,7 @@ def optimize_stringers(x, wingbox1, planform1):
 
     stress = tau_max(x, wingbox_cal, planform_cal)
     while stress > (wingbox_cal.material.sig_yld / 2) * 0.8:
-        if len(stringer_list) * stringer_used.base > wingbox_cal.width(planform_cal, 0) or len(stringer_list) > 60:
+        if len(stringer_list) * stringer_used.base > wingbox_cal.width(planform_cal, 0) or len(stringer_list) > 20:
             done = False
             break
         for b in range(2):

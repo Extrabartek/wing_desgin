@@ -38,10 +38,10 @@ MMOI_list = []
 torsional_list = []
 number_of_strigers_list = []
 stringer_len = []
-list_of_box_thickness = np.arange(0.004, 0.012, 0.001)
-list_of_stringer_thickness = np.arange(0.001, 0.004, 0.001)
-list_of_base_len = np.arange(0.05, 0.16, 0.05)
-list_of_flange_len = np.arange(0.05, 0.16, 0.05)
+list_of_box_thickness = np.arange(0.003, 0.010, 0.001)
+list_of_stringer_thickness = np.arange(0.001, 0.006, 0.001)
+list_of_base_len = np.arange(0.15, 0.31, 0.05)
+list_of_flange_len = np.arange(0.15, 0.31, 0.05)
 list_of_combinations = []
 i = 0
 
@@ -113,6 +113,11 @@ for t_b in list_of_box_thickness:
                         f"ngers {len(wingbox.stringers):.3f}, distribution {len_list}")
                 list_of_combinations.append([wingbox, wingbox.total_weight(planform)])
                 list_of_combinations = sorted(list_of_combinations, key=lambda u: u[1])
+"""
+# t_w = 0.004, t_s = 0.003, b = 0.05, f = 0.05 stringers 34 (max 60) done
+# t_w = 0.004, t_s = 0.003, b = 0.15, f = 0.05 max 20
+# t_W = 0.005, t_s = 0.001, b = 0.05, f = 0.05 max 8
+# t_w = 0.004, t_s = 0.003, b = 0.15, f = 0.15 max 20
 
 
 # analysis
@@ -286,7 +291,7 @@ plt.show()
 
 plt.plot(rangy_range, MMOI_list)
 plt.axis([0, planform.b / 2, 0, float(max(MMOI_list)) * 1.1])
-plt.title("Design Option 1: Moment of Inertia Distribution")
+plt.title("Design Option 2: Moment of Inertia Distribution")
 plt.xlabel("Distance from root [m]")
 plt.ylabel("Moment of inertia [$m^4$]")
 plt.tight_layout()
@@ -295,7 +300,7 @@ plt.show()
 
 plt.plot(rangy_range, torsional_list)
 plt.axis([0, planform.b / 2, 0, float(max(torsional_list)) * 1.1])
-plt.title("Design Option 1: Torsional Constant Distribution")
+plt.title("Design Option 2: Torsional Constant Distribution")
 plt.xlabel("Distance from root [m]")
 plt.ylabel("Torsional Constant [$m^4$]")
 plt.tight_layout()
@@ -311,7 +316,7 @@ plt.show()
 plt.plot(rangy_range, twist_list[0], label="Load factor: 2.5")
 plt.plot(rangy_range, twist_list[1], label="Load factor: -1")
 plt.axis([0, planform.b / 2, min(min(twist_list[0]), min(twist_list[1])) * 1.1, max(max(twist_list[0]), max(twist_list[1])) * 1.1])
-plt.title("Design Option 1: Wing twist Angle Distribution")
+plt.title("Design Option 2: Wing twist Angle Distribution")
 plt.xlabel("Distance from root [m]")
 plt.ylabel("Twist angle [deg]")
 plt.tight_layout()
