@@ -19,7 +19,7 @@ weight_final = 23528
 list_stringers = []
 for x in range(4):
     list_stringers.append(stringer_full)
-wingbox = fn.WingBox(0.013, list_stringers, aluminum)
+wingbox = fn.WingBox(0.005, list_stringers, aluminum)
 WP41.b = planform.b
 WP41.cr = planform.cr
 WP41.ct = planform.ct
@@ -45,16 +45,16 @@ MMOI_list = []
 torsional_list = []
 number_of_strigers_list = []
 stringer_len = []
-list_of_box_thickness = np.arange(0.005, 0.015, 0.001)
-list_of_stringer_thickness = np.arange(0.003, 0.009, 0.001)
-list_of_base_len = np.arange(0.05, 0.15, 0.1)
-list_of_flange_len = np.arange(0.05, 0.15, 0.1)
+list_of_box_thickness = np.arange(0.001, 0.006, 0.001)
+list_of_stringer_thickness = np.arange(0.001, 0.006, 0.001)
+list_of_base_len = np.arange(0.05, 0.15, 0.01)
+list_of_flange_len = np.arange(0.05, 0.15, 0.01)
 list_of_combinations = []
 i = 0
 
 
 #Optimisation
-"""
+#"""
 for t_b in list_of_box_thickness:
     print(f"I'm doing wingbox thickness {1000 * t_b: 0.3f} mm. We at i = {i}")
     for t_s in list_of_stringer_thickness:
@@ -81,6 +81,7 @@ for t_b in list_of_box_thickness:
                     break
                 stringer_len = fn.stringer_length_conversion(number_of_strigers_list, test_stringer, step_size, rangy_range)
                 wingbox.stringers = stringer_len
+                wingbox.thickness = t_b
                 len_list = []
                 for stringer in wingbox.stringers:
                     len_list.append(stringer.x_stop)
@@ -105,6 +106,10 @@ for t_b in list_of_box_thickness:
                     print(f"The maximum vertical deflection is {fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)} m, allowed is 4.7 m")
                 list_of_combinations.append([wingbox, wingbox.total_weight(planform)])
                 list_of_combinations = sorted(list_of_combinations, key=lambda u: u[1])
+                print(
+                    f"Wingbox number {i} is completed with weight {wingbox.total_weight(planform):.3f} kg, wingbox thickness {1000 * t_b:.3f} mm, stringer "
+                    f"thickness {1000 * t_s:.3f} mm, base length {100 * s_b:.3f} cm, flange height {100 * s_f:.3f} cm, number of stri"
+                    f"ngers {len(wingbox.stringers):.3f}, distribution {len_list}")
 
 """
 #analysis
@@ -179,4 +184,4 @@ plt.plot(rangy_range, MMOI_list)
 plt.show()
 plt.plot(rangy_range, torsional_list)
 plt.show()
-#"""
+"""
