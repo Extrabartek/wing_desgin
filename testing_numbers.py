@@ -19,7 +19,7 @@ stringer_full = fn.Stringer(0.007, 0.15, 0.15, planform.b / 2, aluminum)
 list_stringers = []
 for x in range(4):
     list_stringers.append(stringer_full)
-wingbox = fn.WingBox(0.005, list_stringers, aluminum)
+wingbox = fn.WingBox([0.005, 0.005, 0.005, 0.005], list_stringers, aluminum)
 WP41.b = planform.b
 WP41.cr = planform.cr
 WP41.ct = planform.ct
@@ -121,10 +121,11 @@ for t_b in list_of_box_thickness:
 
 
 # analysis
-t_w = 0.005
-t_s = 0.001
-b = 0.05
-f = 0.05
+t_w = 0.004
+t_w_list = [0.004, 0.004, 0.004, 0.004]
+t_s = 0.003
+b = 0.15
+f = 0.15
 
 # Make wingbox
 number_of_strigers_list = []
@@ -135,7 +136,7 @@ test_list_of_stringer = []
 stringer_len = []
 for u in range(4):
     test_list_of_stringer.append(test_stringer)
-test_wing = fn.WingBox(t_w, test_list_of_stringer, aluminum)
+test_wing = fn.WingBox(t_w_list, test_list_of_stringer, aluminum)
 
 number = [0, True]
 fn.load_factor = 2.5
@@ -223,6 +224,20 @@ for x in rangy_range:
 # print(f"The twist angle at the tip is {max(abs(twist_list[0][-1]), abs(twist_list[1][-1]))} degrees")
 
 #creating lines for the tau_max graph
+
+plt.plot(rangy_range, normal_list[0], label="Load factor: 2.5")
+plt.plot(rangy_range, normal_list[1], label="Load factor: -1")
+plt.plot(rangy_range, critical_column_stress[0], label="Load factor: 2.5 Buckle")
+plt.plot(rangy_range, critical_column_stress[1], label="Load factor: -1 Buckle")
+plt.axis([0, planform.b / 2, int(min(min(normal_list[0]), min(normal_list[1])) * 1.1), int(max(max(normal_list[0]), max(normal_list[1])) * 1.1)])
+plt.title("Design Option 2: Normal Distribution")
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Lift per unit length[N/m]")
+plt.tight_layout()
+plt.grid()
+plt.legend()
+plt.show()
+
 '''
 yid_list = []
 proc80_yid_list = []

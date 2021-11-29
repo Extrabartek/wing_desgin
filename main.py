@@ -158,19 +158,22 @@ class Stringer:
 
 # same as the planform and material such for wingbox geometry
 class WingBox:
-    def __init__(self, t, stringers, material):
+    def __init__(self, t_list, stringers, material):
         """
         Initiate variable of type wingbox
 
-        :param t: Thickness of the sheets used [m]
-        :type t: float
+        :param t_list: List of the thicknesses of the sheets used [m]
+        # first two are the top and bottom plate
+        # third and fourth are front and rear spar
+        :type t_list: list
         :param stringers: The list of stringers used
         :type stringers: list of Stringer
         :param material: material of wingbox
         :type material: Material
         """
         self.a = 0
-        self.thickness = t
+        self.thickness = 0.005
+        self.thickness_list = t_list
         self.stringers = stringers
         self.planemass = (10220.5 / 1.3)
         self.material = material
@@ -213,13 +216,20 @@ class WingBox:
         :rtype: float
         """
         stringer_moment = 0
+        wingbox_moment = 0
         for stringer in self.stringers:
             stringer_moment += (y < stringer.x_stop) * ((stringer.area() * (
                     self.height(planform, y) - stringer.centroid()) ** 2) + stringer.moment_inertia())
-        return 2 * self.width(planform, y) * self.thickness * self.height(planform,
-                                                                          y) ** 2 + self.thickness * 8 * self.height(
-            planform,
-            y) ** 3 / 6 + stringer_moment
+        # top plate
+        wingbox_moment += self.width(planform, y) * self.thickness_list[0] * self.height(planform, y) ** 2
+        # bottom plate
+        wingbox_moment += self.width(planform, y) * self.thickness_list[1] * self.height(planform, y) ** 2
+        # front spar
+        wingbox_moment += self.width(planform, y) * self.thickness_list[2] * self.height(planform, y) ** 2
+        # rear spar
+        wingbox_moment += self.width(planform, y) * self.thickness_list[3] * self.height(planform, y) ** 2
+
+        return stringer_moment + wingbox_moment
 
     def torsional_constant(self, y, planform):
         """
@@ -250,9 +260,9 @@ class WingBox:
         stringer_area = 0
         for stringer in self.stringers:
             stringer_area += (x < stringer.x_stop) * stringer.area()
-        return 4 * self.height(planform, x) * self.thickness + 2 * self.width(planform, x) * self.thickness \
-               + stringer_area + (4 * self.height(planform, x) + 2 * self.width(planform, x)) \
-               * 1.816 * (1 / 1000)
+        return 4 * self.height(planform, x) * self.thickness + 2 * self.width(planform,
+                                                                              x) * self.thickness + stringer_area + (
+                           4 * self.height(planform, x) + 2 * self.width(planform, x)) * 1.816 * (1 / 1000)
 
     def mass_distribution(self, planform, x):
         """
@@ -517,7 +527,7 @@ def optimize_stringers(x, wingbox1, planform1):
 
     stringer_used = wingbox1.stringers[0]
     stringer_list = []
-    wingbox_cal = WingBox(wingbox1.thickness, wingbox1.stringers, wingbox1.material)
+    wingbox_cal = WingBox(wingbox1.thickness_list, wingbox1.stringers, wingbox1.material)
     planform_cal = Planform(planform1.b, planform1.cr, planform1.ct, planform1.sweep_le, planform1.spar_rear,
                             planform1.spar_front)
     # The following part is to make sure that only 4 full length stringer exist
