@@ -595,3 +595,17 @@ def dynamic_pressure(wingbox, planform):
                         planform.b / 2)[0])
 
     return q
+
+
+def column_buckling(x, stringer):
+    """
+    This function returns the critical stress of the stringer column at a distance X
+
+    :param x: Distance away from the root [m]
+    :type x: float
+    :param stringer: The type of stringer used
+    :type stringer: Stringer
+    :return: Critical stress for column buckling [Pa]
+    :rtype: float
+    """
+    return ((math.pi ** 2) * stringer.material.E * stringer.moment_inertia()) / (x ** 2 * stringer.area())

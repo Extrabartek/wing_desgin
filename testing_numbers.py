@@ -34,6 +34,8 @@ shear_list = [[], []]
 deflection_list = [[], []]
 tau_max_list = [[], []]
 mass_list = []
+normal_list = [[],[]]
+critical_column_stress = [[], []]
 MMOI_list = []
 torsional_list = []
 number_of_strigers_list = []
@@ -204,8 +206,9 @@ for x in rangy_range:
     # MMOI_list.append(wingbox.moment_of_inertia(planform, x))
     # torsional_list.append(wingbox.torsional_constant(x, planform))
     # twist_list[0].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
-    deflection_list[0].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
-    print("dome")
+    #deflection_list[0].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
+    normal_list[0].append(abs(fn.normal_stress(x, wingbox, planform)))
+    critical_column_stress[0].append(fn.column_buckling(x, test_stringer))
 
 fn.load_factor = -1
 fn.AoA = -10
@@ -218,8 +221,10 @@ for x in rangy_range:
     # shear_list[1].append(fn.shear_force(x, wingbox, planform))
     # tau_max_list[1].append(fn.tau_max(x, wingbox, planform))
     # twist_list[1].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
-    deflection_list[1].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
-    print("dome")
+    #deflection_list[1].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
+    normal_list[1].append(fn.normal_stress(x, wingbox, planform))
+    critical_column_stress[1].append(fn.column_buckling(x, test_stringer))
+
 # print(f"The maximum vertical deflection is {max(abs(deflection_list[0][-1]), abs(deflection_list[1][-1]))} m, allowed is 4.7 m")
 # print(f"The twist angle at the tip is {max(abs(twist_list[0][-1]), abs(twist_list[1][-1]))} degrees")
 
@@ -345,7 +350,7 @@ plt.tight_layout()
 plt.grid()
 plt.legend()
 plt.show()
-'''
+
 
 plt.plot(rangy_range, deflection_list[0], label="Load factor: 2.5")
 plt.plot(rangy_range, deflection_list[1], label="Load factor: -1")
@@ -356,3 +361,4 @@ plt.ylabel("Vertical deflection [m]")
 plt.legend()
 plt.grid()
 plt.show()
+'''
