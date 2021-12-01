@@ -109,8 +109,7 @@ class Stringer:
         """
         self.t = t
         self.x_stop = x_stop
-        self.base = base
-        self.flange = flange
+        self.a = a
         self.material = material
 
     def area(self):
@@ -178,9 +177,9 @@ class Stringer:
         :rtype: float
         """
 
-        return (self.t * self.flange ** 3) / 12 + self.t * self.flange * (
-                self.flange / 2 - self.centroid()) ** 2 + self.base * self.t * self.centroid() ** 2
+        # return (self.a / 4 * (self.a / 4) ** 3 - (self.a / 4 - 2 * self.t) * (self.a / 4 - 2 * self.t) ** 3) / 12
 
+        return (self.a ** 3 * self.t) / 96
 
 
 class WingBox:
@@ -436,9 +435,6 @@ def bending_moment(x, wingbox, planform):
     :type planform: Planform
     """
 
-    # According to the Mechanics of Materials the bending moment should be a double integral of the distributed load
-    # intensity (lift_distribution - g*(mass_distribution)). Should discuss that in the session
-
     moment = integrate.quad(lambda a: shear_force(a, wingbox,
                                                   planform), x, planform.b / 2, epsrel=0.5, epsabs=0.5)[0]
     return -moment  # minus sign is included for coordinates
@@ -500,7 +496,7 @@ def vertical_deflection(y, material, wingbox, planform):
         epsabs=0.5, epsrel=0.5)[0]
 
 
-def twist_angle(x, wingbox, material, planform):  # lower limit must be set for the fuselage
+def twist_angle(x, wingbox, material, planform):
     """
     This function returns the twist angle at y distance away from the root chord
 
@@ -567,8 +563,8 @@ def shear_stress(x, wingbox, planform):
 
 def tau_max(x, wingbox, planform):
     """
-    This function will return the maximum shear stress (according to the Mohr's circle) at a given distance away from
-    the root (in meters)
+    This function will return the maximum shear stress (according to
+    the Mohr's circle) at a given distance away from the root (in meters)
 
     :param x: Distance away from the root [m]
     :type x: float
@@ -584,16 +580,18 @@ def tau_max(x, wingbox, planform):
     point2 = math.sqrt(shear_stress(x, wingbox, planform)[3] ** 2)
 
     # edge
-    point3 = math.sqrt(shear_stress(x, wingbox, planform)[1] ** 2 + (normal_stress(x, wingbox, planform) / 2) ** 2)
-    point4 = math.sqrt(shear_stress(x, wingbox, planform)[1] ** 2 + (normal_stress(x, wingbox, planform) / 2) ** 2)
+    point3 = math.sqrt(shear_stress(x, wingbox, planform)[1] ** 2 +
+                       (normal_stress(x, wingbox, planform) / 2) ** 2)
+    point4 = math.sqrt(shear_stress(x, wingbox, planform)[1] ** 2 +
+                       (normal_stress(x, wingbox, planform) / 2) ** 2)
 
     return max(point1, point2, point3, point4)
 
 
 def optimize_stringers(x, wingbox1, planform1):
     """
-    This function will optimize the number of stringers (find the minimal safe number) at a given distance away from the
-    root (in meters)
+    This function will optimize the number of stringers (find the minimal safe number)
+    at a given distance away from the root (in meters)
 
     :param x: Distance away from the root [m]
     :type x: float
@@ -608,8 +606,8 @@ def optimize_stringers(x, wingbox1, planform1):
     stringer_used = wingbox1.stringers[0]
     stringer_list = []
     wingbox_cal = WingBox(wingbox1.thickness_list, wingbox1.stringers, wingbox1.material)
-    planform_cal = Planform(planform1.b, planform1.cr, planform1.ct, planform1.sweep_le, planform1.spar_rear,
-                            planform1.spar_front)
+    planform_cal = Planform(planform1.b, planform1.cr, planform1.ct,
+                            planform1.sweep_le, planform1.spar_rear, planform1.spar_front)
     # The following part is to make sure that only 4 full length stringer exist
     for a in range(4):
         stringer_list.append(stringer_used)
@@ -619,7 +617,8 @@ def optimize_stringers(x, wingbox1, planform1):
 
     stress = tau_max(x, wingbox_cal, planform_cal)
     while stress > (wingbox_cal.material.sig_yld / 2) * 0.8:
-        if len(stringer_list) * stringer_used.base > wingbox_cal.width(planform_cal, 0) or len(stringer_list) > 60:
+        if len(stringer_list) * stringer_used.base > wingbox_cal.width(planform_cal, 0) \
+                or len(stringer_list) > 60:
             done = False
             break
         for b in range(2):
@@ -649,7 +648,8 @@ def stringer_length_conversion(number_of_stringer_list, stringer, step_size, ran
     list_stringers = []
 
     for a in range(int(max(number_of_stringer_list))):
-        list_stringers.append(Stringer(stringer.t, stringer.base, stringer.flange, 0, stringer.material))
+        list_stringers.append(Stringer(stringer.t, stringer.base,
+                                       stringer.flange, 0, stringer.material))
 
     for x in rangy:
         for a in range(int(number_of_stringer_list[int(x / step_size)])):
@@ -668,11 +668,12 @@ def dynamic_pressure(wingbox, planform):
     :return: The dynamic pressure in [kg/m*s^2]
     """
     q = load_factor * g * ((weight_final / 2)
-                           + integrate.quad(lambda a: wingbox.mass_distribution(planform, a), 0, planform.b / 2,
-                                            epsrel=0.1, epsabs=0.1)[0]) / \
+                           + integrate.quad(lambda a: \
+                                                wingbox.mass_distribution(planform, a), 0,
+                                            planform.b / 2, epsrel=0.1, epsabs=0.1)[0]) / \
         (integrate.quad(lambda a: WP41.c(a) * (
-                (AoA == 0) * WP41.cly1(a) + (AoA == 10) * WP41.cly2(a) + (AoA == -10) * WP41.cly3(a)), 0,
-                        planform.b / 2)[0])
+                (AoA == 0) * WP41.cly1(a) + (AoA == 10) * WP41.cly2(a) +
+                (AoA == -10) * WP41.cly3(a)), 0, planform.b / 2)[0])
 
     return q
 
