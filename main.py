@@ -12,9 +12,7 @@ fuel = 0
 weight_final = 23528
 
 
-# class definition list
 class Material:
-    # if any parameters need to be added follow the method for the already added parameters
     def __init__(self, rho, sig_yld, sig_ult, E, G):
         """
         Initiate variable of type material
@@ -32,6 +30,7 @@ class Material:
         """
         self.rho = rho
         self.sig_yld = sig_yld
+
         self.sig_ult = sig_ult
         self.E = E
         self.G = G
@@ -49,7 +48,6 @@ class Material:
 
 
 class Planform:
-    # if any parameters need to be added follow the method for the already added parameters
     def __init__(self, b, cr, ct, sweep_le, spar_rear, spar_front):
         """
         Initiate variable of type planform
@@ -96,16 +94,14 @@ class Planform:
 
 
 class Stringer:
-    def __init__(self, t, base, flange, x_stop, material):
+    def __init__(self, t, a, x_stop, material):
         """
         Initiate variable of type stringer.
 
         :param t: Thickness of stringer in [m]
         :type t: float
-        :param base: Width of stringer in [m]
-        :type base: float
-        :param flange: Height of stringer in [m]
-        :type flange: float
+        :param a: The perimeter of the stringer [m]
+        :type a: float
         :param material: The material of the stringer
         :type material: Material
         :param x_stop: The distance form the root at which the stringer ends
@@ -124,7 +120,35 @@ class Stringer:
         :return: Cross-sectional area of the stringer [m^2]
         :rtype: float
         """
-        return self.flange * self.t + self.base * self.t - self.t * self.t
+        return self.a * self.t
+
+    '''
+    def variable_area(self, h):
+        """
+        This function gives the area (in meters squared) if the stringer was cut at given distance (in meter)
+
+        :param h: The distance from the mounted part of the stringer [m]
+        :type h: float
+        :return: The area of the stringer is it was cut at a given distance h [m].
+        :rtype: float
+        """
+        area = 0
+        if h < 0:
+            return 0
+
+        if h < self.a / 4:
+
+            if h < self.t:
+                area = h * self.a / 4
+            elif self.t < h < (self.a / 4 - self.t):
+                area = self.t * self.a / 4 + 2 * self.t * h
+            elif (self.a / 4 - self.t) < h < self.a / 4:
+                area = self.t * self.a / 4 + 2 * self.t * (self.a / 4) + (self.a / 4 - h) * self.a / 4
+        else:
+            area = self.area
+
+        return area
+    '''
 
     def mass(self):
         """
@@ -139,15 +163,17 @@ class Stringer:
         """
         This function calculates the vertical centroid position of an L-stringer
 
-        :return: Distance of the centroid from the attached flange
+        :return: Distance of the centroid from the attached base
         :rtype: float
         """
-        return ((self.flange / 2) * self.flange * self.t + (self.t / 2) * self.base * self.t) / (
-                self.t * (self.flange + self.base))
+        return self.a / 8
+
+    # def variable_centroid(self, h):
 
     def moment_inertia(self):
         """
         This function returns the moment of inertia of the stringers
+
         :return: moment of inertia of the stringer in m^4
         :rtype: float
         """
@@ -156,26 +182,29 @@ class Stringer:
                 self.flange / 2 - self.centroid()) ** 2 + self.base * self.t * self.centroid() ** 2
 
 
-# same as the planform and material such for wingbox geometry
+
 class WingBox:
-    def __init__(self, t_list, stringers, material):
+    def __init__(self, t_list, stringers_top, stringers_bottom, material):
         """
         Initiate variable of type wingbox
 
         :param t_list: List of the thicknesses of the sheets used [m]
         # first two are the top and bottom plate
-        # third and fourth are front and rear spar
+        # third is the thickness of the spars
         :type t_list: list
-        :param stringers: The list of stringers used
-        :type stringers: list of Stringer
+        :param stringers_top: The list of stringers used at the top of the wingbox
+        :type stringers_top: list of Stringer
+        :param stringers_bottom: The list of stringers used at the bottom of the wingbox
+        :type stringers_bottom: list of Stringer
         :param material: material of wingbox
         :type material: Material
         """
-        self.a = 0
-        self.thickness = 0.005
-        self.thickness_list = t_list
-        self.stringers = stringers
-        self.planemass = (10220.5 / 1.3)
+
+        self.t_top = t_list[0]
+        self.t_bottom = t_list[1]
+        self.t_spar = t_list[2]
+        self.stringers_top = stringers_top
+        self.stringers_bottom = stringers_bottom
         self.material = material
 
     def width(self, planform, y):
@@ -193,7 +222,8 @@ class WingBox:
 
     def height(self, planform, y):
         """
-        This function returns the wingbox half-height from the wing geometry at any given distance from the root
+        This function returns the wingbox half-height (in meters) from the wing geometry at any given
+        distance from the root (in meters)
 
         :param planform: The planform used
         :type planform: Planform
@@ -203,6 +233,41 @@ class WingBox:
         :rtype: float
         """
         return 0.1296 * self.width(planform, y)
+
+    def centroid(self, planform, y):
+        """
+        This function returns the position of the centroid (distance from the bottom sheet in meters)
+        at a given distance from the root (in meters)
+
+        :param y: Distance from the root [m]
+        :type y: float
+        :param planform: Planform used
+        :type planform: Planform
+        :return: Distance of the centroid from the bottom sheet [m]
+        :rtype: float
+        """
+
+        total_area = 0
+        total_product = 0
+
+        for stringer in self.stringers_bottom:
+            total_area += stringer.area() * (y < stringer.x_stop)
+        for stringer in self.stringers_top:
+            total_area += stringer.area() * (y < stringer.x_stop)
+
+        total_area += (
+                self.width(planform, y) * (self.t_top + self.t_bottom) + 4 * self.height(planform, y) * self.t_spar)
+
+        for stringer in self.stringers_bottom:
+            total_product += stringer.area() * (stringer.centroid() + self.t_bottom) * (y < stringer.x_stop)
+        for stringer in self.stringers_top:
+            total_product += stringer.area() * (2 * self.height(planform, y) - stringer.centroid() - self.t_top) * (
+                    y < stringer.x_stop)
+
+        total_product += (2 * self.height(planform, y) * (
+                2 * self.height(planform, y) * self.t_spar + self.width(planform, y) * self.t_top))
+
+        return total_product / total_area
 
     def moment_of_inertia(self, planform, y):
         """
@@ -217,17 +282,20 @@ class WingBox:
         """
         stringer_moment = 0
         wingbox_moment = 0
-        for stringer in self.stringers:
-            stringer_moment += (y < stringer.x_stop) * ((stringer.area() * (
-                    self.height(planform, y) - stringer.centroid()) ** 2) + stringer.moment_inertia())
+        for stringer in self.stringers_top:
+            stringer_moment += (y < stringer.x_stop) * (stringer.moment_inertia() + stringer.area() * (
+                    2 * self.height(planform, y) - self.centroid(planform,
+                                                                 y) - stringer.centroid() - self.t_top) ** 2)
+        for stringer in self.stringers_bottom:
+            stringer_moment += (y < stringer.x_stop) * (stringer.moment_inertia() + stringer.area() * (
+                    self.centroid(planform, y) - stringer.centroid() - self.t_bottom) ** 2)
         # top plate
         wingbox_moment += self.width(planform, y) * self.thickness_list[0] * self.height(planform, y) ** 2
         # bottom plate
-        wingbox_moment += self.width(planform, y) * self.thickness_list[1] * self.height(planform, y) ** 2
-        # front spar
-        wingbox_moment += self.width(planform, y) * self.thickness_list[2] * self.height(planform, y) ** 2
-        # rear spar
-        wingbox_moment += self.width(planform, y) * self.thickness_list[3] * self.height(planform, y) ** 2
+        wingbox_moment += self.width(planform, y) * self.t_bottom * self.centroid(planform, y) ** 2
+        # front spars
+        wingbox_moment += (4 / 3) * self.height(planform, y) ** 3 * self.t_spar + 4 * self.height(planform, y) * \
+                          self.t_spar * (self.centroid(planform, y) - self.height(planform, y)) ** 2
 
         return stringer_moment + wingbox_moment
 
@@ -244,25 +312,31 @@ class WingBox:
         """
 
         return (4 * (self.width(planform, y) * 2 * self.height(planform, y)) ** 2) / (
-                (2 * self.width(planform, y) / self.thickness) + (4 * self.height(planform, y) / self.thickness))
+                (self.width(planform, y) / self.t_top) + (self.width(planform, y) / self.t_bottom) + (
+                4 * self.height(planform, y) / self.t_spar))
 
-    def cross_section(self, planform, x):
+    def cross_section(self, planform, y):
         """
         This function calculates the cross-section of the wingbox
 
         :param planform: The planform used
         :type planform: Planform
-        :param x: distance from the root [m]
-        :type x: float
+        :param y: distance from the root [m]
+        :type y: float
         :return: cross-sectional area of the wingbox in [m^2]
         :rtype: float
         """
-        stringer_area = 0
-        for stringer in self.stringers:
-            stringer_area += (x < stringer.x_stop) * stringer.area()
-        return 4 * self.height(planform, x) * self.thickness + 2 * self.width(planform,
-                                                                              x) * self.thickness + stringer_area + (
-                           4 * self.height(planform, x) + 2 * self.width(planform, x)) * 1.816 * (1 / 1000)
+        total_area = 0
+
+        for stringer in self.stringers_bottom:
+            total_area += stringer.area() * (y < stringer.x_stop)
+        for stringer in self.stringers_top:
+            total_area += stringer.area() * (y < stringer.x_stop)
+
+        total_area += (
+                self.width(planform, y) * (self.t_top + self.t_bottom) + 4 * self.height(planform, y) * self.t_spar)
+
+        return total_area + 2 * (self.width(planform, y) + 2 * self.height(planform, y)) * 1.816 * (1 / 1000)
 
     def mass_distribution(self, planform, x):
         """
@@ -289,21 +363,25 @@ class WingBox:
         :type planform: Planform
         :param x: The distance from the root [m]
         :type x: float
+        :param h: The chosen distance from the bottom plate [m]
+        :type h: float
         :return: This function returns the first moment of area in [m^3]
         :rtype: float
         """
-        q = self.height(planform, x) ** 2 * self.thickness + self.height(planform, x) * self.width(planform,
-                                                                                                   x) * self.thickness
-        for stringer in self.stringers:
-            q += stringer.area() * (self.height(planform, x) - stringer.centroid()) * (stringer.x_stop > x)
-        return q
+        q_total = 0
+        # spar contribution
+        q_total += abs((self.centroid(planform, x) - (2 * self.height(planform, x) - h)/2)) * (2*self.height(planform, x)-h) * self.t_spar # NOT DONE!!!!!
+
+        # q = self.height(planform, x) ** 2 * self.thickness + self.height(planform, x) * \
+        # self.width(planform, x) * self.thickness
+        # for stringer in self.stringers:
+        # q += stringer.area() * (self.height(planform, x) - stringer.centroid()) * (stringer.x_stop > x)
+        # return q
 
     def total_weight(self, planform):
-        return integrate.quad(lambda a: self.mass_distribution(planform, a), 0, planform.b / 2, epsrel=0.3, epsabs=0.3)[
-            0]
+        return integrate.quad(lambda a: self.mass_distribution(planform, a),
+                              0, planform.b / 2, epsrel=0.3, epsabs=0.3)[0]
 
-
-# function definition list
 
 def lift_distribution(x):
     """
@@ -335,9 +413,11 @@ def shear_force(x, wingbox, planform):
     :return: The shear force per unit length [N/m]
     :rtype: float
     """
-    shear = integrate.quad(lambda a: (WP41.Ndis0(a, AoA)), x, planform.b / 2, epsabs=0.3, epsrel=0.3)[0] - \
+    shear = integrate.quad(lambda a: (WP41.Ndis0(a, AoA)), x, planform.b / 2,
+                           epsabs=0.3, epsrel=0.3)[0] - \
             g * np.cos(np.radians(AoA)) * load_factor * \
-            integrate.quad(lambda a: wingbox.mass_distribution(planform, a), x, planform.b / 2, epsabs=0.3, epsrel=0.3)[
+            integrate.quad(lambda a: wingbox.mass_distribution(planform, a),
+                           x, planform.b / 2, epsabs=0.3, epsrel=0.3)[
                 0]
     return shear
 
@@ -359,7 +439,8 @@ def bending_moment(x, wingbox, planform):
     # According to the Mechanics of Materials the bending moment should be a double integral of the distributed load
     # intensity (lift_distribution - g*(mass_distribution)). Should discuss that in the session
 
-    moment = integrate.quad(lambda a: shear_force(a, wingbox, planform), x, planform.b / 2, epsrel=0.5, epsabs=0.5)[0]
+    moment = integrate.quad(lambda a: shear_force(a, wingbox,
+                                                  planform), x, planform.b / 2, epsrel=0.5, epsabs=0.5)[0]
     return -moment  # minus sign is included for coordinates
 
 
@@ -376,8 +457,7 @@ def torsion(x, planform):
     return (1 / 8) * planform.chord(x) * WP41.Ndis0(x, AoA) + WP41.Mdis(x, AoA)
 
 
-# deflection profiles
-def slope_deflection(y, material, wingbox, planform):  # dv/dy , E modulus is for one material (can be improved later)
+def slope_deflection(y, wingbox, planform):
     """
     This function returns the lateral deflection (v) at y distance away from the root chord,
 
@@ -385,15 +465,14 @@ def slope_deflection(y, material, wingbox, planform):  # dv/dy , E modulus is fo
     :type planform: Planform
     :param y: Distance away from the root [m]
     :type y: float
-    :param material: Type of material used
-    :type: Material
     :param wingbox: The wingbox used
     :type: WingBox
     :return: Lateral deflection [m]
     :type: float
     """
     return -1 * integrate.quad(
-        lambda b: bending_moment(b, wingbox, planform) / wingbox.moment_of_inertia(planform, b), 0, y,
+        lambda b: bending_moment(b, wingbox, planform) \
+                  / wingbox.moment_of_inertia(planform, b), 0, y,
         epsabs=0.5, epsrel=0.5)[0]
 
 
@@ -415,7 +494,8 @@ def vertical_deflection(y, material, wingbox, planform):
 
     return -1 / material.E * integrate.quad(
         lambda b:
-        integrate.quad(lambda a: bending_moment(a, wingbox, planform) / wingbox.moment_of_inertia(planform, a), 0, b,
+        integrate.quad(lambda a: bending_moment(a, wingbox,
+                                                planform) / wingbox.moment_of_inertia(planform, a), 0, b,
                        epsabs=0.5, epsrel=0.5)[0], 0, y,
         epsabs=0.5, epsrel=0.5)[0]
 

@@ -15,18 +15,18 @@ Parameter input
 
 aluminum = fn.Material(2700, 276 * (10 ** 6), 310 * (10 ** 6), 68.9 * (10 ** 9), 26 * (10 ** 9))
 planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
-stringer_full = fn.Stringer(0.007, 0.15, 0.15, planform.b / 2, aluminum)
+stringer_full = fn.Stringer(0.003, 0.08, planform.b / 2, aluminum)
 list_stringers = []
 for x in range(4):
     list_stringers.append(stringer_full)
-wingbox = fn.WingBox([0.005, 0.005, 0.005, 0.005], list_stringers, aluminum)
+wingbox = fn.WingBox([0.005, 0.005, 0.005], list_stringers, list_stringers,aluminum)
 WP41.b = planform.b
 WP41.cr = planform.cr
 WP41.ct = planform.ct
 
 twist_list = [[], []]
 torsion_list = [[], []]
-step_size = 0.25
+step_size = 0.1
 rangy_range = np.arange(0, planform.b / 2, step_size)
 lift_list = [[], []]
 bending_list = [[], []]
@@ -47,6 +47,8 @@ list_of_flange_len = np.arange(0.15, 0.31, 0.05)
 list_of_combinations = []
 i = 0
 
+print(stringer_full.moment_inertia())
+'''
 # Optimisation
 """
 for t_b in list_of_box_thickness:
@@ -93,8 +95,11 @@ for t_b in list_of_box_thickness:
                         number_of_strigers_list2.append(number[0])
                 if not number[1]:
                     break
-                number_of_strigers_list = list(map(max, number_of_strigers_list1, number_of_strigers_list2))
-                stringer_len = fn.stringer_length_conversion(number_of_strigers_list, test_stringer, step_size, rangy_range)
+                number_of_strigers_list = list(map(max, number_of_strigers_list1,
+                                                   number_of_strigers_list2))
+                stringer_len = fn.stringer_length_conversion(number_of_strigers_list,
+                                                             test_stringer, step_size,
+                                                             rangy_range)
                 wingbox.stringers = stringer_len
                 wingbox.thickness = t_b
                 len_list = []
@@ -121,7 +126,7 @@ for t_b in list_of_box_thickness:
 # t_W = 0.005, t_s = 0.001, b = 0.05, f = 0.05 max 8
 # t_w = 0.004, t_s = 0.003, b = 0.15, f = 0.15 max 20
 
-
+'''
 # analysis
 t_w = 0.004
 t_w_list = [0.004, 0.004, 0.004, 0.004]
@@ -178,7 +183,7 @@ print(
     f"ngers {len(wingbox.stringers):.3f}, distribution {len_list}")
 
 # Analysis plots
-'''
+
 plt.plot(rangy_range, number_of_strigers_list)
 plt.axis([0, planform.b / 2, 0, int(max(number_of_strigers_list) * 1.1)])
 plt.grid()
@@ -187,7 +192,7 @@ plt.xlabel("Distance from root [m]")
 plt.ylabel("Number of stringers")
 plt.tight_layout()
 plt.show()
-'''
+
 
 step_size = 0.5
 rangy_range = np.arange(0, planform.b / 2, step_size)
@@ -243,7 +248,7 @@ plt.grid()
 plt.legend()
 plt.show()
 
-'''
+
 yid_list = []
 proc80_yid_list = []
 for x in rangy_range:
