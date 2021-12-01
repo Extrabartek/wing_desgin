@@ -13,7 +13,8 @@ import main as fn
 Parameter input 
 '''
 
-aluminum = fn.Material(2700, 276 * (10 ** 6), 310 * (10 ** 6), 68.9 * (10 ** 9), 26 * (10 ** 9))
+aluminum = fn.Material(2700, 276 * (10 ** 6), 310 * (10 ** 6), 68.9 *
+                       (10 ** 9), 26 * (10 ** 9))
 planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
 stringer_full = fn.Stringer(0.003, 0.08, planform.b / 2, aluminum)
 list_stringers = []
@@ -50,7 +51,7 @@ i = 0
 print(stringer_full.moment_inertia())
 '''
 # Optimisation
-"""
+
 for t_b in list_of_box_thickness:
     print(f"I'm doing wingbox thickness {1000 * t_b: 0.3f} mm. We at i = {i}")
     for t_s in list_of_stringer_thickness:
@@ -120,7 +121,7 @@ for t_b in list_of_box_thickness:
                         f"ngers {len(wingbox.stringers):.3f}, distribution {len_list}")
                 list_of_combinations.append([wingbox, wingbox.total_weight(planform)])
                 list_of_combinations = sorted(list_of_combinations, key=lambda u: u[1])
-"""
+'''
 # t_w = 0.004, t_s = 0.003, b = 0.05, f = 0.05 stringers 34 (max 60) done
 # t_w = 0.004, t_s = 0.003, b = 0.15, f = 0.05 max 20 done
 # t_W = 0.005, t_s = 0.001, b = 0.05, f = 0.05 max 8

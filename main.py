@@ -289,7 +289,8 @@ class WingBox:
             stringer_moment += (y < stringer.x_stop) * (stringer.moment_inertia() + stringer.area() * (
                     self.centroid(planform, y) - stringer.centroid() - self.t_bottom) ** 2)
         # top plate
-        wingbox_moment += self.width(planform, y) * self.thickness_list[0] * self.height(planform, y) ** 2
+        wingbox_moment += self.width(planform, y) * self.t_top * (
+                2 * self.height(planform, y) - self.centroid(planform, y)) ** 2
         # bottom plate
         wingbox_moment += self.width(planform, y) * self.t_bottom * self.centroid(planform, y) ** 2
         # front spars
@@ -354,7 +355,7 @@ class WingBox:
             planform, x) * rho_fuel
         return mass
 
-    def Q(self, planform, x):
+    def Q(self, planform, x, h):
         """
         This function calculates the first moment of area
 
