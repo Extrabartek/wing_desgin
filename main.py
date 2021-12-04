@@ -355,7 +355,7 @@ class WingBox:
             planform, x) * rho_fuel
         return mass
 
-    def Q(self, planform, x, h):
+    def Q(self, planform, y, h):
         """
         This function calculates the first moment of area
 
@@ -368,9 +368,10 @@ class WingBox:
         :return: This function returns the first moment of area in [m^3]
         :rtype: float
         """
+        y_prime = (2 * self.height(planform, y) - (h - self.centroid(planform, y))) / 2
         q_total = 0
         # spar contribution
-        q_total += abs((self.centroid(planform, x) - (2 * self.height(planform, x) - h)/2)) * (2*self.height(planform, x)-h) * self.t_spar # NOT DONE!!!!!
+        q_total += 2 * abs(y_prime) * 2 * abs(y_prime) * self.t_spar + ()# NOT DONE!!!!!
 
         # q = self.height(planform, x) ** 2 * self.thickness + self.height(planform, x) * \
         # self.width(planform, x) * self.thickness
