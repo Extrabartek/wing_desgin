@@ -368,8 +368,10 @@ class WingBox:
         :return: This function returns the first moment of area in [m^3]
         :rtype: float
         """
-        y_prime = (2 * self.height(planform, y) - (h - self.centroid(planform, y))) / 2
-        q_total = 0
+        yprime1 = abs(self.centroid(planform, y) - (self.height(planform, y) - (h / 2)))
+        yprime2 = ((2 * self.height(planform, y) - self.centroid(planform, y)) - self.t_top/2) #centroid of the top plate
+        yprime3 = (2 * self.height(planform, y) - self.stringers_top[0].centroid() - self.t_top - self.centroid(planform, y)) #centroid of one of the top stringers
+        product_area = len(self.stringers_top) * yprime3 * self.stringers_top[0].area() + yprime2 * self.t_top * self.width(planform, y)
         # spar contribution
         q_total = 2 * yprime1 * (2 * self.height(planform, y) - h) * self.t_spar + product_area
         return q_total
@@ -517,7 +519,7 @@ def twist_angle(x, wingbox, material, planform):
             0]
 
 
-def normal_stress(x, wingbox, planform):
+def normal_stress(x, wingbox, planform, h):
     """
     This function returns the maximum normal stress (in Pascal) at a given distance away from the root (in meters)
 
@@ -531,7 +533,7 @@ def normal_stress(x, wingbox, planform):
     :type planform: Planform
     :return: The maximum normal stress at a given distance [Pa]
     """
-    return bending_moment(x, wingbox, planform) * wingbox.height(planform, x) / (wingbox.moment_of_inertia(planform, x))
+    return bending_moment(x, wingbox, planform) * (h - wingbox.centroid(planform, x)) / (wingbox.moment_of_inertia(planform, x))
 
 
 def shear_stress(x, h, wingbox, planform):
@@ -569,17 +571,13 @@ def tau_max(x, wingbox, planform):
     :return: The maximum shear stress [N/m^2]
     :rtype: float
     """
-    # zero line
-    point1 = math.sqrt(shear_stress(x, wingbox, planform)[2] ** 2)
-    point2 = math.sqrt(shear_stress(x, wingbox, planform)[3] ** 2)
+    max_list = []
+    step_size = wingbox.height(planform, x) / 20
 
-    # edge
-    point3 = math.sqrt(shear_stress(x, wingbox, planform)[1] ** 2 +
-                       (normal_stress(x, wingbox, planform) / 2) ** 2)
-    point4 = math.sqrt(shear_stress(x, wingbox, planform)[1] ** 2 +
-                       (normal_stress(x, wingbox, planform) / 2) ** 2)
+    for h in np.arange(0, 2 * wingbox.height(planform, x), step_size):
+        max_list.append(math.sqrt(shear_stress(x, h, wingbox, planform) ** 2 + (1 / 2 * normal_stress(x, wingbox, planform, h)) ** 2))
 
-    return max(point1, point2, point3, point4)
+    return max(max_list)
 
 
 def optimize_stringers(x, wingbox1, planform1):

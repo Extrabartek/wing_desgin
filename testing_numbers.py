@@ -46,9 +46,11 @@ list_of_stringer_thickness = np.arange(0.001, 0.006, 0.001)
 list_of_base_len = np.arange(0.15, 0.31, 0.05)
 list_of_flange_len = np.arange(0.15, 0.31, 0.05)
 list_of_combinations = []
+Mdis_list = [[],[]]
 i = 0
 
 print(stringer_full.moment_inertia())
+# h as function of height
 '''
 # Optimisation
 
@@ -127,24 +129,24 @@ for t_b in list_of_box_thickness:
 # t_W = 0.005, t_s = 0.001, b = 0.05, f = 0.05 max 8
 # t_w = 0.004, t_s = 0.003, b = 0.15, f = 0.15 max 20
 
-'''
+
 # analysis
 t_w = 0.004
 t_w_list = [0.004, 0.004, 0.004, 0.004]
 t_s = 0.003
-b = 0.15
-f = 0.15
+a = 0.08
 
 # Make wingbox
 number_of_strigers_list = []
 number_of_strigers_list1 = []
 number_of_strigers_list2 = []
-test_stringer = fn.Stringer(t_s, b, f, planform.b / 2, aluminum)
-test_list_of_stringer = []
+test_stringer = fn.Stringer(t_s, a, planform.b / 2, aluminum)
+test_list_of_stringer1 = []
+test_list_of_stringer2 = []
 stringer_len = []
 for u in range(4):
     test_list_of_stringer.append(test_stringer)
-test_wing = fn.WingBox(t_w_list, test_list_of_stringer, aluminum)
+test_wing = fn.WingBox(t_w_list, test_list_of_stringer1, aluminum)
 
 number = [0, True]
 fn.load_factor = 2.5
@@ -212,9 +214,10 @@ for x in rangy_range:
     # MMOI_list.append(wingbox.moment_of_inertia(planform, x))
     # torsional_list.append(wingbox.torsional_constant(x, planform))
     # twist_list[0].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
-    #deflection_list[0].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
-    normal_list[0].append(abs(fn.normal_stress(x, wingbox, planform)))
-    critical_column_stress[0].append(fn.column_buckling(x, test_stringer))
+    # deflection_list[0].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
+    # normal_list[0].append(abs(fn.normal_stress(x, wingbox, planform)))
+    # critical_column_stress[0].append(fn.column_buckling(x, test_stringer))
+    Mdis_list[0].append(WP41.Mdis(x, fn.AoA))
 
 fn.load_factor = -1
 fn.AoA = -10
@@ -227,15 +230,16 @@ for x in rangy_range:
     # shear_list[1].append(fn.shear_force(x, wingbox, planform))
     # tau_max_list[1].append(fn.tau_max(x, wingbox, planform))
     # twist_list[1].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
-    #deflection_list[1].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
-    normal_list[1].append(fn.normal_stress(x, wingbox, planform))
-    critical_column_stress[1].append(fn.column_buckling(x, test_stringer))
+    # deflection_list[1].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
+    # normal_list[1].append(fn.normal_stress(x, wingbox, planform))
+    # critical_column_stress[1].append(fn.column_buckling(x, test_stringer))
+    Mdis_list[1].append(WP41.Mdis(x, fn.AoA))
 
 # print(f"The maximum vertical deflection is {max(abs(deflection_list[0][-1]), abs(deflection_list[1][-1]))} m, allowed is 4.7 m")
 # print(f"The twist angle at the tip is {max(abs(twist_list[0][-1]), abs(twist_list[1][-1]))} degrees")
 
 #creating lines for the tau_max graph
-
+'''
 plt.plot(rangy_range, normal_list[0], label="Load factor: 2.5")
 plt.plot(rangy_range, normal_list[1], label="Load factor: -1")
 plt.plot(rangy_range, critical_column_stress[0], label="Load factor: 2.5 Buckle")
@@ -368,3 +372,12 @@ plt.legend()
 plt.grid()
 plt.show()
 '''
+plt.plot(rangy_range, Mdis_list[0], label="Load factor: 2.5")
+plt.plot(rangy_range, Mdis_list[1], label="Load factor: -1")
+plt.axis([0, planform.b / 2, min(min(Mdis_list[0]), min(Mdis_list[1])) * 1.1, max(max(Mdis_list[0]), max(Mdis_list[1])) * 1.1])
+plt.title("Mdis distribution")
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Vertical deflection [m]")
+plt.legend()
+plt.grid()
+plt.show()
