@@ -361,8 +361,8 @@ class WingBox:
 
         :param planform: The planform used
         :type planform: Planform
-        :param x: The distance from the root [m]
-        :type x: float
+        :param y: The distance from the root [m]
+        :type y: float
         :param h: The chosen distance from the bottom plate [m]
         :type h: float
         :return: This function returns the first moment of area in [m^3]
@@ -371,13 +371,8 @@ class WingBox:
         y_prime = (2 * self.height(planform, y) - (h - self.centroid(planform, y))) / 2
         q_total = 0
         # spar contribution
-        q_total += 2 * abs(y_prime) * 2 * abs(y_prime) * self.t_spar + ()# NOT DONE!!!!!
-
-        # q = self.height(planform, x) ** 2 * self.thickness + self.height(planform, x) * \
-        # self.width(planform, x) * self.thickness
-        # for stringer in self.stringers:
-        # q += stringer.area() * (self.height(planform, x) - stringer.centroid()) * (stringer.x_stop > x)
-        # return q
+        q_total = 2 * yprime1 * (2 * self.height(planform, y) - h) * self.t_spar + product_area
+        return q_total
 
     def total_weight(self, planform):
         return integrate.quad(lambda a: self.mass_distribution(planform, a),
@@ -452,7 +447,11 @@ def torsion(x, planform):
     :rtype: float
     :param planform: The planform used
     """
-    return (1 / 8) * planform.chord(x) * WP41.Ndis0(x, AoA) + WP41.Mdis(x, AoA)
+    # return (1 / 8) * planform.chord(x) * WP41.Ndis0(x, AoA) + WP41.Mdis(x, AoA)
+    return \
+        integrate.quad(lambda a: (1 / 8) * planform.chord(a) * WP41.Ndis0(a, AoA) + WP41.Mdis(a, AoA), x,
+                       planform.b / 2,
+                       epsabs=0.5, epsrel=0.5)[0]
 
 
 def slope_deflection(y, wingbox, planform):
@@ -524,6 +523,8 @@ def normal_stress(x, wingbox, planform):
 
     :param x: Distance from the root [m]
     :type x: float
+    :param h: height from the bottom plate
+    :type h: float
     :param wingbox: The wingbox used
     :type wingbox: WingBox
     :param planform: The planform used
@@ -544,23 +545,12 @@ def shear_stress(x, wingbox, planform):
     :param planform: the planform used
     :type planform: Planform
     :return: The shear stress in four places[N/m^2]
-    :rtype: list
+    :rtype: float
     """
-    point_edge_1 = (shear_force(x, wingbox, planform) * wingbox.width(planform, x) * wingbox.height(planform, x)) / \
-                   wingbox.moment_of_inertia(planform, x) - torsion(x, planform) / (
-                           2 * wingbox.thickness * (2 * wingbox.height(planform, x) * wingbox.width(planform, x)))
-    point_edge_2 = (shear_force(x, wingbox, planform) * wingbox.width(planform, x) * wingbox.height(planform, x)) / \
-                   wingbox.moment_of_inertia(planform, x) + torsion(x, planform) / (
-                           2 * wingbox.thickness * (2 * wingbox.height(planform, x) * wingbox.width(planform, x)))
-    point_mid_1 = -1 * torsion(x, planform) / (
-            2 * wingbox.thickness * (2 * wingbox.height(planform, x) * wingbox.width(planform, x))) \
-                  + (shear_force(x, wingbox, planform) * wingbox.Q(planform, x)) / (
-                          2 * wingbox.moment_of_inertia(planform, x) * wingbox.thickness)
-    point_mid_2 = torsion(x, planform) / (
-            2 * wingbox.thickness * (2 * wingbox.height(planform, x) * wingbox.width(planform, x))) \
-                  + (shear_force(x, wingbox, planform) * wingbox.Q(planform, x)) / (
-                          2 * wingbox.moment_of_inertia(planform, x) * wingbox.thickness)
-    return point_mid_1, point_mid_2, point_edge_1, point_edge_2
+    shear_stress_result = abs((shear_force(x, wingbox, planform) * wingbox.Q(planform, h, x)) / (
+                          2 * wingbox.moment_of_inertia(planform, x) * wingbox.t_spar)) + \
+                          abs(torsion(x, planform) / (4 * wingbox.height(planform, x) * wingbox.width(planform, x) * wingbox.t_spar))
+    return shear_stress_result
 
 
 def tau_max(x, wingbox, planform):
