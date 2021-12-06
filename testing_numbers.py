@@ -16,7 +16,8 @@ Parameter input
 aluminum = fn.Material(2700, 276 * (10 ** 6), 310 * (10 ** 6), 68.9 *
                        (10 ** 9), 26 * (10 ** 9))
 planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
-stringer_full = fn.Stringer(0.003, 0.08, planform.b / 2, aluminum)
+stringer_full = fn.Stringer(0.003, 0.16, planform.b / 2, aluminum)
+stringer_half = fn.Stringer(0.003, 0.16, planform.b / 4, aluminum)
 list_stringers = []
 for x in range(4):
     list_stringers.append(stringer_full)
@@ -371,7 +372,7 @@ plt.ylabel("Vertical deflection [m]")
 plt.legend()
 plt.grid()
 plt.show()
-'''
+
 plt.plot(rangy_range, Mdis_list[0], label="Load factor: 2.5")
 plt.plot(rangy_range, Mdis_list[1], label="Load factor: -1")
 plt.axis([0, planform.b / 2, min(min(Mdis_list[0]), min(Mdis_list[1])) * 1.1, max(max(Mdis_list[0]), max(Mdis_list[1])) * 1.1])
@@ -381,3 +382,4 @@ plt.ylabel("Vertical deflection [m]")
 plt.legend()
 plt.grid()
 plt.show()
+'''

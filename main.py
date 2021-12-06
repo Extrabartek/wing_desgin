@@ -574,7 +574,7 @@ def tau_max(x, wingbox, planform):
     max_list = []
     step_size = wingbox.height(planform, x) / 10
 
-    for h in np.arange(0, 2 * wingbox.height(planform, x), step_size):
+    for h in np.arange(0, (2 * wingbox.height(planform, x) + step_size * 0.95), step_size):
         max_list.append(math.sqrt(shear_stress(x, h, wingbox, planform) ** 2 + (1 / 2 * normal_stress(x, wingbox, planform, h)) ** 2))
 
     return max(max_list), np.argmax(max_list)
