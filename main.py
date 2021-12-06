@@ -569,15 +569,15 @@ def tau_max(x, wingbox, planform):
     :param planform: The planform used
     :type planform: Planform
     :return: The maximum shear stress [N/m^2]
-    :rtype: float
+    :rtype: list
     """
     max_list = []
-    step_size = wingbox.height(planform, x) / 20
+    step_size = wingbox.height(planform, x) / 10
 
     for h in np.arange(0, 2 * wingbox.height(planform, x), step_size):
         max_list.append(math.sqrt(shear_stress(x, h, wingbox, planform) ** 2 + (1 / 2 * normal_stress(x, wingbox, planform, h)) ** 2))
 
-    return max(max_list)
+    return max(max_list), np.argmax(max_list)
 
 
 def optimize_stringers(x, wingbox1, planform1):
