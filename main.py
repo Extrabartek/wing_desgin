@@ -355,7 +355,7 @@ class WingBox:
             planform, x) * rho_fuel
         return mass
 
-    def Q(self, planform, y, h):
+    def Q(self, planform, h, y):
         """
         This function calculates the first moment of area
 
@@ -534,12 +534,14 @@ def normal_stress(x, wingbox, planform):
     return bending_moment(x, wingbox, planform) * wingbox.height(planform, x) / (wingbox.moment_of_inertia(planform, x))
 
 
-def shear_stress(x, wingbox, planform):
+def shear_stress(x, h, wingbox, planform):
     """
     This function calculates the shear stress due to torsion
 
     :param x:distance from root
     :type x: float
+    :param h: height from the bottom plate
+    :type h: float
     :param wingbox: The wingbox used
     :type wingbox: WingBox
     :param planform: the planform used
