@@ -36,6 +36,7 @@ class Material:
         self.sig_ult = sig_ult
         self.E = E
         self.G = G
+        self.nu = nu
 
     def mass(self, volume):
         """
