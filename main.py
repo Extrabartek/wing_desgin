@@ -693,3 +693,40 @@ def column_buckling(x, stringer):
     :rtype: float
     """
     return ((math.pi ** 2) * stringer.material.E * stringer.moment_inertia()) / (x ** 2 * stringer.area())
+
+
+def skin_buckling(y, wingbox, planform):
+    """
+    This function returns the critical stress for skin buckling to occur
+
+    :param y: Distance from the root [m]
+    :type y: float
+    :param planform: The planform used
+    :type planform: Planform
+    :param wingbox: The wingbox used
+    :type wingbox: WingBox
+    :return: The critical stress for skin buckling to occur [Pa]
+    :rtype: float
+    """
+    k_c = 4
+    b_basic = (wingbox.width(planform, y) - len(wingbox.stringers_top) * (wingbox.stringers_top[0].a / 2)) / (
+                len(wingbox.stringers_top) - 1)
+    b = 0
+
+    return ((math.pi ** 2) * k_c * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
+                wingbox.t_top / b) ** 2
+
+
+def web_buckling(y, wingbox, planform):
+    """
+    This function returns the critical stress for web buckling  to occur
+
+    :param y: Distance from the root [m]
+    :type y: float
+    :param planform: The planform used
+    :type planform: Planform
+    :param wingbox: The wingbox used
+    :type wingbox: WingBox
+    :return: The critical stress for web buckling to occur [Pa]
+    :rtype: float
+    """
