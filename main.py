@@ -13,7 +13,7 @@ weight_final = 23528
 
 
 class Material:
-    def __init__(self, rho, sig_yld, sig_ult, E, G):
+    def __init__(self, rho, sig_yld, sig_ult, E, G, nu):
         """
         Initiate variable of type material
 
@@ -27,6 +27,8 @@ class Material:
         :type E: float
         :param G: Shear modules [N/m^2]
         :type G: float
+        :param nu: The Poisson's ratio of the material
+        :type nu: float
         """
         self.rho = rho
         self.sig_yld = sig_yld
@@ -183,7 +185,7 @@ class Stringer:
 
 
 class WingBox:
-    def __init__(self, t_list, stringers_top, stringers_bottom, material):
+    def __init__(self, t_list, stringers_top, stringers_bottom, rib_list, material):
         """
         Initiate variable of type wingbox
 
@@ -195,6 +197,8 @@ class WingBox:
         :type stringers_top: list of Stringer
         :param stringers_bottom: The list of stringers used at the bottom of the wingbox
         :type stringers_bottom: list of Stringer
+        :param rib_list: The list with the locations of the ribs (distance from the root in meter)
+        :type rib_list: list
         :param material: material of wingbox
         :type material: Material
         """
@@ -204,6 +208,7 @@ class WingBox:
         self.t_spar = t_list[2]
         self.stringers_top = stringers_top
         self.stringers_bottom = stringers_bottom
+        self.rib_list = rib_list
         self.material = material
 
     def width(self, planform, y):
@@ -369,9 +374,12 @@ class WingBox:
         :rtype: float
         """
         yprime1 = abs(self.centroid(planform, y) - (self.height(planform, y) - (h / 2)))
-        yprime2 = ((2 * self.height(planform, y) - self.centroid(planform, y)) - self.t_top/2) #centroid of the top plate
-        yprime3 = (2 * self.height(planform, y) - self.stringers_top[0].centroid() - self.t_top - self.centroid(planform, y)) #centroid of one of the top stringers
-        product_area = len(self.stringers_top) * yprime3 * self.stringers_top[0].area() + yprime2 * self.t_top * self.width(planform, y)
+        yprime2 = ((2 * self.height(planform, y) - self.centroid(planform,
+                                                                 y)) - self.t_top / 2)  # centroid of the top plate
+        yprime3 = (2 * self.height(planform, y) - self.stringers_top[0].centroid() - self.t_top - self.centroid(
+            planform, y))  # centroid of one of the top stringers
+        product_area = len(self.stringers_top) * yprime3 * self.stringers_top[
+            0].area() + yprime2 * self.t_top * self.width(planform, y)
         # spar contribution
         q_total = 2 * yprime1 * (2 * self.height(planform, y) - h) * self.t_spar + product_area
         return q_total
@@ -533,7 +541,8 @@ def normal_stress(x, wingbox, planform, h):
     :type planform: Planform
     :return: The maximum normal stress at a given distance [Pa]
     """
-    return bending_moment(x, wingbox, planform) * (h - wingbox.centroid(planform, x)) / (wingbox.moment_of_inertia(planform, x))
+    return bending_moment(x, wingbox, planform) * (h - wingbox.centroid(planform, x)) / (
+        wingbox.moment_of_inertia(planform, x))
 
 
 def shear_stress(x, h, wingbox, planform):
@@ -552,8 +561,9 @@ def shear_stress(x, h, wingbox, planform):
     :rtype: float
     """
     shear_stress_result = abs((shear_force(x, wingbox, planform) * wingbox.Q(planform, h, x)) / (
-                          2 * wingbox.moment_of_inertia(planform, x) * wingbox.t_spar)) + \
-                          abs(torsion(x, planform) / (4 * wingbox.height(planform, x) * wingbox.width(planform, x) * wingbox.t_spar))
+            2 * wingbox.moment_of_inertia(planform, x) * wingbox.t_spar)) + \
+                          abs(torsion(x, planform) / (
+                                  4 * wingbox.height(planform, x) * wingbox.width(planform, x) * wingbox.t_spar))
     return shear_stress_result
 
 
@@ -575,7 +585,8 @@ def tau_max(x, wingbox, planform):
     step_size = wingbox.height(planform, x) / 10
 
     for h in np.arange(0, (2 * wingbox.height(planform, x) + step_size * 0.95), step_size):
-        max_list.append(math.sqrt(shear_stress(x, h, wingbox, planform) ** 2 + (1 / 2 * normal_stress(x, wingbox, planform, h)) ** 2))
+        max_list.append(math.sqrt(
+            shear_stress(x, h, wingbox, planform) ** 2 + (1 / 2 * normal_stress(x, wingbox, planform, h)) ** 2))
 
     return max(max_list), np.argmax(max_list)
 

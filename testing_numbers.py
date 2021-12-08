@@ -8,20 +8,22 @@ import scipy.integrate as integrate
 import WP_41 as WP41
 import main as fn
 
-
 '''
 Parameter input 
 '''
 
 aluminum = fn.Material(2700, 276 * (10 ** 6), 310 * (10 ** 6), 68.9 *
-                       (10 ** 9), 26 * (10 ** 9))
+                       (10 ** 9), 26 * (10 ** 9), 0.33)
 planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
 stringer_full = fn.Stringer(0.003, 0.16, planform.b / 2, aluminum)
 stringer_half = fn.Stringer(0.003, 0.16, planform.b / 4, aluminum)
 list_stringers = []
 for x in range(4):
     list_stringers.append(stringer_full)
-wingbox = fn.WingBox([0.004, 0.008, 0.005], [stringer_full, stringer_full, stringer_full, stringer_full, stringer_full, stringer_half, stringer_half, stringer_half, stringer_half, stringer_half, stringer_half, stringer_half, stringer_half], [stringer_full, stringer_full], aluminum)
+wingbox = fn.WingBox([0.004, 0.008, 0.005],
+                     [stringer_full, stringer_full, stringer_full, stringer_full, stringer_full, stringer_half,
+                      stringer_half, stringer_half, stringer_half, stringer_half, stringer_half, stringer_half,
+                      stringer_half], [stringer_full, stringer_full], [2, 6, 12], aluminum)
 WP41.b = planform.b
 WP41.cr = planform.cr
 WP41.ct = planform.ct
@@ -36,7 +38,7 @@ shear_list = [[], []]
 deflection_list = [[], []]
 tau_max_list = [[], []]
 mass_list = []
-normal_list = [[],[]]
+normal_list = [[], []]
 critical_column_stress = [[], []]
 MMOI_list = []
 torsional_list = []
@@ -47,7 +49,7 @@ list_of_stringer_thickness = np.arange(0.001, 0.006, 0.001)
 list_of_base_len = np.arange(0.15, 0.31, 0.05)
 list_of_flange_len = np.arange(0.15, 0.31, 0.05)
 list_of_combinations = []
-Mdis_list = [[],[]]
+Mdis_list = [[], []]
 i = 0
 
 print(stringer_full.moment_inertia())
@@ -210,7 +212,8 @@ for x in rangy_range:
     # torsion_list[0].append(fn.torsion(x, planform))
     # bending_list[0].append(fn.bending_moment(x, wingbox, planform))
     # shear_list[0].append(fn.shear_force(x, wingbox, planform))
-    tau_max_list[0].append(fn.tau_max(x, wingbox, planform)[1] * (wingbox.height(planform, x) / 10) / (2 * wingbox.height(planform, x)))
+    tau_max_list[0].append(
+        fn.tau_max(x, wingbox, planform)[1] * (wingbox.height(planform, x) / 10) / (2 * wingbox.height(planform, x)))
     # mass_list.append(wingbox.mass_distribution(planform, x))
     # MMOI_list.append(wingbox.moment_of_inertia(planform, x))
     # torsional_list.append(wingbox.torsional_constant(x, planform))
@@ -229,7 +232,8 @@ for x in rangy_range:
     # torsion_list[1].append(fn.torsion(x, planform))
     # bending_list[1].append(fn.bending_moment(x, wingbox, planform))
     # shear_list[1].append(fn.shear_force(x, wingbox, planform))
-    tau_max_list[1].append(fn.tau_max(x, wingbox, planform)[1] * (wingbox.height(planform, x) / 10) / (2 * wingbox.height(planform, x)))
+    tau_max_list[1].append(
+        fn.tau_max(x, wingbox, planform)[1] * (wingbox.height(planform, x) / 10) / (2 * wingbox.height(planform, x)))
     # twist_list[1].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
     # deflection_list[1].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
     # normal_list[1].append(fn.normal_stress(x, wingbox, planform))
@@ -239,7 +243,7 @@ for x in rangy_range:
 # print(f"The maximum vertical deflection is {max(abs(deflection_list[0][-1]), abs(deflection_list[1][-1]))} m, allowed is 4.7 m")
 # print(f"The twist angle at the tip is {max(abs(twist_list[0][-1]), abs(twist_list[1][-1]))} degrees")
 
-#creating lines for the tau_max graph
+# creating lines for the tau_max graph
 '''
 plt.plot(rangy_range, normal_list[0], label="Load factor: 2.5")
 plt.plot(rangy_range, normal_list[1], label="Load factor: -1")
