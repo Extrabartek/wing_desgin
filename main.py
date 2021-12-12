@@ -3,7 +3,7 @@ import scipy.integrate as integrate
 import math
 import WP_41 as WP41
 
-# global constant
+# Global constant
 g = 9.80665
 AoA = 10  # Degrees
 load_factor = 2.5
@@ -681,6 +681,7 @@ def dynamic_pressure(wingbox, planform):
 
     return q
 
+
 def rib_spacing(normal_stress):
     '''
     This function returns the rivet spacing to meet a certain critical stress
@@ -718,7 +719,9 @@ def column_buckling(x, stringer):
     :return: Critical stress for column buckling [Pa]
     :rtype: float
     """
-    return ((math.pi ** 2) * stringer.material.E * stringer.moment_inertia()) / (x ** 2 * stringer.area())
+
+    K = 1.  # Factor for end conditions of stringers
+    return (K * (math.pi ** 2) * stringer.material.E * stringer.moment_inertia()) / (x ** 2 * stringer.area())
 
 
 def skin_buckling(y, wingbox, planform):
@@ -734,6 +737,7 @@ def skin_buckling(y, wingbox, planform):
     :return: The critical stress for skin buckling to occur [Pa]
     :rtype: float
     """
+
     k_c = 4
     b_basic = (wingbox.width(planform, y) - len(wingbox.stringers_top) * (wingbox.stringers_top[0].a / 2)) / (
                 len(wingbox.stringers_top) - 1)
