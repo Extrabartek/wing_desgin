@@ -681,6 +681,31 @@ def dynamic_pressure(wingbox, planform):
 
     return q
 
+def rib_spacing(normal_stress):
+    '''
+    This function returns the rivet spacing to meet a certain critical stress
+    
+
+    :param normal_stress: normal stress at a certain point along the wing
+    :return: rivet spacing [m]
+    :rtype: float
+    '''
+
+    K = 1
+    E = 69 * 10 ** 9
+    a = 0.15  # Stringer a [m]
+    t = 0.002  # Stringer thickness [m]
+
+    sigma_cr = 1.25 * normal_stress  # Critical stress defined [Pa]
+    A = a*t  # Area of the stringer [m^2]
+    I = 2*a/8*t*a**2/64 + a/4*t*a**2/64 + 2/12*a**3/64*t  # Moment of inertia of the stringer [m^4]
+
+    M_max = 1 * 10 ** 6
+    # sigma_M = M * y / I
+    L = np.sqrt(K * np.pi ** 2 * E * I / (sigma_cr * A)) # Spacing of the rivets [m]
+    print('Rib spacing is', L)
+    return L
+
 
 def column_buckling(x, stringer):
     """
@@ -731,3 +756,17 @@ def web_buckling(y, wingbox, planform):
     :return: The critical stress for web buckling to occur [Pa]
     :rtype: float
     """
+    '''
+    rangrang = np.linspace(0, 15.50, 500)
+    tau = []
+    for i in range(rangrang):
+        tau.append(tau_max(i, wingbox, planform))
+    taumax = max(tau)
+    print('Tau max is', taumax)
+    '''
+    k_s = 5.5
+    b = wingbox.height(planform, y) * 2
+    # take b at end of little wing box for k_s; most critical
+
+    return ((math.pi ** 2) * k_s * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
+                wingbox.t_spar / b) ** 2
