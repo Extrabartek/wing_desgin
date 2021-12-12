@@ -737,7 +737,9 @@ def skin_buckling(y, wingbox, planform):
     k_c = 4
     b_basic = (wingbox.width(planform, y) - len(wingbox.stringers_top) * (wingbox.stringers_top[0].a / 2)) / (
                 len(wingbox.stringers_top) - 1)
-    b = 0
+    b = b_basic
+    # When first pair is removed, b = b + b_basic
+    # ...
 
     return ((math.pi ** 2) * k_c * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
                 wingbox.t_top / b) ** 2
