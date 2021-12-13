@@ -682,15 +682,15 @@ def dynamic_pressure(wingbox, planform):
     return q
 
 
-def rib_spacing(normal_stress):
-    '''
+def rib_spacing_column(normal_stress):
+    """
     This function returns the rivet spacing to meet a certain critical stress
-    
+
 
     :param normal_stress: normal stress at a certain point along the wing
     :return: rivet spacing [m]
     :rtype: float
-    '''
+    """
 
     K = 1
     E = 69 * 10 ** 9

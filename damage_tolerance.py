@@ -47,8 +47,8 @@ while x <= 15.5:
     i = i + 1
 
 
-print('Web buckling is', fn.web_buckling(13.5, tn.wingbox, tn.planform)/10**6)
-print('Shear stress is', fn.shear_stress(13.5,tn.wingbox.height(tn.planform, 13.5), tn.wingbox, tn.planform)/10**6)
+print('Web buckling critical stress is', fn.web_buckling(13.5, tn.wingbox, tn.planform)/10**6)
+print('Shear stress is', fn.shear_stress(13.5, tn.wingbox.height(tn.planform, 13.5), tn.wingbox, tn.planform)/10**6)
 
 print('Rib placement =', rib_placement)
 
