@@ -41,7 +41,10 @@ x = 0
 rib_placement = []
 i = 0
 while x <= 15.5:
-    rib_placement.append(x + fn.rib_spacing(abs(fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x)/2))))
+    if fn.rib_spacing_column(abs(fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x)/2))) > fn.rib_spacing_web(tn.aluminum, tn.wingbox, x):
+        rib_placement.append(x + fn.rib_spacing_column(abs(fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x) / 2))
+    else:
+        rib_placement.append(x + fn.rib_spacing_web(tn.aluminum, tn.wingbox, tn.planform, x))
     x = rib_placement[i]
     i = i + 1
 

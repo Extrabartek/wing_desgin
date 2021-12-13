@@ -707,6 +707,19 @@ def rib_spacing_column(normal_stress):
     print('Rib spacing is', L)
     return L
 
+def rib_spacing_web(material, wingbox,planform, x):
+    '''
+    This function gives the rib spacing required to account for web buckling
+    :param material: material used
+    :param wingbox: wingbox used
+    :param planform: planform used
+    :param x: distance along the wing
+    :return:
+    '''
+    ks = 4
+    b = np.pi()*wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * tau_max(x, wingbox, planform))
+    return b
+
 
 def column_buckling(x, stringer):
     """
