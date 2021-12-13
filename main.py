@@ -562,9 +562,7 @@ def shear_stress(x, h, wingbox, planform):
     :rtype: float
     """
     shear_stress_result = abs((shear_force(x, wingbox, planform) * wingbox.Q(planform, h, x)) / (
-            2 * wingbox.moment_of_inertia(planform, x) * wingbox.t_spar)) + \
-                          abs(torsion(x, planform) / (
-                                  4 * wingbox.height(planform, x) * wingbox.width(planform, x) * wingbox.t_spar))
+            2 * wingbox.moment_of_inertia(planform, x) * wingbox.t_spar)) + abs(torsion(x, planform) / (4 * wingbox.height(planform, x) * wingbox.width(planform, x) * wingbox.t_spar))
     return shear_stress_result
 
 

@@ -49,6 +49,8 @@ list_of_combinations = []
 i = 0
 
 print(stringer_full.moment_inertia())
+print(fn.shear_stress(0, wingbox.height(planform, 0), wingbox, planform)/10 ** 6)
+print(fn.tau_max(0, wingbox, planform)[0]/10 ** 6)
 '''
 # Optimisation
 
