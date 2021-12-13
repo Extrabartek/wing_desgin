@@ -569,7 +569,8 @@ def shear_stress(x, h, wingbox, planform):
     :rtype: float
     """
     shear_stress_result = abs((shear_force(x, wingbox, planform) * wingbox.Q(planform, h, x)) / (
-            2 * wingbox.moment_of_inertia(planform, x) * wingbox.t_spar)) + abs(torsion(x, planform) / (4 * wingbox.height(planform, x) * wingbox.width(planform, x) * wingbox.t_spar))
+            2 * wingbox.moment_of_inertia(planform, x) * wingbox.t_spar)) + abs(
+        torsion(x, planform) / (4 * wingbox.height(planform, x) * wingbox.width(planform, x) * wingbox.t_spar))
     return shear_stress_result
 
 
@@ -703,16 +704,17 @@ def rib_spacing_column(normal_stress):
     t = 0.002  # Stringer thickness [m]
 
     sigma_cr = 1.25 * normal_stress  # Critical stress defined [Pa]
-    A = a*t  # Area of the stringer [m^2]
-    I = 2*a/8*t*a**2/64 + a/4*t*a**2/64 + 2/12*a**3/64*t  # Moment of inertia of the stringer [m^4]
+    A = a * t  # Area of the stringer [m^2]
+    I = 2 * a / 8 * t * a ** 2 / 64 + a / 4 * t * a ** 2 / 64 + 2 / 12 * a ** 3 / 64 * t  # Moment of inertia of the stringer [m^4]
 
     M_max = 1 * 10 ** 6
     # sigma_M = M * y / I
-    L = np.sqrt(K * np.pi ** 2 * E * I / (sigma_cr * A)) # Spacing of the rivets [m]
+    L = np.sqrt(K * np.pi ** 2 * E * I / (sigma_cr * A))  # Spacing of the rivets [m]
     print('Rib spacing is', L)
     return L
 
-def rib_spacing_web(material, wingbox,planform, x):
+
+def rib_spacing_web(material, wingbox, planform, x):
     '''
     This function gives the rib spacing required to account for web buckling
     :param material: material used
@@ -743,11 +745,11 @@ def column_buckling(x, stringer):
     return (K * (math.pi ** 2) * stringer.material.E * stringer.moment_inertia()) / (x ** 2 * stringer.area())
 
 
-def skin_buckling(y, wingbox, planform):
+def skin_buckling_stringer_count(y, wingbox, planform):
     """
     This function returns the critical stress for skin buckling to occur
 
-    :param y: Distance from the root [m]
+    :param y: Distance from the root [m]h
     :type y: float
     :param planform: The planform used
     :type planform: Planform
@@ -816,4 +818,4 @@ def web_buckling(y, wingbox, planform):
     # take b at end of little wing box for k_s; most critical
 
     return ((math.pi ** 2) * k_s * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
-                wingbox.t_spar / b) ** 2
+            wingbox.t_spar / b) ** 2
