@@ -8,7 +8,7 @@ g = 9.80665
 AoA = 10  # Degrees
 load_factor = 2.5
 rho_fuel = 800  # kg/m^3
-fuel = 0
+fuel = 1
 weight_final = 23528
 
 
@@ -385,9 +385,16 @@ class WingBox:
         q_total = 2 * yprime1 * (2 * self.height(planform, y) - h) * self.t_spar + product_area
         return q_total
 
-    def total_weight(self, planform):
+    def total_weight(self, planform, material):
+        total_rib = 0
+        for rib in self.rib_list:
+            total_rib += self.rib_mass(rib, planform, material)
+
         return integrate.quad(lambda a: self.mass_distribution(planform, a),
-                              0, planform.b / 2, epsrel=0.3, epsabs=0.3)[0]
+                              0, planform.b / 2, epsrel=0.3, epsabs=0.3)[0] + total_rib
+
+    def rib_mass(self, y, planform, material):
+        return 2 * self.height(planform, y) * self.width(planform, y) * 0.002 * material.rho
 
 
 def lift_distribution(x):
@@ -715,7 +722,8 @@ def rib_spacing_web(material, wingbox,planform, x):
     :return:
     '''
     ks = 4
-    b = np.pi()*wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * tau_max(x, wingbox, planform))
+    b = np.pi() * wingbox.t_spar * np.sqrt(
+        (ks * material.E) / (12 * (1 - material.nu ** 2) * tau_max(x, wingbox, planform)))
     return b
 
 
@@ -751,13 +759,35 @@ def skin_buckling(y, wingbox, planform):
 
     k_c = 4
     b_basic = (wingbox.width(planform, y) - len(wingbox.stringers_top) * (wingbox.stringers_top[0].a / 2)) / (
-                len(wingbox.stringers_top) - 1)
-    b = b_basic
-    # When first pair is removed, b = b + b_basic
-    # ...
+            len(wingbox.stringers_top) - 1)
+    b_basic_seq = [b_basic]
+    b_real = 0
 
-    return ((math.pi ** 2) * k_c * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
-                wingbox.t_top / b) ** 2
+    for a in range(6):
+        b_basic_seq.append(b_basic_seq[a] * 2 + wingbox.stringers_top[0].a / 2)
+
+    if load_factor >= 0:
+        b_min = wingbox.t_top * math.sqrt((math.pi * k_c * wingbox.material.E) / (
+                abs(normal_stress(y, wingbox, planform, 2 * wingbox.height(planform, y))) * 12 * (
+                1 - wingbox.material.nu ** 2)))
+
+    else:
+        b_min = wingbox.t_bottom * math.sqrt((math.pi * k_c * wingbox.material.E) / (
+                normal_stress(y, wingbox, planform, 0) * 12 * (1 - wingbox.material.nu ** 2)))
+
+    if b_basic > b_min:
+        return 0, False
+
+    i = 0
+    while b_basic_seq[i] < b_min:
+        b_real = b_basic_seq[i]
+        i += 1
+
+
+    # return ((math.pi ** 2) * k_c * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
+    # wingbox.t_top / b) ** 2
+
+    return b_basic_seq
 
 
 def web_buckling(y, wingbox, planform):
