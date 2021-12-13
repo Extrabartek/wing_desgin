@@ -759,7 +759,7 @@ def skin_buckling_stringer_count(y, wingbox, planform):
     :rtype: float
     """
 
-    k_c = 4
+    k_c = 4  # assumed to be constant
     b_basic = (wingbox.width(planform, y) - len(wingbox.stringers_top) * (wingbox.stringers_top[0].a / 2)) / (
             len(wingbox.stringers_top) - 1)
     b_basic_seq = [b_basic]
