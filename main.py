@@ -385,9 +385,16 @@ class WingBox:
         q_total = 2 * yprime1 * (2 * self.height(planform, y) - h) * self.t_spar + product_area
         return q_total
 
-    def total_weight(self, planform):
+    def total_weight(self, planform, material):
+        total_rib = 0
+        for rib in self.rib_list:
+            total_rib += self.rib_mass(rib, planform, material)
+
         return integrate.quad(lambda a: self.mass_distribution(planform, a),
-                              0, planform.b / 2, epsrel=0.3, epsabs=0.3)[0]
+                              0, planform.b / 2, epsrel=0.3, epsabs=0.3)[0] + total_rib
+
+    def rib_mass(self, y, planform, material):
+        return 2 * self.height(planform, y) * self.width(planform, y) * 0.002 * material.rho
 
 
 def lift_distribution(x):
@@ -562,7 +569,8 @@ def shear_stress(x, h, wingbox, planform):
     :rtype: float
     """
     shear_stress_result = abs((shear_force(x, wingbox, planform) * wingbox.Q(planform, h, x)) / (
-            2 * wingbox.moment_of_inertia(planform, x) * wingbox.t_spar)) + abs(torsion(x, planform) / (4 * wingbox.height(planform, x) * wingbox.width(planform, x) * wingbox.t_spar))
+            2 * wingbox.moment_of_inertia(planform, x) * wingbox.t_spar)) + abs(
+        torsion(x, planform) / (4 * wingbox.height(planform, x) * wingbox.width(planform, x) * wingbox.t_spar))
     return shear_stress_result
 
 
@@ -696,17 +704,16 @@ def rib_spacing_column(normal_stress):
     t = 0.002  # Stringer thickness [m]
 
     sigma_cr = 1.25 * normal_stress  # Critical stress defined [Pa]
-    A = a*t  # Area of the stringer [m^2]
-    I = 2*a/8*t*a**2/64 + a/4*t*a**2/64 + 2/12*a**3/64*t  # Moment of inertia of the stringer [m^4]
+    A = a * t  # Area of the stringer [m^2]
+    I = 2 * a / 8 * t * a ** 2 / 64 + a / 4 * t * a ** 2 / 64 + 2 / 12 * a ** 3 / 64 * t  # Moment of inertia of the stringer [m^4]
 
     M_max = 1 * 10 ** 6
     # sigma_M = M * y / I
-    L = np.sqrt(K * np.pi ** 2 * E * I / (sigma_cr * A)) # Spacing of the rivets [m]
+    L = np.sqrt(K * np.pi ** 2 * E * I / (sigma_cr * A))  # Spacing of the rivets [m]
     print('Rib spacing is', L)
     return L
 
-
-def vertstringer_spacing_web(material, wingbox, planform, x):
+def rib_spacing_web(material, wingbox,planform, x):
     '''
     This function gives the vertical stringer spacing required to account for web buckling
     :param material: material used
@@ -794,7 +801,5 @@ def web_buckling(y, wingbox, planform):
     a = wingbox.height(planform, y) * 2
     b = 3
 
-    # Take b at end of little wing box for k_s; most critical
-    taucr = ((math.pi ** 2) * k_s * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (wingbox.t_spar / b) ** 2
-
-    return taucr
+    return ((math.pi ** 2) * k_s * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
+                wingbox.t_spar / b) ** 2
