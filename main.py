@@ -707,7 +707,7 @@ def rib_spacing_column(normal_stress):
 
 def rib_spacing_web(material, wingbox,planform, x):
     '''
-    This function gives the rib spacing required to account for web buckling
+    This function gives the vertical stringer spacing required to account for web buckling
     :param material: material used
     :param wingbox: wingbox used
     :param planform: planform used
@@ -793,5 +793,4 @@ def web_buckling(y, wingbox, planform):
     b = wingbox.height(planform, y) * 2
     # take b at end of little wing box for k_s; most critical
 
-    return ((math.pi ** 2) * k_s * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
-                wingbox.t_spar / b) ** 2
+    return taucr
