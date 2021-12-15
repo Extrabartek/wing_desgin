@@ -39,14 +39,23 @@ sigmaneg = tn.normal_list[1]
 
 x = 0
 rib_placement = []
+vertstringer_placement = []
 i = 0
 while x <= 15.5:
-    if fn.rib_spacing_column(abs(fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x)/2))) > fn.rib_spacing_web(tn.aluminum, tn.wingbox, x):
-        rib_placement.append(x + fn.rib_spacing_column(abs(fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x) / 2))
-    else:
-        rib_placement.append(x + fn.rib_spacing_web(tn.aluminum, tn.wingbox, tn.planform, x))
+    dummy1 = fn.rib_spacing_column(abs(fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x)/2)))
+    rib_placement.append(x + dummy1)
     x = rib_placement[i]
     i = i + 1
+i = 0
+x = 0
+while x <= 15.5:
+    vertstringer_placement.append(x + fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox, tn.planform, x))
+    x = vertstringer_placement[i]
+    i = i + 1
+
+b = np.linspace(0, 15.5, 100)
+plt.plot(b, fn.web_buckling(b, tn.wingbox, tn.planform))
+plt.show()
 
 print('Web buckling critical stress is', fn.web_buckling(13.5, tn.wingbox, tn.planform)/10**6)
 print('Shear stress is', fn.shear_stress(13.5, tn.wingbox.height(tn.planform, 13.5), tn.wingbox, tn.planform)/10**6)

@@ -715,8 +715,16 @@ def rib_spacing_web(material, wingbox,planform, x):
     :return:
     '''
     ks = 4
-    b = np.pi()*wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * tau_max(x, wingbox, planform))
-    return b
+    dummy_lst = []
+    b = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * tau_max(0, wingbox, planform)[0]))
+    a = wingbox.height(planform, 0) * 2
+    dummy_lst.append(b)
+    if a/b < 1:
+        b = wingbox.height(planform, y) * 2
+        a = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * tau_max(x, wingbox, planform)[0]))
+        dummy_lst = []
+        dummy_lst.append(a)
+    return dummy_lst
 
 
 def column_buckling(x, stringer):
