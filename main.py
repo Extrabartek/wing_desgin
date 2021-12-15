@@ -8,7 +8,7 @@ g = 9.80665
 AoA = 10  # Degrees
 load_factor = 2.5
 rho_fuel = 800  # kg/m^3
-fuel = 1
+fuel = 0
 weight_final = 23528
 
 
@@ -713,10 +713,9 @@ def rib_spacing_column(normal_stress):
     print('Rib spacing is', L)
     return L
 
-
-def rib_spacing_web(material, wingbox, planform, x):
+def rib_spacing_web(material, wingbox,planform, x):
     '''
-    This function gives the rib spacing required to account for web buckling
+    This function gives the vertical stringer spacing required to account for web buckling
     :param material: material used
     :param wingbox: wingbox used
     :param planform: planform used
@@ -724,9 +723,16 @@ def rib_spacing_web(material, wingbox, planform, x):
     :return:
     '''
     ks = 4
-    b = np.pi() * wingbox.t_spar * np.sqrt(
-        (ks * material.E) / (12 * (1 - material.nu ** 2) * tau_max(x, wingbox, planform)))
-    return b
+    dummy_lst = []
+    b = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * tau_max(0, wingbox, planform)[0]))
+    a = wingbox.height(planform, 0) * 2
+    dummy_lst.append(b)
+    if a/b < 1:
+        b = wingbox.height(planform, y) * 2
+        a = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * tau_max(x, wingbox, planform)[0]))
+        dummy_lst = []
+        dummy_lst.append(a)
+    return dummy_lst
 
 
 def column_buckling(x, stringer):
@@ -745,11 +751,11 @@ def column_buckling(x, stringer):
     return (K * (math.pi ** 2) * stringer.material.E * stringer.moment_inertia()) / (x ** 2 * stringer.area())
 
 
-def skin_buckling_stringer_count(y, wingbox, planform):
+def skin_buckling(y, wingbox, planform):
     """
     This function returns the critical stress for skin buckling to occur
 
-    :param y: Distance from the root [m]h
+    :param y: Distance from the root [m]
     :type y: float
     :param planform: The planform used
     :type planform: Planform
@@ -759,37 +765,15 @@ def skin_buckling_stringer_count(y, wingbox, planform):
     :rtype: float
     """
 
-    k_c = 4  # assumed to be constant
+    k_c = 4
     b_basic = (wingbox.width(planform, y) - len(wingbox.stringers_top) * (wingbox.stringers_top[0].a / 2)) / (
-            len(wingbox.stringers_top) - 1)
-    b_basic_seq = [b_basic]
-    b_real = 0
+                len(wingbox.stringers_top) - 1)
+    b = b_basic
+    # When first pair is removed, b = b + b_basic
+    # ...
 
-    for a in range(6):
-        b_basic_seq.append(b_basic_seq[a] * 2 + wingbox.stringers_top[0].a / 2)
-
-    if load_factor >= 0:
-        b_min = wingbox.t_top * math.sqrt((math.pi * k_c * wingbox.material.E) / (
-                abs(normal_stress(y, wingbox, planform, 2 * wingbox.height(planform, y))) * 12 * (
-                1 - wingbox.material.nu ** 2)))
-
-    else:
-        b_min = wingbox.t_bottom * math.sqrt((math.pi * k_c * wingbox.material.E) / (
-                normal_stress(y, wingbox, planform, 0) * 12 * (1 - wingbox.material.nu ** 2)))
-
-    if b_basic > b_min:
-        return 0, False
-
-    i = 0
-    while b_basic_seq[i] < b_min:
-        b_real = b_basic_seq[i]
-        i += 1
-
-
-    # return ((math.pi ** 2) * k_c * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
-    # wingbox.t_top / b) ** 2
-
-    return b_basic_seq
+    return ((math.pi ** 2) * k_c * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
+                wingbox.t_top / b) ** 2
 
 
 def web_buckling(y, wingbox, planform):
@@ -814,8 +798,8 @@ def web_buckling(y, wingbox, planform):
     print('Tau max is', taumax)
     '''
     k_s = 5.5
-    b = wingbox.height(planform, y) * 2
-    # take b at end of little wing box for k_s; most critical
+    a = wingbox.height(planform, y) * 2
+    b = 3
 
     return ((math.pi ** 2) * k_s * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
-            wingbox.t_spar / b) ** 2
+                wingbox.t_spar / b) ** 2
