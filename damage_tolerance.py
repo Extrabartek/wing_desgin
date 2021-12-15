@@ -57,10 +57,13 @@ b = np.linspace(0, 15.5, 100)
 plt.plot(b, fn.web_buckling(b, tn.wingbox, tn.planform))
 plt.show()
 
-print('Web buckling critical stress is', fn.web_buckling(13.5, tn.wingbox, tn.planform)/10**6)
-print('Shear stress is', fn.shear_stress(13.5, tn.wingbox.height(tn.planform, 13.5), tn.wingbox, tn.planform)/10**6)
-
+print('Web buckling critical stress is', fn.web_buckling(0, tn.wingbox, tn.planform)/10**6)
+print('Shear stress is', fn.tau_max(0, tn.wingbox, tn.planform)[0]/10**6)
 print('Rib placement =', rib_placement)
+print('Number of ribs is', (len(rib_placement)-1))
+print('Vertical stringer placement is', vertstringer_placement)
+print('Number of vertical stringers is', (len(vertstringer_placement)-1))
+print('Vertical stringer placement is', fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox, tn.planform, 0))
 
 
 '''

@@ -705,7 +705,8 @@ def rib_spacing_column(normal_stress):
     print('Rib spacing is', L)
     return L
 
-def rib_spacing_web(material, wingbox,planform, x):
+
+def vertstringer_spacing_web(material, wingbox, planform, x):
     '''
     This function gives the vertical stringer spacing required to account for web buckling
     :param material: material used
@@ -790,7 +791,10 @@ def web_buckling(y, wingbox, planform):
     print('Tau max is', taumax)
     '''
     k_s = 5.5
-    b = wingbox.height(planform, y) * 2
-    # take b at end of little wing box for k_s; most critical
+    a = wingbox.height(planform, y) * 2
+    b = 3
+
+    # Take b at end of little wing box for k_s; most critical
+    taucr = ((math.pi ** 2) * k_s * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (wingbox.t_spar / b) ** 2
 
     return taucr
