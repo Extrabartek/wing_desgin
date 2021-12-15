@@ -27,17 +27,17 @@ step_size = 0.1
 rangy_range = np.arange(0, planform.b / 2, step_size)
 number_of_strigers_list = []
 stringer_len = []
-list_of_spar_thickness = np.arange(0.003, 0.010, 0.001)
-list_of_top_thickness = np.arange(0.003, 0.010, 0.001)
-list_of_bottom_thickness = np.arange(0.003, 0.010, 0.001)
+list_of_spar_thickness = np.arange(0.003, 0.007, 0.001)
+list_of_top_thickness = np.arange(0.003, 0.007, 0.001)
+list_of_bottom_thickness = np.arange(0.003, 0.007, 0.001)
 list_of_stringer_thickness = np.arange(0.001, 0.006, 0.001)
-list_of_stringer_a = np.arange(0.04, 0.17, 0.02)
+list_of_stringer_a = np.arange(0.04, 0.17, 0.04)
 list_of_combinations = []
 
 # Optimisation
 i = 0
 for t_s in list_of_spar_thickness:
-    print(f"I'm doing spar thickness {1000 * t_b: 0.3f} mm. We at i = {i}")
+    print(f"I'm doing spar thickness {1000 * t_s: 0.3f} mm. We at i = {i}")
     for t_t in list_of_top_thickness:
         for t_b in list_of_bottom_thickness:
             for t_s in list_of_stringer_thickness:
@@ -97,15 +97,15 @@ for t_s in list_of_spar_thickness:
                     try:
                         if wingbox.total_weight(planform) < list_of_combinations[0][1]:
                             print(
-                                f"Wingbox number {i} is completed with weight {wingbox.total_weight(planform):.3f} kg, wingbox thickness {1000 * t_b:.3f} mm, stringer "
-                                f"thickness {1000 * t_s:.3f} mm, base length {100 * s_b:.3f} cm, flange height {100 * s_f:.3f} cm, number of stri"
-                                f"ngers {len(wingbox.stringers):.3f}, distribution {len_list}")
+                                f"Wingbox number {i} is completed with weight {wingbox.total_weight(planform):.3f} kg, spar thickness {1000 * t_s:.3f} mm, top "
+                                f"thickness {1000 * t_t:.3f} mm, bottom thickness {1000 * t_b:.3f} mm, stringer thickness {1000 * t_s:.3f} mm, "
+                                f"and stringer length {100 * t_s:.3f} cm.  number of stringers {len(wingbox.stringers):.3f}, distribution {len_list}")
                     except LookupError:
                         print(f"First wingbox")
                         print(
-                            f"Wingbox number {i} is completed with weight {wingbox.total_weight(planform):.3f} kg, wingbox thickness {1000 * t_b:.3f} mm, stringer "
-                            f"thickness {1000 * t_s:.3f} mm, base length {100 * s_b:.3f} cm, flange height {100 * s_f:.3f} cm, number of stri"
-                            f"ngers {len(wingbox.stringers):.3f}, distribution {len_list}")
+                            f"Wingbox number {i} is completed with weight {wingbox.total_weight(planform):.3f} kg, spar thickness {1000 * t_s:.3f} mm, top "
+                            f"thickness {1000 * t_t:.3f} mm, bottom thickness {1000 * t_b:.3f} mm, stringer thickness {1000 * t_s:.3f} mm, "
+                            f"and stringer length {100 * t_s:.3f} cm.  number of stringers {len(wingbox.stringers):.3f}, distribution {len_list}")
                     list_of_combinations.append([wingbox, wingbox.total_weight(planform)])
                     list_of_combinations = sorted(list_of_combinations, key=lambda u: u[1])
 
