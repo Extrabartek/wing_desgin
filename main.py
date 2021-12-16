@@ -713,7 +713,7 @@ def rib_spacing_column(normal_stress):
     print('Rib spacing is', L)
     return L
 
-def rib_spacing_web(material, wingbox,planform, x):
+def vertstringer_spacing_web(material, wingbox,planform, x):
     '''
     This function gives the vertical stringer spacing required to account for web buckling
     :param material: material used
@@ -797,8 +797,30 @@ def web_buckling(y, wingbox, planform, material, stringers_list):
     print('Tau max is', taumax)
     '''
     k_s = 5.5
-    a = wingbox.height(planform, y) * 2
-    b = 3
+    a = wingbox.height(planform, y) * 2  # Not relevant (only short side used in calculations for tau_cr)
 
-    return ((math.pi ** 2) * k_s * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
-                wingbox.t_spar / b) ** 2
+    global dummy
+    dummy = 1
+    for i in range(len(stringers_list)-1):
+        if y < stringers_list[i]:
+            if i == 0:
+                y = 0
+            else:
+                y = stringers_list[i-1]
+                dummy = i
+                break
+
+    b = stringers_list[dummy] - stringers_list[dummy-1]
+    output = b
+    '''
+    b = np.pi * wingbox.t_spar * np.sqrt(
+        (k_s * material.E) / (12 * (1 - material.nu ** 2) * 1.1 * shear_stress(y, wingbox.height(planform, y), wingbox, planform)))
+    output = b
+    '''
+    if a / b < 1:
+        a = b
+        b = wingbox.height(planform, y) * 2
+        output = b
+
+    return ((np.pi ** 2) * k_s * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
+                wingbox.t_spar / output) ** 2
