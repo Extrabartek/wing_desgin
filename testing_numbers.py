@@ -1,7 +1,3 @@
-import logging
-import math
-import time
-
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.integrate as integrate
@@ -14,7 +10,7 @@ planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
 stringer_full = fn.Stringer(0.003, 0.08, planform.b / 2, aluminum)
 list_stringers = []
 rib_list =[]
-for x in range(4):
+for x in range(20):
     list_stringers.append(stringer_full)
 wingbox = fn.WingBox([0.005, 0.005, 0.005], list_stringers, list_stringers, rib_list, aluminum)
 WP41.b = planform.b
@@ -31,15 +27,17 @@ shear_list = [[], []]
 deflection_list = [[], []]
 tau_max_list = [[], []]
 mass_list = []
-normal_list = [[],[]]
+normal_list = [[], []]
 critical_column_stress = [[], []]
 MMOI_list = []
 torsional_list = []
+stringer_count_skin_buck = [[], []]
+stringer_count_skin_buck1 = [[], []]
 
 
 # analysis
 step_size = 0.1
-rangy_range = np.arange(0, planform.b / 2, step_size)
+rangy_range = np.arange(0, planform.b / 2 * 0.8, step_size)
 
 '''
 t_w = 0.004
@@ -126,8 +124,11 @@ for x in rangy_range:
     # torsional_list.append(wingbox.torsional_constant(x, planform))
     # twist_list[0].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
     #deflection_list[0].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
-    normal_list[0].append(abs(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x)/2)))
+    # normal_list[0].append(abs(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x)/2)))
     #critical_column_stress[0].append(fn.column_buckling(x, test_stringer))
+    stringer_count_skin_buck[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
+    # stringer_count_skin_buck1[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[1])
+
 
 fn.load_factor = -1
 fn.AoA = -10
@@ -141,8 +142,10 @@ for x in rangy_range:
     # tau_max_list[1].append(fn.tau_max(x, wingbox, planform))
     # twist_list[1].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
     #deflection_list[1].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
-    normal_list[1].append(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x)/2))
+    # normal_list[1].append(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x)/2))
     #critical_column_stress[1].append(fn.column_buckling(x, test_stringer))
+    stringer_count_skin_buck[1].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
+    # stringer_count_skin_buck1[1].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[1])
 '''
 # print(f"The maximum vertical deflection is {max(abs(deflection_list[0][-1]), abs(deflection_list[1][-1]))} m, allowed is 4.7 m")
 # print(f"The twist angle at the tip is {max(abs(twist_list[0][-1]), abs(twist_list[1][-1]))} degrees")
@@ -150,7 +153,7 @@ for x in rangy_range:
 #creating lines for the tau_max graph
 
 plt.plot(rangy_range, normal_list[0], label="Load factor: 2.5")
-plt.plot(rangy_range, normal_list[1], label="Load factor: -1")
+plt.plot(rangy_range, normal_list[1], label="Load factor: -1.0")
 plt.plot(rangy_range, critical_column_stress[0], label="Load factor: 2.5 Buckle")
 plt.plot(rangy_range, critical_column_stress[1], label="Load factor: -1 Buckle")
 plt.axis([0, planform.b / 2, int(min(min(normal_list[0]), min(normal_list[1])) * 1.1), int(max(max(normal_list[0]), max(normal_list[1])) * 1.1)])
@@ -170,7 +173,7 @@ for x in rangy_range:
     proc80_yid_list.append((aluminum.sig_yld / 2) * 0.8)
 
 plt.plot(rangy_range, lift_list[0], label="Load factor: 2.5")
-plt.plot(rangy_range, lift_list[1], label="Load factor: -1")
+plt.plot(rangy_range, lift_list[1], label="Load factor: -1.0")
 plt.axis([0, planform.b / 2, int(min(min(lift_list[0]), min(lift_list[1])) * 1.1), int(max(max(lift_list[0]), max(lift_list[1])) * 1.1)])
 plt.title("Design Option 2: Lift Distribution")
 plt.xlabel("Distance from root [m]")
@@ -181,7 +184,7 @@ plt.legend()
 plt.show()
 
 plt.plot(rangy_range, torsion_list[0], label="Load factor: 2.5")
-plt.plot(rangy_range, torsion_list[1], label="Load factor: -1")
+plt.plot(rangy_range, torsion_list[1], label="Load factor: -1.0")
 plt.axis([0, planform.b / 2, int(min(min(torsion_list[0]), min(torsion_list[1])) * 1.1), int(max(max(torsion_list[0]), max(torsion_list[1])) * 1.1)])
 plt.title("Design Option 2: Internal Torque Distribution")
 plt.xlabel("Distance from root [m]")
@@ -192,7 +195,7 @@ plt.legend()
 plt.show()
 
 plt.plot(rangy_range, bending_list[0], label="Load factor: 2.5")
-plt.plot(rangy_range, bending_list[1], label="Load factor: -1")
+plt.plot(rangy_range, bending_list[1], label="Load factor: -1.0")
 plt.axis([0, planform.b / 2, int(min(min(bending_list[0]), min(bending_list[1])) * 1.1), int(max(max(bending_list[0]), max(bending_list[1])) * 1.1)])
 plt.title("Design Option 2: Internal Bending Moment Distribution")
 plt.xlabel("Distance from root [m]")
@@ -203,7 +206,7 @@ plt.legend()
 plt.show()
 
 plt.plot(rangy_range, shear_list[0], label="Load factor: 2.5")
-plt.plot(rangy_range, shear_list[1], label="Load factor: -1")
+plt.plot(rangy_range, shear_list[1], label="Load factor: -1.0")
 plt.axis([0, planform.b / 2, int(min(min(shear_list[0]), min(shear_list[1])) * 1.1), int(max(max(shear_list[0]), max(shear_list[1])) * 1.1)])
 plt.title("Design Option 2: Internal Shear Force Distribution")
 plt.xlabel("Distance from root [m]")
@@ -214,7 +217,7 @@ plt.legend()
 plt.show()
 
 plt.plot(rangy_range, tau_max_list[0], label="Load factor: 2.5")
-plt.plot(rangy_range, tau_max_list[1], label="Load factor: -1")
+plt.plot(rangy_range, tau_max_list[1], label="Load factor: -1.0")
 plt.axis([0, planform.b / 2, int(min(min(tau_max_list[0]), min(tau_max_list[1])) * 1.1), int(yid_list[0] * 1.1)])
 plt.plot(rangy_range, yid_list, label="Half yield stress")
 plt.plot(rangy_range, proc80_yid_list, label="80% of half yield stress")
@@ -281,3 +284,16 @@ plt.legend()
 plt.grid()
 plt.show()
 '''
+print(wingbox.width(planform, 8))
+
+plt.plot(rangy_range, stringer_count_skin_buck[0], label="Load factor: 2.5")
+plt.plot(rangy_range, stringer_count_skin_buck[1], label="Load factor: -1")
+# plt.plot(rangy_range, stringer_count_skin_buck1[0], label="Load factor: 2.5")
+# plt.plot(rangy_range, stringer_count_skin_buck1[1], label="Load factor: -1")
+# plt.axis([0, planform.b / 2, min(min(stringer_count_skin_buck[0]), min(stringer_count_skin_buck[1])) * 1.1, max(max(stringer_count_skin_buck[0]), max(stringer_count_skin_buck[1])) * 1.1])
+plt.title("Design Option 3: Vertical deflection Distribution")
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Vertical deflection [m]")
+plt.legend()
+plt.grid()
+plt.show()
