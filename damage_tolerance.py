@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import main as fn
 import testing_numbers as tn
+import WP_41
 '''
 # ------------------- Parameters ---------------------------------
 # Wing (box) properties (copied from main.py for ease of access)
@@ -82,6 +83,9 @@ for i in range(len(rib_placement)-1):
 
 x = 0
 critstress = []
+fn.load_factor = 2.5
+fn.AoA = 10
+WP_41.q = fn.dynamic_pressure(tn.wingbox, tn.planform)
 while x <= 11:
     critstress.append(fn.web_buckling(x, tn.wingbox, tn.planform, tn.aluminum, locvertstringers) / fn.shear_stress(x, tn.wingbox.height(tn.planform, x), tn.wingbox, tn.planform))
     x += 0.01
