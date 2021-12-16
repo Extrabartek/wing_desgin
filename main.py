@@ -592,8 +592,7 @@ def tau_max(x, wingbox, planform):
     step_size = wingbox.height(planform, x) / 10
 
     for h in np.arange(0, (2 * wingbox.height(planform, x) + step_size * 0.95), step_size):
-        max_list.append(math.sqrt(
-            shear_stress(x, h, wingbox, planform) ** 2 + (1 / 2 * normal_stress(x, wingbox, planform, h)) ** 2))
+        max_list.append(math.sqrt(shear_stress(x, h, wingbox, planform) ** 2 + (1 / 2 * normal_stress(x, wingbox, planform, h)) ** 2))
 
     return max(max_list), np.argmax(max_list)
 
@@ -722,9 +721,8 @@ def vertstringer_spacing_web(material, wingbox,planform, x):
     :param x: distance along the wing
     :return:
     '''
-    ks = 4
-    dummy_lst = []
-    b = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * tau_max(0, wingbox, planform)[0]))
+    ks = 4.5
+    b = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * shear_stress(x, wingbox.height(planform, x), wingbox, planform)))
     a = wingbox.height(planform, 0) * 2
     output = b
     if a/b < 1:
@@ -747,7 +745,7 @@ def column_buckling(x, stringer):
     """
 
     K = 1.  # Factor for end conditions of stringers
-    return (K * (math.pi ** 2) * stringer.material.E * stringer.moment_inertia()) / (x ** 2 * stringer.area())
+    return (K * (np.pi ** 2) * stringer.material.E * stringer.moment_inertia()) / (x ** 2 * stringer.area())
 
 
 def skin_buckling(y, wingbox, planform):
@@ -771,13 +769,13 @@ def skin_buckling(y, wingbox, planform):
     # When first pair is removed, b = b + b_basic
     # ...
 
-    return ((math.pi ** 2) * k_c * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
+    return ((np.pi ** 2) * k_c * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
                 wingbox.t_top / b) ** 2
 
 
 def web_buckling(y, wingbox, planform, material, stringers_list):
     """
-    This function returns the critical stress for web buckling  to occur
+    This function returns the critical stress for web buckling to occur
 
     :param y: Distance from the root [m]
     :type y: float
