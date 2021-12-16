@@ -690,7 +690,7 @@ def dynamic_pressure(wingbox, planform):
 
 def rib_spacing_column(normal_stress):
     """
-    This function returns the rivet spacing to meet a certain critical stress
+    This function returns the rib spacing to meet a certain critical stress
 
 
     :param normal_stress: normal stress at a certain point along the wing
@@ -709,7 +709,7 @@ def rib_spacing_column(normal_stress):
 
     M_max = 1 * 10 ** 6
     # sigma_M = M * y / I
-    L = np.sqrt(K * np.pi ** 2 * E * I / (sigma_cr * A))  # Spacing of the rivets [m]
+    L = np.sqrt(K * np.pi ** 2 * E * I / (sigma_cr * A))  # Spacing of the ribs [m]
     print('Rib spacing is', L)
     return L
 
