@@ -36,7 +36,7 @@ print("Maximum size of crack such that wing skin fails at limit load = ", c_max,
 
 sigmapos = tn.normal_list[0]
 sigmaneg = tn.normal_list[1]
-
+'''
 x = 0
 rib_placement = []
 vertstringer_placement = []
@@ -52,21 +52,56 @@ while x <= 15.5:
     vertstringer_placement.append(x + fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox, tn.planform, x))
     x = vertstringer_placement[i]
     i = i + 1
+'''
 
-b = np.linspace(0, 15.5, 100)
-plt.plot(b, fn.web_buckling(b, tn.wingbox, tn.planform))
+vertstringer_placement = []
+rib_placement = []
+x = 0
+y = 0
+i = 0
+j = 0
+while x <= tn.planform.b/2:
+    rib_placement.append(x + fn.rib_spacing_column(abs(fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x)/2))))
+    x = rib_placement[i]
+    while y + fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox,tn.planform, y) <= x:
+        vertstringer_placement.append(y + fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox, tn.planform, y))
+        y = vertstringer_placement[j]
+        j = j + 1
+    y = rib_placement[i]
+    i = i + 1
+
+locvertstringers = []
+locribs = []
+for i in range(len(vertstringer_placement)-1):
+    if vertstringer_placement[i] <= tn.planform.b/2:
+        locvertstringers.append(vertstringer_placement[i])
+
+for i in range(len(rib_placement)-1):
+    if rib_placement[i] <= tn.planform.b/2:
+        locribs.append(rib_placement[i])
+
+x = 0
+critstress = []
+while x <= 11:
+    critstress.append(fn.web_buckling(x, tn.wingbox, tn.planform, tn.aluminum, locvertstringers) / fn.shear_stress(x, tn.wingbox.height(tn.planform, x), tn.wingbox, tn.planform))
+    x += 0.01
+del critstress[-1]
+critstress = np.array(critstress)
+b = np.arange(0, 11, 0.01)
+plt.plot(b, critstress)
 plt.show()
 
-print('Web buckling critical stress is', fn.web_buckling(0, tn.wingbox, tn.planform)/10**6)
+
+print('Web buckling critical stress is', fn.web_buckling(0, tn.wingbox, tn.planform, tn.aluminum, locvertstringers)/10**6)
 print('Shear stress is', fn.tau_max(0, tn.wingbox, tn.planform)[0]/10**6)
-print('Rib placement =', rib_placement)
-print('Number of ribs is', (len(rib_placement)-1))
-print('Vertical stringer placement is', vertstringer_placement)
-print('Number of vertical stringers is', (len(vertstringer_placement)-1))
+print('Rib placement =', locribs)
+print('Number of ribs is', (len(locribs)))
+print('Vertical stringer placement is', locvertstringers)
+print('Number of vertical stringers is', (len(locvertstringers)))
 print('Vertical stringer placement is', fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox, tn.planform, 0))
 
-
 '''
+
 del sigmapos[-1]  # MOS goes to infinity (very high in graph), del last point for clearer graph
 del sigmaneg[-1]  # Same as the line above
 b = np.arange(0, 15.55, 15.55/(len(sigmapos)-1))

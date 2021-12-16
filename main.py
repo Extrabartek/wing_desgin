@@ -726,13 +726,12 @@ def rib_spacing_web(material, wingbox,planform, x):
     dummy_lst = []
     b = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * tau_max(0, wingbox, planform)[0]))
     a = wingbox.height(planform, 0) * 2
-    dummy_lst.append(b)
+    output = b
     if a/b < 1:
-        b = wingbox.height(planform, y) * 2
-        a = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * tau_max(x, wingbox, planform)[0]))
-        dummy_lst = []
-        dummy_lst.append(a)
-    return dummy_lst
+        b = wingbox.height(planform, x) * 2
+        a = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * shear_stress(x, wingbox.height(planform, x), wingbox, planform)))
+        output = a
+    return output
 
 
 def column_buckling(x, stringer):
@@ -776,7 +775,7 @@ def skin_buckling(y, wingbox, planform):
                 wingbox.t_top / b) ** 2
 
 
-def web_buckling(y, wingbox, planform):
+def web_buckling(y, wingbox, planform, material, stringers_list):
     """
     This function returns the critical stress for web buckling  to occur
 
