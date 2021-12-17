@@ -104,10 +104,12 @@ spacing = []
 fn.load_factor = 2.5
 fn.AoA = 10
 WP_41.q = fn.dynamic_pressure(tn.wingbox, tn.planform)
-
 while x <= 11:
-    critstress.append(fn.web_buckling(x, tn.wingbox, tn.planform, tn.aluminum, stiffening_elements) / fn.shear_stress(x, tn.wingbox.height(tn.planform, x), tn.wingbox, tn.planform))
-    spacing.append(fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox, tn.planform, x))
+    number = fn.web_buckling(x, tn.wingbox, tn.planform, tn.aluminum, stiffening_elements) / fn.shear_stress(x, tn.wingbox.height(tn.planform, x), tn.wingbox, tn.planform)
+    if number > 4:
+        critstress.append(4)
+    else:
+        critstress.append(number)
     x += 0.01
 del critstress[-1]
 critstress = np.array(critstress)
