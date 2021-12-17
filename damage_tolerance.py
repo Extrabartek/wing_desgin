@@ -74,6 +74,8 @@ while x <= tn.planform.b/2:
     y = rib_placement[i]
     i = i + 1
 
+
+
 locvertstringers = []
 locribs = []
 for i in range(len(vertstringer_placement)-1):
@@ -84,14 +86,27 @@ for i in range(len(rib_placement)-1):
     if rib_placement[i] <= tn.planform.b/2:
         locribs.append(rib_placement[i])
 
+
+stiffening_elements = locvertstringers
+'''
+for element in locvertstringers:
+    stiffening_elements.append(element)
+'''
+
+for i in range(len(locribs)):
+    stiffening_elements.append(locribs[i])
+stiffening_elements.sort()
+print(stiffening_elements)
+
 x = 0
 critstress = []
 spacing = []
 fn.load_factor = 2.5
 fn.AoA = 10
 WP_41.q = fn.dynamic_pressure(tn.wingbox, tn.planform)
+
 while x <= 11:
-    critstress.append(fn.web_buckling(x, tn.wingbox, tn.planform, tn.aluminum, locvertstringers) / fn.shear_stress(x, tn.wingbox.height(tn.planform, x), tn.wingbox, tn.planform))
+    critstress.append(fn.web_buckling(x, tn.wingbox, tn.planform, tn.aluminum, stiffening_elements) / fn.shear_stress(x, tn.wingbox.height(tn.planform, x), tn.wingbox, tn.planform))
     spacing.append(fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox, tn.planform, x))
     x += 0.01
 del critstress[-1]
@@ -103,15 +118,12 @@ b = np.arange(0, 11, 0.01)
 plt.plot(b, critstress)
 plt.show()
 
-plt.plot(b, spacing)
-plt.show()
-
 print('Web buckling critical stress is', fn.web_buckling(0, tn.wingbox, tn.planform, tn.aluminum, locvertstringers)/10**6)
 print('Shear stress is', fn.shear_stress(0, tn.wingbox.height(tn.planform, 0), tn.wingbox, tn.planform)/10**6)
 print('Rib placement =', locribs)
 print('Number of ribs is', (len(locribs)))
 print('Vertical stringer placement is', locvertstringers)
-print('Number of vertical stringers is', (len(locvertstringers)))
+print('Number of vertical stringers is', (len(locvertstringers)- len(locribs)))
 print('Vertical stringer placement is', fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox, tn.planform, 0))
 
 '''
