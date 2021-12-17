@@ -722,12 +722,20 @@ def vertstringer_spacing_web(material, wingbox,planform, x):
     :return:
     '''
     ks = 4.5
-    b = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * 1.1* shear_stress(x, wingbox.height(planform, x), wingbox, planform)))
+    interval = 0.5
+    stepsize = 0.1
+
+    stress_list = []
+
+    for x in np.arange(x, x + interval, stepsize):
+        stress_list.append(shear_stress(x, wingbox.height(planform, x), wingbox, planform))
+    stress = max(stress_list)
+    b = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * 1.1* stress))
     a = wingbox.height(planform, 0) * 2
     output = b
     if a/b < 1:
         b = wingbox.height(planform, x) * 2
-        a = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * 1.1* shear_stress(x, wingbox.height(planform, x), wingbox, planform)))
+        a = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * 1.1 * stress))
         output = a
     return output
 

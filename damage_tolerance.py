@@ -115,7 +115,6 @@ del critstress[-1]
 critstress = np.array(critstress)
 del spacing[-1]
 spacing = np.array(spacing)
-
 b = np.arange(0, 11, 0.01)
 plt.plot(b, critstress)
 plt.show()
