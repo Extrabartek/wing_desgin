@@ -65,8 +65,11 @@ y = 0
 i = 0
 j = 0
 while x <= tn.planform.b/2:
-    rib_placement.append(x + fn.rib_spacing_column(abs(fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x)/2))))
+    rib_placement.append(x + fn.rib_spacing_column(abs(fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x)/2)), tn.wingbox.stringers_top[0]))
     x = rib_placement[i]
+    if x > tn.planform.b / 2:
+        print("I broke the infinite loop")
+        break
     while y + fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox,tn.planform, y) <= x:
         vertstringer_placement.append(y + fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox, tn.planform, y))
         y = vertstringer_placement[j]
@@ -113,7 +116,6 @@ while x <= 11:
     x += 0.01
 del critstress[-1]
 critstress = np.array(critstress)
-del spacing[-1]
 spacing = np.array(spacing)
 b = np.arange(0, 11, 0.01)
 plt.plot(b, critstress)

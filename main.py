@@ -687,13 +687,14 @@ def dynamic_pressure(wingbox, planform):
     return q
 
 
-def rib_spacing_column(normal_stress):
+def rib_spacing_column(normal_stress, stringer):
     """
     This function returns the rib spacing to meet a certain critical stress
 
 
     :param normal_stress: normal stress at a certain point along the wing
     :return: rivet spacing [m]
+    :param stringer: The stringer used for the calculations
     :rtype: float
     """
 
@@ -703,8 +704,9 @@ def rib_spacing_column(normal_stress):
     t = 0.002  # Stringer thickness [m]
 
     sigma_cr = 1.25 * normal_stress  # Critical stress defined [Pa]
-    A = a * t  # Area of the stringer [m^2]
-    I = 2 * a / 8 * t * a ** 2 / 64 + a / 4 * t * a ** 2 / 64 + 2 / 12 * a ** 3 / 64 * t  # Moment of inertia of the stringer [m^4]
+    A = stringer.area()  # Area of the stringer [m^2]
+    I = stringer.moment_inertia()
+    # I = 2 * a / 8 * t * a ** 2 / 64 + a / 4 * t * a ** 2 / 64 + 2 / 12 * a ** 3 / 64 * t  # Moment of inertia of the stringer [m^4]
 
     M_max = 1 * 10 ** 6
     # sigma_M = M * y / I

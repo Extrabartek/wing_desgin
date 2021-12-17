@@ -35,11 +35,11 @@ def does_it_work(wingbox, planform):
 planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
 
 t = 0.001  # meter
-a = 0.05  # meter
-t_top = 0.004
-t_bottom = 0.003
+a = 0.04  # meter
+t_top = 0.0042
+t_bottom = 0.0032
 t_spar = 0.005
-step_size = 1
+step_size = 0.5
 rangy_range_2 = np.arange(0, planform.b/2, step_size)
 
 
@@ -47,8 +47,8 @@ aluminum = fn.Material(2700, 276 * (10 ** 6), 310 * (10 ** 6), 68.9 * (10 ** 9),
 # list_of_stringer_lengths = [0.7, 1.2, 1.6, 1.9, 2.2, 2.5, 2.7, 3.0, 3.2, 3.5, 3.7, 3.9, 4.1, 4.3, 4.4, 4.7, 4.9, 5.2, 15.5, 15.5]
 list_of_stringer_top = []
 list_of_stringer_bottom = []
-list_of_stringer_lengths1 = [15.600000000000001, 14.950000000000001, 14.950000000000001, 14.55, 13.700000000000001, 13.700000000000001, 13.700000000000001, 12.000000000000002, 12.000000000000002, 12.000000000000002, 12.000000000000002, 12.000000000000002, 12.000000000000002, 12.000000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001]
-list_of_stringer_lengths2 = [15.600000000000001, 14.850000000000001, 14.850000000000001, 14.450000000000001, 13.55, 13.55, 13.55, 11.8, 11.8, 11.8, 11.8, 11.8, 11.8, 11.8, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001]
+list_of_stringer_lengths1 = [15.600000000000001, 15.600000000000001,1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 2.1, 2.1, 2.1, 2.1, 2.1, 2.1, 2.1, 2.1, 1.2, 1.2, 0.6, 0.6,0.6, 0.6,14.950000000000001, 14.950000000000001, 14.55, 13.700000000000001, 13.700000000000001, 13.700000000000001, 12.000000000000002, 12.000000000000002, 12.000000000000002, 12.000000000000002, 12.000000000000002, 12.000000000000002, 12.000000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001]
+list_of_stringer_lengths2 = [15.600000000000001, 15.600000000000001,1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 2.1, 2.1, 2.1, 2.1, 2.1, 2.1, 2.1, 2.1, 1.2, 1.2, 0.6, 0.6,0.6, 0.6,14.850000000000001, 14.850000000000001, 14.450000000000001, 13.55, 13.55, 13.55, 11.8, 11.8, 11.8, 11.8, 11.8, 11.8, 11.8, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001]
 
 for x in range(len(list_of_stringer_lengths1)):
     list_of_stringer_top.append(fn.Stringer(t, a, list_of_stringer_lengths1[x], aluminum))
@@ -61,6 +61,7 @@ wingbox = fn.WingBox([t_top, t_bottom, t_spar], list_of_stringer_top, list_of_st
 tau_max_list = [[], []]
 buckling_stringer_count = [[], []]
 actual_stringer_count = [[], []]
+spacing_list = [[],[]]
 
 fn.load_factor = 2.5
 fn.AoA = 10
@@ -73,6 +74,10 @@ for x in rangy_range_2:
     # for stringer in wingbox.stringers_top:
         # number += (stringer.x_stop > x)
     # actual_stringer_count[0].append(number)
+    # stringer_count = 0
+    # for stringer in wingbox.stringers_top:
+        # stringer_count += (stringer.x_stop >= x) * 1
+    # spacing_list[0].append((wingbox.width(planform, x) - stringer_count * wingbox.stringers_top[0].a)/(stringer_count-1))
 
 fn.load_factor = -1
 fn.AoA = -10
@@ -83,8 +88,13 @@ for x in rangy_range_2:
     # buckling_stringer_count[1].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
     # number = 0
     # for stringer in wingbox.stringers_bottom:
-     #    number += (stringer.x_stop > x)
-   #  actual_stringer_count[1].append(number)
+         # number += (stringer.x_stop > x)
+    # actual_stringer_count[1].append(number)
+    # stringer_count = 0
+    # for stringer in wingbox.stringers_bottom:
+        # stringer_count += (stringer.x_stop >= x) * 1
+    # spacing_list[1].append(
+        #(wingbox.width(planform, x) - stringer_count * wingbox.stringers_top[0].a) / (stringer_count - 1))
 
 
 
@@ -95,7 +105,7 @@ for x in rangy_range_2:
     proc80_yid_list.append((aluminum.sig_yld / 2) * 0.8)
 
 plt.plot(rangy_range_2, tau_max_list[0], label="Load factor: 2.5")
-plt.plot(rangy_range_2, tau_max_list[1], label="Load factor: -1.0")
+# plt.plot(rangy_range_2, tau_max_list[1], label="Load factor: -1.0")
 # plt.axis([0, planform.b / 2, int(min(min(tau_max_list[0]), min(tau_max_list[1])) * 1.1), int(yid_list[0] * 1.1)])
 plt.plot(rangy_range_2, yid_list, label="Half yield stress")
 plt.plot(rangy_range_2, proc80_yid_list, label="80% of half yield stress")
@@ -136,6 +146,18 @@ for stringer in fn.stringer_length_conversion(buckling_stringer_count[1], wingbo
 
 print(f"{list_of_length_req1} top side")
 print(f"{list_of_length_req2} bottom side")
+'''
+'''
+plt.plot(rangy_range_2, spacing_list[0], label="Top spacing")
+plt.plot(rangy_range_2, spacing_list[1], label="Bottom spacing")
+# plt.axis([0, planform.b / 2, int(min(min(tau_max_list[0]), min(tau_max_list[1])) * 1.1), int(yid_list[0] * 1.1)])
+plt.title("Design Option 2: Maximum Shear Stress Distribution")
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Spacing [m]")
+plt.tight_layout()
+plt.grid()
+plt.legend()
+plt.show()
 '''
 fn.load_factor = 2.5
 fn.AoA = 10
