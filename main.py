@@ -722,12 +722,12 @@ def vertstringer_spacing_web(material, wingbox,planform, x):
     :return:
     '''
     ks = 4.5
-    b = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * shear_stress(x, wingbox.height(planform, x), wingbox, planform)))
+    b = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * 1.1* shear_stress(x, wingbox.height(planform, x), wingbox, planform)))
     a = wingbox.height(planform, 0) * 2
     output = b
     if a/b < 1:
         b = wingbox.height(planform, x) * 2
-        a = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * shear_stress(x, wingbox.height(planform, x), wingbox, planform)))
+        a = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * 1.1* shear_stress(x, wingbox.height(planform, x), wingbox, planform)))
         output = a
     return output
 
@@ -820,7 +820,7 @@ def web_buckling(y, wingbox, planform, material, stringers_list):
     taumax = max(tau)
     print('Tau max is', taumax)
     '''
-    k_s = 5.5
+    k_s = 4.5
     a = wingbox.height(planform, y) * 2  # Not relevant (only short side used in calculations for tau_cr)
 
     global dummy
@@ -846,5 +846,5 @@ def web_buckling(y, wingbox, planform, material, stringers_list):
         b = wingbox.height(planform, y) * 2
         output = b
 
-    return ((np.pi ** 2) * k_s * wingbox.material.E) / (12 * (1 - wingbox.material.nu ** 2)) * (
+    return ((np.pi ** 2) * k_s * material.E) / (12 * (1 - material.nu ** 2)) * (
                 wingbox.t_spar / output) ** 2

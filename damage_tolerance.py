@@ -53,10 +53,13 @@ while x <= 15.5:
     vertstringer_placement.append(x + fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox, tn.planform, x))
     x = vertstringer_placement[i]
     i = i + 1
-'''
 
+'''
 vertstringer_placement = []
 rib_placement = []
+fn.load_factor = 2.5
+fn.AoA = 10
+WP_41.q = fn.dynamic_pressure(tn.wingbox, tn.planform)
 x = 0
 y = 0
 i = 0
@@ -83,18 +86,25 @@ for i in range(len(rib_placement)-1):
 
 x = 0
 critstress = []
+spacing = []
 fn.load_factor = 2.5
 fn.AoA = 10
 WP_41.q = fn.dynamic_pressure(tn.wingbox, tn.planform)
 while x <= 11:
     critstress.append(fn.web_buckling(x, tn.wingbox, tn.planform, tn.aluminum, locvertstringers) / fn.shear_stress(x, tn.wingbox.height(tn.planform, x), tn.wingbox, tn.planform))
+    spacing.append(fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox, tn.planform, x))
     x += 0.01
 del critstress[-1]
 critstress = np.array(critstress)
+del spacing[-1]
+spacing = np.array(spacing)
+
 b = np.arange(0, 11, 0.01)
 plt.plot(b, critstress)
 plt.show()
 
+plt.plot(b, spacing)
+plt.show()
 
 print('Web buckling critical stress is', fn.web_buckling(0, tn.wingbox, tn.planform, tn.aluminum, locvertstringers)/10**6)
 print('Shear stress is', fn.tau_max(0, tn.wingbox, tn.planform)[0]/10**6)
