@@ -107,7 +107,7 @@ plt.plot(b, spacing)
 plt.show()
 
 print('Web buckling critical stress is', fn.web_buckling(0, tn.wingbox, tn.planform, tn.aluminum, locvertstringers)/10**6)
-print('Shear stress is', fn.tau_max(0, tn.wingbox, tn.planform)[0]/10**6)
+print('Shear stress is', fn.shear_stress(0, tn.wingbox.height(tn.planform, 0), tn.wingbox, tn.planform)/10**6)
 print('Rib placement =', locribs)
 print('Number of ribs is', (len(locribs)))
 print('Vertical stringer placement is', locvertstringers)

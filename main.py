@@ -657,11 +657,11 @@ def stringer_length_conversion(number_of_stringer_list, stringer, step_size, ran
 
     list_stringers = []
 
-    for a in range(int(max(number_of_stringer_list))):
+    for a in range(math.ceil(max(number_of_stringer_list))):
         list_stringers.append(Stringer(stringer.t, stringer.a, 0, stringer.material))
 
     for x in rangy:
-        for a in range(int(number_of_stringer_list[int(x / step_size)])):
+        for a in range(math.ceil(number_of_stringer_list[int(x / step_size)])):
             list_stringers[a].x_stop = x + step_size
 
     return list_stringers

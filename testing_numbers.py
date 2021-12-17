@@ -10,13 +10,24 @@ planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
 stringer_full = fn.Stringer(0.003, 0.08, planform.b / 2, aluminum)
 list_stringers = []
 rib_list =[]
-for x in range(20):
-    list_stringers.append(stringer_full)
-wingbox = fn.WingBox([0.005, 0.005, 0.005], list_stringers, list_stringers, rib_list, aluminum)
+list_of_stringer_top = []
+t = 0.0025
+a = 0.10
+list_of_stringer_bottom = []
+list_of_stringer_lengths1 = [15.56, 14.73, 14.73, 14.09, 13.31, 13.31, 11.19, 11.19, 11.19, 11.19, 11.19, 11.19, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995]
+list_of_stringer_lengths2 = [15.56, 14.3, 14.3, 13.75, 12.25, 12.25, 9.13, 9.13, 9.13, 9.13, 9.13, 9.13, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997]
+
+for x in range(len(list_of_stringer_lengths1)):
+    list_of_stringer_top.append(fn.Stringer(t, a, list_of_stringer_lengths1[x], aluminum))
+for x in range(len(list_of_stringer_lengths2)):
+    list_of_stringer_bottom.append(fn.Stringer(t, a, list_of_stringer_lengths2[x], aluminum))
+wingbox = fn.WingBox([0.005, 0.005, 0.005], list_of_stringer_top, list_of_stringer_bottom, rib_list, aluminum)
 WP41.b = planform.b
 WP41.cr = planform.cr
 WP41.ct = planform.ct
 WP41.q = fn.dynamic_pressure(wingbox, planform)
+
+
 
 # List statements
 twist_list = [[], []]
