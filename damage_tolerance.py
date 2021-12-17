@@ -126,7 +126,7 @@ print('Shear stress is', fn.shear_stress(0, tn.wingbox.height(tn.planform, 0), t
 print('Rib placement =', locribs)
 print('Number of ribs is', (len(locribs)))
 print('Vertical stringer placement is', locvertstringers)
-print('Number of vertical stringers is', (len(locvertstringers)- len(locribs)))
+print('Number of vertical stringers is', (len(locvertstringers) - len(locribs)))
 print('Vertical stringer placement is', fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox, tn.planform, 0))
 
 '''

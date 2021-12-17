@@ -699,9 +699,9 @@ def rib_spacing_column(normal_stress, stringer):
     """
 
     K = 1
-    E = 69 * 10 ** 9
-    a = 0.15  # Stringer a [m]
-    t = 0.002  # Stringer thickness [m]
+    E = stringer.material.E
+    # a = stringer.a  # Stringer a [m]
+    # t = stringer.t # Stringer thickness [m]
 
     sigma_cr = 1.25 * normal_stress  # Critical stress defined [Pa]
     A = stringer.area()  # Area of the stringer [m^2]

@@ -166,5 +166,7 @@ WP41.q = fn.dynamic_pressure(wingbox, planform)
 print(f"Twist is {math.degrees(fn.twist_angle(planform.b / 2, wingbox, aluminum, planform))} degree")
 print(f"Deflection is {fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)} meters")
 
+
 # [15.56, 14.71, 14.71, 13.37, 13.37, 13.37, 11.29, 11.29, 11.29, 11.29, 11.29, 6.89, 6.89, 6.89, 6.89, 6.89, 6.89, 6.89, 6.89, 6.89, 6.89, 6.89] top side
 # [15.56, 14.28, 14.28, 12.95, 12.34, 12.34, 9.4, 9.4, 9.4, 9.4, 9.4, 3.2399999999999998, 3.2399999999999998, 3.2399999999999998, 3.2399999999999998, 3.2399999999999998, 3.2399999999999998, 3.2399999999999998, 3.2399999999999998, 3.2399999999999998, 3.2399999999999998, 3.2399999999999998] bottom side
+
