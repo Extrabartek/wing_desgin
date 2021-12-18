@@ -129,8 +129,8 @@ print('Vertical stringer placement is', locvertstringers)
 print('Number of vertical stringers is', (len(locvertstringers) - len(locribs)))
 print('Vertical stringer placement is', fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox, tn.planform, 0))
 
-'''
 
+'''
 del sigmapos[-1]  # MOS goes to infinity (very high in graph), del last point for clearer graph
 del sigmaneg[-1]  # Same as the line above
 b = np.arange(0, 15.55, 15.55/(len(sigmapos)-1))
