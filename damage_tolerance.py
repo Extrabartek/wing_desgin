@@ -65,7 +65,7 @@ y = 0
 i = 0
 j = 0
 while x <= tn.planform.b/2:
-    rib_placement.append(x + fn.rib_spacing_column(abs(fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x)/2)), tn.wingbox.stringers_top[0]))
+    rib_placement.append(x + fn.rib_spacing_column(abs(fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x)*2)), tn.wingbox.stringers_top[0]))
     x = rib_placement[i]
     if x > tn.planform.b / 2:
         print("I broke the infinite loop")
@@ -102,23 +102,40 @@ stiffening_elements.sort()
 print(stiffening_elements)
 
 x = 0
-critstress = []
+critstressweb = []
 spacing = []
-fn.load_factor = 2.5
-fn.AoA = 10
-WP_41.q = fn.dynamic_pressure(tn.wingbox, tn.planform)
 while x <= 11:
     number = fn.web_buckling(x, tn.wingbox, tn.planform, tn.aluminum, stiffening_elements) / fn.shear_stress(x, tn.wingbox.height(tn.planform, x), tn.wingbox, tn.planform)
     if number > 4:
-        critstress.append(4)
+        critstressweb.append(4)
     else:
-        critstress.append(number)
+        critstressweb.append(number)
     x += 0.01
-del critstress[-1]
-critstress = np.array(critstress)
+del critstressweb[-1]
+critstressweb = np.array(critstressweb)
 spacing = np.array(spacing)
+
+critstresscolumn = []
+while x <= 11:
+    number = fn.column_buckling(x, tn.wingbox.stringers_top[0]) / fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x)*2)
+    if number > 4:
+        critstresscolumn.append(4)
+    else:
+        critstresscolumn.append(number)
+    x += 0.01
+
+del critstresscolumn[-1]
+critstresscolumn = np.array(critstresscolumn)
 b = np.arange(0, 11, 0.01)
-plt.plot(b, critstress)
+
+plt.plot(b, critstressweb, label = "MOS web buckling")
+plt.plot(b, critstresscolumn, label = "MOS Column Buckling")
+plt.axis([0, tn.planform.b / 2, min(min(critstressweb), min(critstresscolumn))* 1.1, max(max(critstressweb), max(critstresscolumn)) * 1.1])
+plt.legend()
+plt.title('Margin of safety for web buckling')
+plt.xlabel("Distance from root [m]")
+plt.ylabel("Margin of safety [-]")
+plt.grid()
 plt.show()
 
 print('Web buckling critical stress is', fn.web_buckling(0, tn.wingbox, tn.planform, tn.aluminum, locvertstringers)/10**6)
