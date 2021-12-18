@@ -692,9 +692,13 @@ def rib_spacing_column(normal_stress, stringer):
     This function returns the rib spacing to meet a certain critical stress
 
 
-    :param normal_stress: normal stress at a certain point along the wing
-    :return: rivet spacing [m]
-    :param stringer: The stringer used for the calculations
+    :param x: Distance away from the root [m]
+    :type x: float
+    :param wingbox: The wingbox used
+    :type wingbox: WingBox
+    :param planform: The planform used
+    :type planform: Planform
+    :return: The spacing of the next rib
     :rtype: float
     """
 
@@ -714,7 +718,8 @@ def rib_spacing_column(normal_stress, stringer):
     print('Rib spacing is', L)
     return L
 
-def vertstringer_spacing_web(material, wingbox,planform, x):
+
+def vertstringer_spacing_web(material, wingbox, planform, x):
     '''
     This function gives the vertical stringer spacing required to account for web buckling
     :param material: material used
@@ -732,10 +737,10 @@ def vertstringer_spacing_web(material, wingbox,planform, x):
     for x in np.arange(x, x + interval, stepsize):
         stress_list.append(shear_stress(x, wingbox.height(planform, x), wingbox, planform))
     stress = max(stress_list)
-    b = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * 1.1* stress))
+    b = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * 1.1 * stress))
     a = wingbox.height(planform, 0) * 2
     output = b
-    if a/b < 1:
+    if a / b < 1:
         b = wingbox.height(planform, x) * 2
         a = np.pi * wingbox.t_spar * np.sqrt((ks * material.E) / (12 * (1 - material.nu ** 2) * 1.1 * stress))
         output = a
@@ -773,8 +778,10 @@ def skin_buckling_stringer_count(y, wingbox, planform):
     """
 
     k_c = 4  # assumed to be constant
-    b_basic = (wingbox.width(planform, y) - len(wingbox.stringers_top) * (wingbox.stringers_top[0].a / 2)) / (
-            len(wingbox.stringers_top) - 1)
+
+    number_of_stringers = len(wingbox.stringers_top) * (load_factor == 2.5) + len(wingbox.stringers_bottom) * (load_factor == -1)
+    b_basic = (wingbox.width(planform, y) - number_of_stringers * (wingbox.stringers_top[0].a / 2)) / (
+            number_of_stringers - 1)
     b_basic_seq = [b_basic]
     b_real = 0
 
@@ -794,7 +801,7 @@ def skin_buckling_stringer_count(y, wingbox, planform):
         return -1, False
 
     if b_min > wingbox.width(planform, y):
-        return wingbox.width(planform, y) , True
+        return wingbox.width(planform, y), True
 
     i = 0
     while b_basic_seq[i] < b_min:
@@ -840,11 +847,11 @@ def web_buckling(y, wingbox, planform, material, stringers_list):
             if i == 0:
                 y = 0
             else:
-                y = stringers_list[i-1]
+                y = stringers_list[i - 1]
                 dummy = i
                 break
 
-    b = stringers_list[dummy] - stringers_list[dummy-1]
+    b = stringers_list[dummy] - stringers_list[dummy - 1]
     output = b
     """
     if y < stringers_list[0]:
@@ -867,4 +874,4 @@ def web_buckling(y, wingbox, planform, material, stringers_list):
         output = b
 
     return ((np.pi ** 2) * k_s * material.E) / (12 * (1 - material.nu ** 2)) * (
-                wingbox.t_spar / output) ** 2
+            wingbox.t_spar / output) ** 2

@@ -65,7 +65,7 @@ y = 0
 i = 0
 j = 0
 while x <= tn.planform.b/2:
-    rib_placement.append(x + fn.rib_spacing_column(abs(fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x)*2)), tn.wingbox.stringers_top[0]))
+    rib_placement.append(x + fn.rib_spacing_column(x, tn.wingbox, tn.planform))
     x = rib_placement[i]
     if x > tn.planform.b / 2:
         print("I broke the infinite loop")

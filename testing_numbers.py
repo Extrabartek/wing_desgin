@@ -9,25 +9,26 @@ aluminum = fn.Material(2700, 276 * (10 ** 6), 310 * (10 ** 6), 68.9 * (10 ** 9),
 planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
 stringer_full = fn.Stringer(0.003, 0.08, planform.b / 2, aluminum)
 list_stringers = []
-rib_list =[]
+rib_list = [1.0358219781600446, 2.092566819700103, 3.1769008553898237, 4.297432806130567, 5.465739226914051, 6.698567110111765, 7.963634682512992, 9.345771397237678, 10.911089148344796, 12.802971956868905]
 list_of_stringer_top = []
 t = 0.001
-a = 0.10
+a = 0.16
 list_of_stringer_bottom = []
 list_of_stringer_lengths1 = [15.56, 14.73, 14.73, 14.09, 13.31, 13.31, 11.19, 11.19, 11.19, 11.19, 11.19, 11.19, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995]
-list_of_stringer_lengths2 = [15.56, 14.3, 14.3, 13.75, 12.25, 12.25, 9.13, 9.13, 9.13, 9.13, 9.13, 9.13, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997, 2.9299999999999997]
+list_of_stringer_lengths2 = [15.600000000000001, 14.500000000000002, 14.500000000000002, 13.700000000000001, 11.950000000000001, 11.950000000000001, 11.950000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 15.555]
 
 for x in range(len(list_of_stringer_lengths1)):
     list_of_stringer_top.append(fn.Stringer(t, a, list_of_stringer_lengths1[x], aluminum))
 for x in range(len(list_of_stringer_lengths2)):
     list_of_stringer_bottom.append(fn.Stringer(t, a, list_of_stringer_lengths2[x], aluminum))
-wingbox = fn.WingBox([0.005, 0.005, 0.005], list_of_stringer_top, list_of_stringer_bottom, rib_list, aluminum)
+wingbox = fn.WingBox([0.006, 0.005, 0.005], list_of_stringer_top, list_of_stringer_bottom, rib_list, aluminum)
 WP41.b = planform.b
 WP41.cr = planform.cr
 WP41.ct = planform.ct
 WP41.q = fn.dynamic_pressure(wingbox, planform)
 
-
+fn.fuel = 0
+print(wingbox.total_weight(planform, aluminum))
 
 # List statements
 twist_list = [[], []]

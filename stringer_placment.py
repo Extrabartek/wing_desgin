@@ -34,21 +34,21 @@ def does_it_work(wingbox, planform):
 '''
 planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
 
-t = 0.001  # meter
-a = 0.04  # meter
-t_top = 0.0042
-t_bottom = 0.0032
+t = 0.0015  # meter
+a = 0.16  # meter
+t_top = 0.006
+t_bottom = 0.005
 t_spar = 0.005
-step_size = 0.5
-rangy_range_2 = np.arange(0, planform.b/2, step_size)
+step_size = 0.01
+rangy_range_2 = np.arange(0, planform.b / 2, step_size)
 
 
 aluminum = fn.Material(2700, 276 * (10 ** 6), 310 * (10 ** 6), 68.9 * (10 ** 9), 26 * (10 ** 9), 0.33)
 # list_of_stringer_lengths = [0.7, 1.2, 1.6, 1.9, 2.2, 2.5, 2.7, 3.0, 3.2, 3.5, 3.7, 3.9, 4.1, 4.3, 4.4, 4.7, 4.9, 5.2, 15.5, 15.5]
 list_of_stringer_top = []
 list_of_stringer_bottom = []
-list_of_stringer_lengths1 = [15.600000000000001, 15.600000000000001, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 2.1, 2.1, 2.1, 2.1, 2.1, 2.1, 2.1, 2.1, 1.2, 1.2, 0.6, 0.6, 0.6, 0.6, 14.950000000000001, 14.950000000000001, 14.55, 13.700000000000001, 13.700000000000001, 13.700000000000001, 12.000000000000002, 12.000000000000002, 12.000000000000002, 12.000000000000002, 12.000000000000002, 12.000000000000002, 12.000000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 8.500000000000002, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001, 0.9500000000000001]
-list_of_stringer_lengths2 = [15.600000000000001, 15.600000000000001, 1.6, 1.6, 1.6, 1.6, 1.6, 1.6, 2.1, 2.1, 2.1, 2.1, 2.1, 2.1, 2.1, 2.1, 1.2, 1.2, 0.6, 0.6, 0.6, 0.6, 14.850000000000001, 14.850000000000001, 14.450000000000001, 13.55, 13.55, 13.55, 11.8, 11.8, 11.8, 11.8, 11.8, 11.8, 11.8, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001]
+list_of_stringer_lengths1 = [15.600000000000001, 14.500000000000002, 14.500000000000002, 13.700000000000001, 11.950000000000001, 11.950000000000001, 11.950000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 15.555]
+list_of_stringer_lengths2 = [15.600000000000001, 14.3, 14.250000000000002, 13.450000000000001, 11.55, 11.55, 11.55, 7.6000000000000005, 7.6000000000000005, 7.6000000000000005, 7.6000000000000005, 7.6000000000000005, 15.555]
 
 for x in range(len(list_of_stringer_lengths1)):
     list_of_stringer_top.append(fn.Stringer(t, a, list_of_stringer_lengths1[x], aluminum))
@@ -61,43 +61,43 @@ wingbox = fn.WingBox([t_top, t_bottom, t_spar], list_of_stringer_top, list_of_st
 tau_max_list = [[], []]
 buckling_stringer_count = [[], []]
 actual_stringer_count = [[], []]
-spacing_list = [[],[]]
+spacing_list = [[], []]
 
 fn.load_factor = 2.5
 fn.AoA = 10
 WP41.q = fn.dynamic_pressure(wingbox, planform)
 
 for x in rangy_range_2:
-    tau_max_list[0].append(fn.tau_max(x, wingbox, planform)[0])
-    # buckling_stringer_count[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
-    # number = 0
-    # for stringer in wingbox.stringers_top:
-        # number += (stringer.x_stop > x)
-    # actual_stringer_count[0].append(number)
-    # stringer_count = 0
-    # for stringer in wingbox.stringers_top:
-        # stringer_count += (stringer.x_stop >= x) * 1
-    # spacing_list[0].append((wingbox.width(planform, x) - stringer_count * wingbox.stringers_top[0].a)/(stringer_count-1))
+    # tau_max_list[0].append(fn.tau_max(x, wingbox, planform)[0])
+    buckling_stringer_count[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
+    number = 0
+    for stringer in wingbox.stringers_top:
+        number += (stringer.x_stop > x)
+    actual_stringer_count[0].append(number)
+    stringer_count = 0
+    for stringer in wingbox.stringers_top:
+        stringer_count += (stringer.x_stop >= x) * 1
+    spacing_list[0].append((wingbox.width(planform, x) - stringer_count * wingbox.stringers_top[0].a / 2)/(stringer_count-1))
 
 fn.load_factor = -1
 fn.AoA = -10
 WP41.q = fn.dynamic_pressure(wingbox, planform)
 
 for x in rangy_range_2:
-    tau_max_list[1].append(fn.tau_max(x, wingbox, planform)[0])
-    # buckling_stringer_count[1].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
-    # number = 0
-    # for stringer in wingbox.stringers_bottom:
-         # number += (stringer.x_stop > x)
-    # actual_stringer_count[1].append(number)
-    # stringer_count = 0
-    # for stringer in wingbox.stringers_bottom:
-        # stringer_count += (stringer.x_stop >= x) * 1
-    # spacing_list[1].append(
-        #(wingbox.width(planform, x) - stringer_count * wingbox.stringers_top[0].a) / (stringer_count - 1))
+    # tau_max_list[1].append(fn.tau_max(x, wingbox, planform)[0])
+    buckling_stringer_count[1].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
+    number = 0
+    for stringer in wingbox.stringers_bottom:
+         number += (stringer.x_stop > x)
+    actual_stringer_count[1].append(number)
+    stringer_count = 0
+    for stringer in wingbox.stringers_bottom:
+        stringer_count += (stringer.x_stop >= x) * 1
+    spacing_list[1].append(
+        (wingbox.width(planform, x) - stringer_count * wingbox.stringers_top[0].a / 2) / (stringer_count - 1))
 
 
-
+'''
 yid_list = []
 proc80_yid_list = []
 for x in rangy_range_2:
@@ -116,9 +116,9 @@ plt.tight_layout()
 plt.grid()
 plt.legend()
 plt.show()
-
-
 '''
+
+
 plt.plot(rangy_range_2, actual_stringer_count[0], label="Real stringer count top")
 plt.plot(rangy_range_2, actual_stringer_count[1], label="Real stringer count bottom")
 plt.plot(rangy_range_2, buckling_stringer_count[0], label="Needed stringers for buckling top")
@@ -144,6 +144,9 @@ for stringer in fn.stringer_length_conversion(buckling_stringer_count[0], wingbo
 for stringer in fn.stringer_length_conversion(buckling_stringer_count[1], wingbox.stringers_top[0], step_size, rangy_range_2):
     list_of_length_req2.append(stringer.x_stop)
 
+list_of_length_req1[-1] = planform.b / 2
+list_of_length_req2[-1] = planform.b / 2
+
 print(f"{list_of_length_req1} top side")
 print(f"{list_of_length_req2} bottom side")
 '''
@@ -158,13 +161,13 @@ plt.tight_layout()
 plt.grid()
 plt.legend()
 plt.show()
-'''
+
 fn.load_factor = 2.5
 fn.AoA = 10
 WP41.q = fn.dynamic_pressure(wingbox, planform)
 
-print(f"Twist is {math.degrees(fn.twist_angle(planform.b / 2, wingbox, aluminum, planform))} degree")
-print(f"Deflection is {fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)} meters")
+# print(f"Twist is {math.degrees(fn.twist_angle(planform.b / 2, wingbox, aluminum, planform))} degree")
+# print(f"Deflection is {fn.vertical_deflection(planform.b / 2, aluminum, wingbox, planform)} meters")
 
 
 # [15.56, 14.71, 14.71, 13.37, 13.37, 13.37, 11.29, 11.29, 11.29, 11.29, 11.29, 6.89, 6.89, 6.89, 6.89, 6.89, 6.89, 6.89, 6.89, 6.89, 6.89, 6.89] top side
