@@ -295,7 +295,6 @@ plt.legend()
 plt.grid()
 plt.show()
 '''
-print(wingbox.width(planform, 8))
 
 plt.plot(rangy_range, stringer_count_skin_buck[0], label="Load factor: 2.5")
 plt.plot(rangy_range, stringer_count_skin_buck[1], label="Load factor: -1")

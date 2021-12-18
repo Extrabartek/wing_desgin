@@ -846,6 +846,16 @@ def web_buckling(y, wingbox, planform, material, stringers_list):
 
     b = stringers_list[dummy] - stringers_list[dummy-1]
     output = b
+    """
+    if y < stringers_list[0]:
+        b = stringers_list[0]
+    elif y > stringers_list[-1]:
+        b = planform.b / 2 - stringers_list[-1]
+    else:
+        for i in range(len(stringers_list)):
+            if y <= stringers_list[i] and y >= stringers_list[i - 1]:
+                b = stringers_list[i] - stringers_list[i - 1]
+    output = b
     '''
     b = np.pi * wingbox.t_spar * np.sqrt(
         (k_s * material.E) / (12 * (1 - material.nu ** 2) * 1.1 * shear_stress(y, wingbox.height(planform, y), wingbox, planform)))
