@@ -106,8 +106,8 @@ critstressweb = []
 spacing = []
 while x <= tn.planform.b/2:
     number = fn.web_buckling(x, tn.wingbox, tn.planform, tn.aluminum, stiffening_elements) / fn.shear_stress(x, tn.wingbox.height(tn.planform, x), tn.wingbox, tn.planform)
-    if number > 4:
-        critstressweb.append(4)
+    if number > 2.5:
+        critstressweb.append(2.5)
     else:
         critstressweb.append(number)
     x += 0.01
@@ -115,18 +115,19 @@ while x <= tn.planform.b/2:
 critstressweb = np.array(critstressweb)
 spacing = np.array(spacing)
 
+x = 0.00
 critstresscolumn = []
-while x <= 11:
-    number = fn.column_buckling(x, tn.wingbox.stringers_top[0]) / fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x)*2)
-    if number > 4:
-        critstresscolumn.append(4)
+while x <= tn.planform.b/2:
+    number = fn.column_buckling(x, tn.wingbox.stringers_top[0], locribs, tn.planform) / abs(fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x)*2))
+    if number > 2.5:
+        critstresscolumn.append(2.5)
     else:
         critstresscolumn.append(number)
     x += 0.01
 
-del critstresscolumn[-1]
+#del critstresscolumn[-1]
 critstresscolumn = np.array(critstresscolumn)
-b = np.arange(0, 11, 0.01)
+b = np.arange(0.00, tn.planform.b/2, 0.01)
 
 plt.plot(b, critstressweb, label = "MOS web buckling")
 plt.plot(b, critstresscolumn, label = "MOS Column Buckling")

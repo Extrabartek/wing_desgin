@@ -687,7 +687,7 @@ def dynamic_pressure(wingbox, planform):
     return q
 
 
-def rib_spacing_column(normal_stress, stringer):
+def rib_spacing_column(x, wingbox, planform):
     """
     This function returns the rib spacing to meet a certain critical stress
 
@@ -703,13 +703,23 @@ def rib_spacing_column(normal_stress, stringer):
     """
 
     K = 1
-    E = stringer.material.E
+    E = wingbox.stringers_top[0].material.E
     # a = stringer.a  # Stringer a [m]
     # t = stringer.t # Stringer thickness [m]
+    interval = 0.5
+    stepsize = 0.1
 
-    sigma_cr = 1.25 * normal_stress  # Critical stress defined [Pa]
-    A = stringer.area()  # Area of the stringer [m^2]
-    I = stringer.moment_inertia()
+    height = (load_factor == 2.5) * wingbox.height(planform, x) * 2
+
+    stress_list = []
+
+    for x in np.arange(x, x + interval, stepsize):
+        stress_list.append(abs(normal_stress(x, wingbox, planform, height)))
+    stress = max(stress_list)
+
+    sigma_cr = 1.1 * stress  # Critical stress defined [Pa]
+    A = wingbox.stringers_top[0].area()  # Area of the stringer [m^2]
+    I = wingbox.stringers_top[0].moment_inertia()
     # I = 2 * a / 8 * t * a ** 2 / 64 + a / 4 * t * a ** 2 / 64 + 2 / 12 * a ** 3 / 64 * t  # Moment of inertia of the stringer [m^4]
 
     M_max = 1 * 10 ** 6
@@ -747,7 +757,7 @@ def vertstringer_spacing_web(material, wingbox, planform, x):
     return output
 
 
-def column_buckling(x, stringer):
+def column_buckling(x, stringer, riblist, planform):
     """
     This function returns the critical stress of the stringer column at a distance X
 
@@ -760,7 +770,19 @@ def column_buckling(x, stringer):
     """
 
     K = 1.  # Factor for end conditions of stringers
-    return (K * (np.pi ** 2) * stringer.material.E * stringer.moment_inertia()) / (x ** 2 * stringer.area())
+    L = 0
+
+    if x < riblist[0]:
+        L = riblist[0]
+    elif x > riblist[-1]:
+        L = planform.b / 2 - riblist[-1]
+    else:
+        for i in range(len(riblist)):
+            if x <= riblist[i] and x >= riblist[i - 1]:
+                L = riblist[i] - riblist[i - 1]
+
+    stress = (K * (np.pi ** 2) * stringer.material.E * stringer.moment_inertia()) / (L ** 2 * stringer.area())
+    return stress
 
 
 def skin_buckling_stringer_count(y, wingbox, planform):
@@ -840,9 +862,9 @@ def web_buckling(y, wingbox, planform, material, stringers_list):
     k_s = 4.5
     a = wingbox.height(planform, y) * 2  # Not relevant (only short side used in calculations for tau_cr)
 
-    global dummy
+    """
     dummy = 1
-    for i in range(len(stringers_list)-1):
+    for i in range(len(stringers_list) - 1):
         if y < stringers_list[i]:
             if i == 0:
                 y = 0
