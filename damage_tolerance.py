@@ -125,13 +125,18 @@ while x <= tn.planform.b/2:
         critstresscolumn.append(number)
     x += 0.01
 
+x = 0.00
+critstressskin = []
+while x <= tn.planform.b/2:
+    number = tn.skin
 #del critstresscolumn[-1]
 critstresscolumn = np.array(critstresscolumn)
 b = np.arange(0.00, tn.planform.b/2, 0.01)
 
 plt.plot(b, critstressweb, label = "MOS web buckling")
 plt.plot(b, critstresscolumn, label = "MOS Column Buckling")
-plt.axis([0, tn.planform.b / 2, 1, 2])
+plt.plot(b, critstressskin, label = "MOS Skin Buckling")
+plt.axis([0, tn.planform.b / 2, 1, 2.8])
 plt.legend()
 plt.title('Margin of safety for web buckling')
 plt.xlabel("Distance from root [m]")
