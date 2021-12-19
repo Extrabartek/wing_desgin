@@ -116,7 +116,7 @@ plt.tight_layout()
 plt.grid()
 plt.legend()
 plt.show()
-'''
+
 
 '''
 plt.plot(rangy_range_2, actual_stringer_count[0], label="Real stringer count top")
