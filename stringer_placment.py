@@ -47,8 +47,9 @@ aluminum = fn.Material(2700, 276 * (10 ** 6), 310 * (10 ** 6), 68.9 * (10 ** 9),
 # list_of_stringer_lengths = [0.7, 1.2, 1.6, 1.9, 2.2, 2.5, 2.7, 3.0, 3.2, 3.5, 3.7, 3.9, 4.1, 4.3, 4.4, 4.7, 4.9, 5.2, 15.5, 15.5]
 list_of_stringer_top = []
 list_of_stringer_bottom = []
-list_of_stringer_lengths1 = [15.600000000000001, 0.2, 0.2, 0.2, 14.900000000000002, 14.900000000000002, 14.400000000000002, 13.400000000000002, 13.400000000000002, 13.400000000000002, 13.400000000000002, 11.55, 11.55, 11.55, 11.55, 11.55, 11.55, 11.55, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 15.555]
-list_of_stringer_lengths2 = [15.600000000000001, 14.8, 14.8, 13.900000000000002, 13.900000000000002, 12.600000000000001, 12.600000000000001, 12.600000000000001, 12.600000000000001, 12.600000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 15.555]
+list_of_stringer_lengths1 = [15.600000000000001, 14.500000000000002, 14.500000000000002, 13.700000000000001, 11.950000000000001, 11.950000000000001, 11.950000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 15.555]
+list_of_stringer_lengths2 = [15.600000000000001, 14.500000000000002, 14.500000000000002, 13.700000000000001, 11.950000000000001, 11.950000000000001, 11.950000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 15.555]
+
 
 for x in range(len(list_of_stringer_lengths1)):
     list_of_stringer_top.append(fn.Stringer(t, a, list_of_stringer_lengths1[x], aluminum))
@@ -68,16 +69,16 @@ fn.AoA = 10
 WP41.q = fn.dynamic_pressure(wingbox, planform)
 
 for x in rangy_range_2:
-    tau_max_list[0].append(fn.tau_max(x, wingbox, planform)[0])
-    # buckling_stringer_count[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
-    # number = 0
-    # for stringer in wingbox.stringers_top:
-        # number += (stringer.x_stop > x)
-    # actual_stringer_count[0].append(number)
-    # stringer_count = 0
-    # for stringer in wingbox.stringers_top:
-        # stringer_count += (stringer.x_stop >= x) * 1
-    # spacing_list[0].append((wingbox.width(planform, x) - stringer_count * wingbox.stringers_top[0].a / 2)/(stringer_count-1))
+    # tau_max_list[0].append(fn.tau_max(x, wingbox, planform)[0])
+    buckling_stringer_count[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
+    number = 0
+    for stringer in wingbox.stringers_top:
+        number += (stringer.x_stop > x)
+    actual_stringer_count[0].append(number)
+    stringer_count = 0
+    for stringer in wingbox.stringers_top:
+        stringer_count += (stringer.x_stop >= x) * 1
+    spacing_list[0].append((wingbox.width(planform, x) - stringer_count * wingbox.stringers_top[0].a / 2)/(stringer_count-1))
 
 fn.load_factor = -1
 fn.AoA = -10

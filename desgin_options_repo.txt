@@ -69,3 +69,6 @@ MOS for web buckling is 1.111382871009835
 MOS for skin buckling is 1.0215492978690912
 MOS for normal stress is 1.827708430681074
 MOS for combined stress is 1.4357734161945703
+
+The deflection at the tip is 0.6696683304270576
+The twist angle at the tip is 0.007294073735417936
