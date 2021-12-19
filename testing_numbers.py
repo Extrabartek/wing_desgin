@@ -14,9 +14,9 @@ list_of_stringer_top = []
 t = 0.001
 a = 0.04
 list_of_stringer_bottom = []
-list_of_stringer_lengths1 = [15.56, 14.73, 14.73, 14.09, 13.31, 13.31, 11.19, 11.19, 11.19, 11.19, 11.19, 11.19, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995]
-list_of_stringer_lengths2 = [15.600000000000001, 14.500000000000002, 14.500000000000002, 13.700000000000001, 11.950000000000001, 11.950000000000001, 11.950000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 15.555]
-
+list_of_stringer_lengths1 = [15.600000000000001, 0.2, 0.2, 0.2, 0.2, 14.900000000000002, 14.900000000000002, 14.400000000000002, 13.400000000000002, 13.400000000000002, 13.400000000000002, 13.400000000000002, 11.55, 11.55, 11.55, 11.55, 11.55, 11.55, 11.55, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7, 15.555]
+list_of_stringer_lengths2 = [15.600000000000001, 14.8, 14.8, 0.2,13.900000000000002, 13.900000000000002, 12.600000000000001, 12.600000000000001, 12.600000000000001, 12.600000000000001, 12.600000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 9.950000000000001, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 15.555]
+combination_of_vertical_stiff = [0.21160043034450057, 0.42394380088945155, 0.6370775720299807, 0.8503830520645674, 1.065240976722662, 1.2810452270801789, 1.497851437278757, 1.7157233197818793, 1.9347181442988592, 2.1549024457766355, 2.3763465999179556, 2.599127291281336, 2.8233204387003745, 3.0490105647239916, 3.2762840517385183, 3.5052332961150725, 3.7359628282497352, 3.968583713867636, 4.2032119921227595, 4.43908627134836, 4.677204455141326, 4.917715337916954, 5.160778909365251, 5.40657147316978, 5.655292662596251, 5.907152732743459, 6.1623922916534575, 6.421280378698733, 6.684115089659066, 6.951235316350674, 7.223028780693003, 7.499935788662708, 7.775008367199394, 8.055807487404174, 8.342786331227028, 8.636478845100617, 8.937638777469553, 9.24720933691539, 9.566332827991376, 9.89642192317952, 10.239264312984583, 10.596387714772384, 10.97152989200857, 11.368865238883892, 11.79414285571838, 12.248839279590102, 12.753796280979744, 13.298631645621448, 13.334788943268922, 13.944859575395707, 14.052037489135284, 15.089089949808034]
 for x in range(len(list_of_stringer_lengths1)):
     list_of_stringer_top.append(fn.Stringer(t, a, list_of_stringer_lengths1[x], aluminum))
 for x in range(len(list_of_stringer_lengths2)):
@@ -310,7 +310,7 @@ plt.legend()
 plt.grid()
 plt.show()
 '''
-
+'''
 plt.plot(rangy_range, stringer_count_skin_buck[0], label="Load factor: 2.5")
 plt.plot(rangy_range, stringer_count_skin_buck[1], label="Load factor: -1")
 # plt.plot(rangy_range, stringer_count_skin_buck1[0], label="Load factor: 2.5")
@@ -322,3 +322,54 @@ plt.ylabel("Vertical deflection [m]")
 plt.legend()
 plt.grid()
 plt.show()
+'''
+
+plt.plot(rangy_range, MOSwebbuck[0], label="MOS Web Buckling")
+plt.plot(rangy_range, MOScolumnbuck[0], label="MOS Column Buckling")
+plt.plot(rangy_range, MOSskinbuck[0], label="MOS Skin Buckling")
+plt.axis([0, planform.b / 2, 1, 4])
+# plt.title('Margin of safety for buckling for load factor 2.5')
+plt.xlabel("Distance from Root [m]")
+plt.ylabel("Margin of Safety [-]")
+plt.legend(loc=2)
+plt.grid()
+plt.show()
+
+plt.plot(rangy_range, MOSwebbuck[1], label="MOS Web Buckling")
+plt.plot(rangy_range, MOScolumnbuck[1], label="MOS Column Buckling")
+plt.plot(rangy_range, MOSskinbuck[1], label="MOS Skin Buckling")
+plt.axis([0, planform.b / 2, 1, 8])
+# plt.title('Margin of safety for buckling for load factor -1')
+plt.xlabel("Distance from Root [m]")
+plt.ylabel("Margin of Safety [-]")
+plt.legend(loc=2)
+plt.grid()
+plt.show()
+
+plt.plot(rangy_range, MOSnormal[0], label="MOS Normal Stress")
+plt.plot(rangy_range, MOScombined[0], label="MOS Combined Stress")
+plt.axis([0, planform.b / 2, 1, 4])
+# plt.title('Margin of safety for stress for load factor 2.5')
+plt.xlabel("Distance from Root [m]")
+plt.ylabel("Margin of Safety [-]")
+plt.tight_layout()
+plt.legend()
+plt.grid()
+plt.show()
+
+plt.plot(rangy_range, MOSnormal[1], label="MOS Normal Stress")
+plt.plot(rangy_range, MOScombined[1], label="MOS Combined Stress")
+plt.axis([0, planform.b / 2, 2, 8])
+# plt.title('Margin of safety for stress for load factor -1')
+plt.xlabel("Distance from Root [m]")
+plt.ylabel("Margin of Safety [-]")
+plt.tight_layout()
+plt.legend()
+plt.grid()
+plt.show()
+
+print(f"MOS for column buckling is {min([min(MOScolumnbuck[0]), min(MOScolumnbuck[1])])}")
+print(f"MOS for web buckling is {min([min(MOSwebbuck[0]), min(MOSwebbuck[1])])}")
+print(f"MOS for skin buckling is {min([min(MOSskinbuck[0]), min(MOSskinbuck[1])])}")
+print(f"MOS for normal stress is {min([min(MOSnormal[0]), min(MOSnormal[1])])}")
+print(f"MOS for combined stress is {min([min(MOScombined[0]), min(MOScombined[1])])}")
