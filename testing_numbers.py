@@ -47,6 +47,7 @@ MMOI_list = []
 torsional_list = []
 stringer_count_skin_buck = [[], []]
 stringer_count_skin_buck1 = [[], []]
+stringer_count = [[], []]
 
 MOSwebbuck = [[], []]
 MOScolumnbuck = [[], []]
@@ -133,7 +134,13 @@ fn.AoA = 10
 fn.fuel = 1
 WP41.q = fn.dynamic_pressure(wingbox, planform)
 for x in rangy_range:
-    # lift_list[0].append(WP41.Ndis0(x, fn.AoA))
+    number = 0
+    for stringer in wingbox.stringers_top:
+        number += (stringer.x_stop > x)
+    stringer_count[0].append(number)
+
+for x in rangy_range:
+    lift_list[0].append(WP41.Ndis0(x, fn.AoA))
     # torsion_list[0].append(fn.torsion(x, planform))
     # bending_list[0].append(fn.bending_moment(x, wingbox, planform))
     # shear_list[0].append(fn.shear_force(x, wingbox, planform))
@@ -143,7 +150,7 @@ for x in rangy_range:
     # torsional_list.append(wingbox.torsional_constant(x, planform))
     # twist_list[0].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
     # deflection_list[0].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
-    normal_list[0].append(abs(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x)*0)))
+    # normal_list[0].append(abs(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x)/2)))
     # critical_column_stress[0].append(fn.column_buckling(x, test_stringer))
     # stringer_count_skin_buck[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
     # stringer_count_skin_buck1[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[1])
@@ -158,20 +165,26 @@ fn.AoA = -10
 fn.fuel = 1
 WP41.q = fn.dynamic_pressure(wingbox, planform)
 for x in rangy_range:
-    # lift_list[1].append(WP41.Ndis0(x, fn.AoA))
+    number = 0
+    for stringer in wingbox.stringers_bottom:
+        number += (stringer.x_stop > x)
+    stringer_count[1].append(number)
+
+for x in rangy_range:
+    lift_list[1].append(WP41.Ndis0(x, fn.AoA))
     # torsion_list[1].append(fn.torsion(x, planform))
     # bending_list[1].append(fn.bending_moment(x, wingbox, planform))
     # shear_list[1].append(fn.shear_force(x, wingbox, planform))
     # tau_max_list[1].append(fn.tau_max(x, wingbox, planform))
     # twist_list[1].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
     # deflection_list[1].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
-    normal_list[1].append(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x)*2))
+    # normal_list[1].append(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x)/2))
     # critical_column_stress[1].append(fn.column_buckling(x, test_stringer))
     # stringer_count_skin_buck[1].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
     # stringer_count_skin_buck1[1].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[1])
-    #MOSwebbuck[1].append(fn.web_buckling(x, wingbox, planform, aluminum, combination_of_vertical_stiff) / fn.shear_stress(x, wingbox.height(planform, x), wingbox,planform))
-    #MOScolumnbuck[1].append(fn.column_buckling(x, wingbox.stringers_top[0], wingbox.rib_list, planform) / abs(fn.normal_stress(x, wingbox, planform, 0)))
-    #MOSskinbuck[1].append(abs(fn.skin_buckling(x, wingbox, planform) / fn.normal_stress(x, wingbox, planform, 0)))
+    MOSwebbuck[1].append(fn.web_buckling(x, wingbox, planform, aluminum, combination_of_vertical_stiff) / fn.shear_stress(x, wingbox.height(planform, x), wingbox,planform))
+    MOScolumnbuck[1].append(fn.column_buckling(x, wingbox.stringers_top[0], wingbox.rib_list, planform) / abs(fn.normal_stress(x, wingbox, planform, 0)))
+    MOSskinbuck[1].append(abs(fn.skin_buckling(x, wingbox, planform) / fn.normal_stress(x, wingbox, planform, 0)))
     #MOSnormal[1].append(abs(wingbox.material.sig_yld / (fn.normal_stress(x, wingbox, planform, 2 * wingbox.height(planform, x)))))
     #MOScombined[1].append(abs((wingbox.material.sig_yld / 2) / fn.tau_max(x, wingbox, planform)[0]))
 '''
@@ -325,7 +338,7 @@ plt.legend()
 plt.grid()
 plt.show()
 '''
-'''
+
 plt.plot(rangy_range, MOSwebbuck[0], label="MOS Web Buckling")
 plt.plot(rangy_range, MOScolumnbuck[0], label="MOS Column Buckling")
 plt.plot(rangy_range, MOSskinbuck[0], label="MOS Skin Buckling")
@@ -334,6 +347,7 @@ plt.axis([0, planform.b / 2, 1, 4])
 plt.xlabel("Distance from Root [m]")
 plt.ylabel("Margin of Safety [-]")
 plt.legend(loc=2)
+plt.tight_layout()
 plt.grid()
 plt.show()
 
@@ -345,9 +359,10 @@ plt.axis([0, planform.b / 2, 1, 8])
 plt.xlabel("Distance from Root [m]")
 plt.ylabel("Margin of Safety [-]")
 plt.legend(loc=2)
+plt.tight_layout()
 plt.grid()
 plt.show()
-
+'''
 plt.plot(rangy_range, MOSnormal[0], label="MOS Normal Stress")
 plt.plot(rangy_range, MOScombined[0], label="MOS Combined Stress")
 plt.axis([0, planform.b / 2, 1, 4])
@@ -369,16 +384,22 @@ plt.tight_layout()
 plt.legend()
 plt.grid()
 plt.show()
+'''
+plt.plot(rangy_range, stringer_count[0], label="Stringer count on Top Sheet")
+plt.plot(rangy_range, stringer_count[1], label="Stringer Count on Bottom Sheet")
+plt.axis([0, planform.b / 2, 0, 22])
+# plt.title('Margin of safety for stress for load factor -1')
+plt.xlabel("Distance from Root [m]")
+plt.ylabel("Stringer Count [-]")
+plt.tight_layout()
+plt.legend()
+plt.grid()
+plt.show()
 
-fn.load_factor = 2.5
-fn.AoA = 10
-fn.fuel = 1
-WP41.q = fn.dynamic_pressure(wingbox, planform)
 #print(f"MOS for column buckling is {min([min(MOScolumnbuck[0]), min(MOScolumnbuck[1])])}")
 #print(f"MOS for web buckling is {min([min(MOSwebbuck[0]), min(MOSwebbuck[1])])}")
 #print(f"MOS for skin buckling is {min([min(MOSskinbuck[0]), min(MOSskinbuck[1])])}")
 #print(f"MOS for normal stress is {min([min(MOSnormal[0]), min(MOSnormal[1])])}")
 #print(f"MOS for combined stress is {min([min(MOScombined[0]), min(MOScombined[1])])}")
-print(f"The deflection at the tip is {fn.vertical_deflection(planform.b/2, aluminum, wingbox, planform)}")
-print(f"The twist angle at the tip is {fn.twist_angle(planform.b/2, wingbox, aluminum, planform)}")
-'''
+#print(f"The deflection at the tip is {fn.vertical_deflection(planform.b/2, aluminum, wingbox, planform)}")
+#print(f"The twist angle at the tip is {fn.twist_angle(planform.b/2, wingbox, aluminum, planform)}")
