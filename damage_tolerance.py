@@ -130,6 +130,8 @@ print('The margin of safety at the root for negative loading is', MOS_testneg)
 # ------------------ Plots ----------------------
 plt.plot(b, MOSpos, label="Load Factor 2.5")
 plt.plot(b, MOSneg, label='Load Factor -1')
+plt.tight_layout()
+plt.grid()
 #plt.yscale("log")
 plt.axis([0, tn.planform.b / 2, 1, 8])
 plt.xlabel("Wing span [m]")
