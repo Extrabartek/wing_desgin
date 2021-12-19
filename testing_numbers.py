@@ -133,7 +133,7 @@ fn.AoA = 10
 fn.fuel = 1
 WP41.q = fn.dynamic_pressure(wingbox, planform)
 for x in rangy_range:
-    lift_list[0].append(WP41.Ndis0(x, fn.AoA))
+    # lift_list[0].append(WP41.Ndis0(x, fn.AoA))
     # torsion_list[0].append(fn.torsion(x, planform))
     # bending_list[0].append(fn.bending_moment(x, wingbox, planform))
     # shear_list[0].append(fn.shear_force(x, wingbox, planform))
@@ -143,7 +143,7 @@ for x in rangy_range:
     # torsional_list.append(wingbox.torsional_constant(x, planform))
     # twist_list[0].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
     # deflection_list[0].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
-    # normal_list[0].append(abs(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x)/2)))
+    normal_list[0].append(abs(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x)*0)))
     # critical_column_stress[0].append(fn.column_buckling(x, test_stringer))
     # stringer_count_skin_buck[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
     # stringer_count_skin_buck1[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[1])
@@ -158,14 +158,14 @@ fn.AoA = -10
 fn.fuel = 1
 WP41.q = fn.dynamic_pressure(wingbox, planform)
 for x in rangy_range:
-    lift_list[1].append(WP41.Ndis0(x, fn.AoA))
+    # lift_list[1].append(WP41.Ndis0(x, fn.AoA))
     # torsion_list[1].append(fn.torsion(x, planform))
     # bending_list[1].append(fn.bending_moment(x, wingbox, planform))
     # shear_list[1].append(fn.shear_force(x, wingbox, planform))
     # tau_max_list[1].append(fn.tau_max(x, wingbox, planform))
     # twist_list[1].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
     # deflection_list[1].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
-    # normal_list[1].append(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x)/2))
+    normal_list[1].append(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x)*2))
     # critical_column_stress[1].append(fn.column_buckling(x, test_stringer))
     # stringer_count_skin_buck[1].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
     # stringer_count_skin_buck1[1].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[1])
@@ -369,7 +369,7 @@ plt.tight_layout()
 plt.legend()
 plt.grid()
 plt.show()
-'''
+
 fn.load_factor = 2.5
 fn.AoA = 10
 fn.fuel = 1
@@ -381,3 +381,4 @@ WP41.q = fn.dynamic_pressure(wingbox, planform)
 #print(f"MOS for combined stress is {min([min(MOScombined[0]), min(MOScombined[1])])}")
 print(f"The deflection at the tip is {fn.vertical_deflection(planform.b/2, aluminum, wingbox, planform)}")
 print(f"The twist angle at the tip is {fn.twist_angle(planform.b/2, wingbox, aluminum, planform)}")
+'''
