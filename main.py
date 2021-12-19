@@ -897,3 +897,6 @@ def web_buckling(y, wingbox, planform, material, stringers_list):
 
     return ((np.pi ** 2) * k_s * material.E) / (12 * (1 - material.nu ** 2)) * (
             wingbox.t_spar / output) ** 2
+
+def skin_buckling(y, planform):
+    return
