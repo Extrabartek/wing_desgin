@@ -34,13 +34,13 @@ def does_it_work(wingbox, planform):
 '''
 planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
 
-t = 0.001  # meter
-a = 0.04  # meter
-t_top = 0.0042
-t_bottom = 0.0032
+t = 0.0015  # meter
+a = 0.16  # meter
+t_top = 0.006
+t_bottom = 0.005
 t_spar = 0.005
-step_size = 0.5
-rangy_range_2 = np.arange(0, 4, step_size)
+step_size = 0.1
+rangy_range_2 = np.arange(0, planform.b / 2, step_size)
 
 
 aluminum = fn.Material(2700, 276 * (10 ** 6), 310 * (10 ** 6), 68.9 * (10 ** 9), 26 * (10 ** 9), 0.33)
@@ -85,20 +85,20 @@ fn.AoA = -10
 WP41.q = fn.dynamic_pressure(wingbox, planform)
 
 for x in rangy_range_2:
-    tau_max_list[1].append(fn.tau_max(x, wingbox, planform)[0])
-    # buckling_stringer_count[1].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
-    # number = 0
-    # for stringer in wingbox.stringers_bottom:
-         # number += (stringer.x_stop > x)
-    # actual_stringer_count[1].append(number)
-    # stringer_count = 0
-    # for stringer in wingbox.stringers_bottom:
-        # stringer_count += (stringer.x_stop >= x) * 1
-    # spacing_list[1].append(
-        # (wingbox.width(planform, x) - stringer_count * wingbox.stringers_top[0].a / 2) / (stringer_count - 1))
+    # tau_max_list[1].append(fn.tau_max(x, wingbox, planform)[0])
+    buckling_stringer_count[1].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
+    number = 0
+    for stringer in wingbox.stringers_bottom:
+        number += (stringer.x_stop > x)
+    actual_stringer_count[1].append(number)
+    stringer_count = 0
+    for stringer in wingbox.stringers_bottom:
+        stringer_count += (stringer.x_stop >= x) * 1
+    spacing_list[1].append(
+        (wingbox.width(planform, x) - stringer_count * wingbox.stringers_top[0].a / 2) / (stringer_count - 1))
 
 
-
+'''
 yid_list = []
 proc80_yid_list = []
 for x in rangy_range_2:
@@ -117,9 +117,9 @@ plt.tight_layout()
 plt.grid()
 plt.legend()
 plt.show()
-
-
 '''
+
+
 plt.plot(rangy_range_2, actual_stringer_count[0], label="Real stringer count top")
 plt.plot(rangy_range_2, actual_stringer_count[1], label="Real stringer count bottom")
 plt.plot(rangy_range_2, buckling_stringer_count[0], label="Needed stringers for buckling top")
@@ -162,7 +162,7 @@ plt.tight_layout()
 plt.grid()
 plt.legend()
 plt.show()
-'''
+
 fn.load_factor = 2.5
 fn.AoA = 10
 WP41.q = fn.dynamic_pressure(wingbox, planform)
