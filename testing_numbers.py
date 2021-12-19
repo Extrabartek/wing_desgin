@@ -154,9 +154,9 @@ for x in rangy_range:
     # critical_column_stress[0].append(fn.column_buckling(x, test_stringer))
     # stringer_count_skin_buck[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
     # stringer_count_skin_buck1[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[1])
-    MOSwebbuck[0].append(fn.web_buckling(x, wingbox, planform, aluminum, combination_of_vertical_stiff) / fn.shear_stress(x, wingbox.height(planform, x), wingbox, planform))
-    MOScolumnbuck[0].append(fn.column_buckling(x, wingbox.stringers_top[0], wingbox.rib_list, planform) / abs(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x) * 2)))
-    MOSskinbuck[0].append(abs(fn.skin_buckling(x, wingbox, planform) / fn.normal_stress(x, wingbox, planform, 2 * wingbox.height(planform, x))))
+    #MOSwebbuck[0].append(fn.web_buckling(x, wingbox, planform, aluminum, combination_of_vertical_stiff) / fn.shear_stress(x, wingbox.height(planform, x), wingbox, planform))
+    #MOScolumnbuck[0].append(fn.column_buckling(x, wingbox.stringers_top[0], wingbox.rib_list, planform) / abs(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x) * 2)))
+    #MOSskinbuck[0].append(abs(fn.skin_buckling(x, wingbox, planform) / fn.normal_stress(x, wingbox, planform, 2 * wingbox.height(planform, x))))
     #MOSnormal[0].append(abs( wingbox.material.sig_yld / (fn.normal_stress(x, wingbox, planform, 2 * wingbox.height(planform, x)))))
     #MOScombined[0].append(abs((wingbox.material.sig_yld / 2) / fn.tau_max(x, wingbox, planform)[0]))
 

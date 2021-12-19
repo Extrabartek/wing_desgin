@@ -54,7 +54,7 @@ while x <= 15.5:
     x = vertstringer_placement[i]
     i = i + 1
 
-'''
+
 vertstringer_placement = []
 rib_placement = []
 fn.load_factor = 2.5
@@ -91,11 +91,11 @@ for i in range(len(rib_placement)-1):
 
 
 stiffening_elements = locvertstringers
-'''
+
 for element in locvertstringers:
     stiffening_elements.append(element)
 '''
-
+'''
 for i in range(len(locribs)):
     stiffening_elements.append(locribs[i])
 stiffening_elements.sort()
@@ -108,31 +108,31 @@ print('Number of ribs is', (len(locribs)))
 print('Vertical stringer placement is', locvertstringers)
 print('Number of vertical stringers is', (len(locvertstringers) - len(locribs)))
 print('Vertical stringer placement is', fn.vertstringer_spacing_web(tn.aluminum, tn.wingbox, tn.planform, 0))
-
-
 '''
+
+
 del sigmapos[-1]  # MOS goes to infinity (very high in graph), del last point for clearer graph
 del sigmaneg[-1]  # Same as the line above
-b = np.arange(0, 15.55, 15.55/(len(sigmapos)-1))
+b = np.arange(0, 15.55, 15.55/(len(sigmapos)))
 
 MOSpos = np.abs(sigma_a / sigmapos)  # Calculation of safety factor for positive loading
 MOSneg = np.abs(sigma_a / sigmaneg)  # Calculation of safety factor for negative loading
 print('len b = ', len(b), 'len sigma = ', len(sigmapos))
-
+'''
 print("b =", b)
 print("sigmapos =", sigmapos)
-
+'''
 MOS_testpos = np.abs(sigma_a/sigmapos[0])  # Calculate lowest safety factor (positive loading)
 MOS_testneg = np.abs(sigma_a/sigmaneg[1])  # Calculate lowest safety factor (negative loading)
 print('The margin of safety at the root for positive loading is', MOS_testpos)
 print('The margin of safety at the root for negative loading is', MOS_testneg)
 
 # ------------------ Plots ----------------------
-plt.plot(b, MOSpos, label="Positive loading")
-plt.plot(b, MOSneg, label='Negative loading')
-plt.yscale("log")
+plt.plot(b, MOSpos, label="Load Factor 2.5")
+plt.plot(b, MOSneg, label='Load Factor -1')
+#plt.yscale("log")
+plt.axis([0, tn.planform.b / 2, 1, 8])
 plt.xlabel("Wing span [m]")
 plt.ylabel("Safety Margin [-]")
 plt.legend()
 plt.show()
-'''
