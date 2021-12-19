@@ -20,6 +20,10 @@ MOS for skin buckling is 1.0934218752362281
 MOS for normal stress is 1.5018605844099109
 MOS for combined stress is 1.3389068475520864
 
+The deflection at the tip is 0.7782928761520755
+The twist angle at the tip is 0.007756609319094183
+
+
 Design 2 ("Thin plates" on 2mm less)
 t = 0.001  # meter
 a = 0.04  # meter
@@ -40,6 +44,9 @@ MOS for web buckling is 1.4759970775123643
 MOS for skin buckling is 1.0361161836559245
 MOS for normal stress is 1.240047263210606
 MOS for combined stress is 0.9997999602218117
+
+The deflection at the tip is 1.0299015925561765
+The twist angle at the tip is 0.009982760770199954
 
 
 Design 3 (big boy / chunky boy)
