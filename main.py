@@ -898,5 +898,16 @@ def web_buckling(y, wingbox, planform, material, stringers_list):
     return ((np.pi ** 2) * k_s * material.E) / (12 * (1 - material.nu ** 2)) * (
             wingbox.t_spar / output) ** 2
 
-def skin_buckling(y, planform):
-    return
+
+def skin_buckling(y, wingbox, planform):
+    t = ((load_factor > 0) * wingbox.t_top + (load_factor < 0) * wingbox.t_bottom)
+    number = 0
+    if load_factor > 0:
+        for stringer in wingbox.stringers_top:
+            number += (stringer.x_stop > y)
+    else:
+        for stringer in wingbox.stringers_bottom:
+            number += (stringer.x_stop > y)
+    b = (wingbox.width(planform, y) - (wingbox.stringers_top[0].a / 2 * number)) / (number - 1)
+
+    return (math.pi * 4 * wingbox.material.E) / (12 * (1 - 0.33 ** 2)) * (t / b) ** 2

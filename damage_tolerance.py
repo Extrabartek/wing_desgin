@@ -101,49 +101,6 @@ for i in range(len(locribs)):
 stiffening_elements.sort()
 print(stiffening_elements)
 
-x = 0.00
-critstressweb = []
-spacing = []
-while x <= tn.planform.b/2:
-    number = fn.web_buckling(x, tn.wingbox, tn.planform, tn.aluminum, stiffening_elements) / fn.shear_stress(x, tn.wingbox.height(tn.planform, x), tn.wingbox, tn.planform)
-    if number > 2.5:
-        critstressweb.append(2.5)
-    else:
-        critstressweb.append(number)
-    x += 0.01
-#del critstressweb[-1]
-critstressweb = np.array(critstressweb)
-spacing = np.array(spacing)
-
-x = 0.00
-critstresscolumn = []
-while x <= tn.planform.b/2:
-    number = fn.column_buckling(x, tn.wingbox.stringers_top[0], locribs, tn.planform) / abs(fn.normal_stress(x, tn.wingbox, tn.planform, tn.wingbox.height(tn.planform, x)*2))
-    if number > 2.5:
-        critstresscolumn.append(2.5)
-    else:
-        critstresscolumn.append(number)
-    x += 0.01
-
-x = 0.00
-critstressskin = []
-while x <= tn.planform.b/2:
-    number = tn.skin
-#del critstresscolumn[-1]
-critstresscolumn = np.array(critstresscolumn)
-b = np.arange(0.00, tn.planform.b/2, 0.01)
-
-plt.plot(b, critstressweb, label = "MOS web buckling")
-plt.plot(b, critstresscolumn, label = "MOS Column Buckling")
-plt.plot(b, critstressskin, label = "MOS Skin Buckling")
-plt.axis([0, tn.planform.b / 2, 1, 2.8])
-plt.legend()
-plt.title('Margin of safety for web buckling')
-plt.xlabel("Distance from root [m]")
-plt.ylabel("Margin of safety [-]")
-plt.grid()
-plt.show()
-
 print('Web buckling critical stress is', fn.web_buckling(0, tn.wingbox, tn.planform, tn.aluminum, locvertstringers)/10**6)
 print('Shear stress is', fn.shear_stress(0, tn.wingbox.height(tn.planform, 0), tn.wingbox, tn.planform)/10**6)
 print('Rib placement =', locribs)

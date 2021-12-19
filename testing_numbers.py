@@ -9,10 +9,10 @@ aluminum = fn.Material(2700, 276 * (10 ** 6), 310 * (10 ** 6), 68.9 * (10 ** 9),
 planform = fn.Planform(31.11, 6.46, 1.84, 0.63, 0.6, 0.15)
 stringer_full = fn.Stringer(0.003, 0.08, planform.b / 2, aluminum)
 list_stringers = []
-rib_list = [1.0358219781600446, 2.092566819700103, 3.1769008553898237, 4.297432806130567, 5.465739226914051, 6.698567110111765, 7.963634682512992, 9.345771397237678, 10.911089148344796, 12.802971956868905]
+rib_list = [0.21160043034450057, 0.42394380088945155, 0.6370775720299807, 0.8503830520645674, 1.065240976722662, 1.2810452270801789, 1.497851437278757, 1.7157233197818793, 1.9347181442988592, 2.1549024457766355, 2.3763465999179556, 2.599127291281336, 2.8233204387003745, 3.0490105647239916, 3.2762840517385183, 3.5052332961150725, 3.7359628282497352, 3.968583713867636, 4.2032119921227595, 4.43908627134836, 4.677204455141326, 4.917715337916954, 5.160778909365251, 5.40657147316978, 5.655292662596251, 5.907152732743459, 6.1623922916534575, 6.421280378698733, 6.684115089659066, 6.951235316350674, 7.223028780693003, 7.499935788662708, 7.775008367199394, 8.055807487404174, 8.342786331227028, 8.636478845100617, 8.937638777469553, 9.24720933691539, 9.566332827991376, 9.89642192317952, 10.239264312984583, 10.596387714772384, 10.97152989200857, 11.368865238883892, 11.79414285571838, 12.248839279590102, 12.753796280979744, 13.334788943268922, 14.052037489135284, 15.089089949808034]
 list_of_stringer_top = []
 t = 0.001
-a = 0.16
+a = 0.04
 list_of_stringer_bottom = []
 list_of_stringer_lengths1 = [15.56, 14.73, 14.73, 14.09, 13.31, 13.31, 11.19, 11.19, 11.19, 11.19, 11.19, 11.19, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995, 6.6899999999999995]
 list_of_stringer_lengths2 = [15.600000000000001, 14.500000000000002, 14.500000000000002, 13.700000000000001, 11.950000000000001, 11.950000000000001, 11.950000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 8.200000000000001, 15.555]
@@ -21,7 +21,7 @@ for x in range(len(list_of_stringer_lengths1)):
     list_of_stringer_top.append(fn.Stringer(t, a, list_of_stringer_lengths1[x], aluminum))
 for x in range(len(list_of_stringer_lengths2)):
     list_of_stringer_bottom.append(fn.Stringer(t, a, list_of_stringer_lengths2[x], aluminum))
-wingbox = fn.WingBox([0.006, 0.005, 0.005], list_of_stringer_top, list_of_stringer_bottom, rib_list, aluminum)
+wingbox = fn.WingBox([0.0042, 0.0032, 0.005], list_of_stringer_top, list_of_stringer_bottom, rib_list, aluminum)
 WP41.b = planform.b
 WP41.cr = planform.cr
 WP41.ct = planform.ct
@@ -46,6 +46,11 @@ torsional_list = []
 stringer_count_skin_buck = [[], []]
 stringer_count_skin_buck1 = [[], []]
 
+MOSwebbuck = [[], []]
+MOScolumnbuck = [[], []]
+MOSskinbuck = [[], []]
+MOSnormal = [[], []]
+MOScombined = [[], []]
 
 # analysis
 step_size = 0.1
@@ -126,7 +131,7 @@ fn.AoA = 10
 fn.fuel = 1
 WP41.q = fn.dynamic_pressure(wingbox, planform)
 for x in rangy_range:
-    # lift_list[0].append(WP41.Ndis0(x, fn.AoA))
+    #lift_list[0].append(WP41.Ndis0(x, fn.AoA))
     # torsion_list[0].append(fn.torsion(x, planform))
     # bending_list[0].append(fn.bending_moment(x, wingbox, planform))
     # shear_list[0].append(fn.shear_force(x, wingbox, planform))
@@ -135,12 +140,16 @@ for x in rangy_range:
     # MMOI_list.append(wingbox.moment_of_inertia(planform, x))
     # torsional_list.append(wingbox.torsional_constant(x, planform))
     # twist_list[0].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
-    #deflection_list[0].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
+    # deflection_list[0].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
     # normal_list[0].append(abs(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x)/2)))
-    #critical_column_stress[0].append(fn.column_buckling(x, test_stringer))
-    stringer_count_skin_buck[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
+    # critical_column_stress[0].append(fn.column_buckling(x, test_stringer))
+    # stringer_count_skin_buck[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
     # stringer_count_skin_buck1[0].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[1])
-
+    MOSwebbuck[0].append(fn.web_buckling(x, wingbox, planform, aluminum, combination_of_vertical_stiff) / fn.shear_stress(x, wingbox.height(planform, x), wingbox, planform))
+    MOScolumnbuck[0].append(fn.column_buckling(x, wingbox.stringers_top[0], wingbox.rib_list, planform) / abs(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x) * 2)))
+    MOSskinbuck[0].append(abs(fn.skin_buckling(x, wingbox, planform) / fn.normal_stress(x, wingbox, planform, 2 * wingbox.height(planform, x))))
+    MOSnormal[0].append(abs( wingbox.material.sig_yld / (fn.normal_stress(x, wingbox, planform, 2 * wingbox.height(planform, x)))))
+    MOScombined[0].append(abs((wingbox.material.sig_yld / 2) / fn.tau_max(x, wingbox, planform)[0]))
 
 fn.load_factor = -1
 fn.AoA = -10
@@ -153,11 +162,16 @@ for x in rangy_range:
     # shear_list[1].append(fn.shear_force(x, wingbox, planform))
     # tau_max_list[1].append(fn.tau_max(x, wingbox, planform))
     # twist_list[1].append(np.degrees(fn.twist_angle(x, wingbox, aluminum, planform)))
-    #deflection_list[1].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
+    # deflection_list[1].append(fn.vertical_deflection(x, aluminum, wingbox, planform))
     # normal_list[1].append(fn.normal_stress(x, wingbox, planform, wingbox.height(planform, x)/2))
-    #critical_column_stress[1].append(fn.column_buckling(x, test_stringer))
-    stringer_count_skin_buck[1].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
+    # critical_column_stress[1].append(fn.column_buckling(x, test_stringer))
+    # stringer_count_skin_buck[1].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[0])
     # stringer_count_skin_buck1[1].append(fn.skin_buckling_stringer_count(x, wingbox, planform)[1])
+    MOSwebbuck[1].append(fn.web_buckling(x, wingbox, planform, aluminum, combination_of_vertical_stiff) / fn.shear_stress(x, wingbox.height(planform, x), wingbox,planform))
+    MOScolumnbuck[1].append(fn.column_buckling(x, wingbox.stringers_top[0], wingbox.rib_list, planform) / abs(fn.normal_stress(x, wingbox, planform, 0)))
+    MOSskinbuck[1].append(abs(fn.skin_buckling(x, wingbox, planform) / fn.normal_stress(x, wingbox, planform, 0)))
+    MOSnormal[1].append(abs(wingbox.material.sig_yld / (fn.normal_stress(x, wingbox, planform, 2 * wingbox.height(planform, x)))))
+    MOScombined[1].append(abs((wingbox.material.sig_yld / 2) / fn.tau_max(x, wingbox, planform)[0]))
 '''
 # print(f"The maximum vertical deflection is {max(abs(deflection_list[0][-1]), abs(deflection_list[1][-1]))} m, allowed is 4.7 m")
 # print(f"The twist angle at the tip is {max(abs(twist_list[0][-1]), abs(twist_list[1][-1]))} degrees")
