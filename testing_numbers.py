@@ -53,8 +53,8 @@ MOSnormal = [[], []]
 MOScombined = [[], []]
 
 # analysis
-step_size = 0.1
-rangy_range = np.arange(0, planform.b / 2 * 0.8, step_size)
+step_size = 0.2
+rangy_range = np.arange(0, planform.b / 2, step_size)
 
 '''
 t_w = 0.004
@@ -156,7 +156,7 @@ fn.AoA = -10
 fn.fuel = 1
 WP41.q = fn.dynamic_pressure(wingbox, planform)
 for x in rangy_range:
-    # lift_list[1].append(WP41.Ndis0(x, fn.AoA))
+    #lift_list[1].append(WP41.Ndis0(x, fn.AoA))
     # torsion_list[1].append(fn.torsion(x, planform))
     # bending_list[1].append(fn.bending_moment(x, wingbox, planform))
     # shear_list[1].append(fn.shear_force(x, wingbox, planform))

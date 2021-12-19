@@ -801,7 +801,8 @@ def skin_buckling_stringer_count(y, wingbox, planform):
 
     k_c = 4  # assumed to be constant
 
-    number_of_stringers = len(wingbox.stringers_top) * (load_factor == 2.5) + len(wingbox.stringers_bottom) * (load_factor == -1)
+    number_of_stringers = len(wingbox.stringers_top) * (load_factor == 2.5) + len(wingbox.stringers_bottom) * (
+                load_factor == -1)
     b_basic = (wingbox.width(planform, y) - number_of_stringers * (wingbox.stringers_top[0].a / 2)) / (
             number_of_stringers - 1)
     b_basic_seq = [b_basic]
