@@ -338,7 +338,7 @@ plt.legend()
 plt.grid()
 plt.show()
 '''
-
+'''
 plt.plot(rangy_range, MOSwebbuck[0], label="MOS Web Buckling")
 plt.plot(rangy_range, MOScolumnbuck[0], label="MOS Column Buckling")
 plt.plot(rangy_range, MOSskinbuck[0], label="MOS Skin Buckling")
@@ -362,7 +362,7 @@ plt.legend(loc=2)
 plt.tight_layout()
 plt.grid()
 plt.show()
-'''
+
 plt.plot(rangy_range, MOSnormal[0], label="MOS Normal Stress")
 plt.plot(rangy_range, MOScombined[0], label="MOS Combined Stress")
 plt.axis([0, planform.b / 2, 1, 4])
@@ -384,7 +384,7 @@ plt.tight_layout()
 plt.legend()
 plt.grid()
 plt.show()
-'''
+
 plt.plot(rangy_range, stringer_count[0], label="Stringer count on Top Sheet")
 plt.plot(rangy_range, stringer_count[1], label="Stringer Count on Bottom Sheet")
 plt.axis([0, planform.b / 2, 0, 22])
@@ -395,11 +395,11 @@ plt.tight_layout()
 plt.legend()
 plt.grid()
 plt.show()
-
+'''
 #print(f"MOS for column buckling is {min([min(MOScolumnbuck[0]), min(MOScolumnbuck[1])])}")
 #print(f"MOS for web buckling is {min([min(MOSwebbuck[0]), min(MOSwebbuck[1])])}")
 #print(f"MOS for skin buckling is {min([min(MOSskinbuck[0]), min(MOSskinbuck[1])])}")
 #print(f"MOS for normal stress is {min([min(MOSnormal[0]), min(MOSnormal[1])])}")
 #print(f"MOS for combined stress is {min([min(MOScombined[0]), min(MOScombined[1])])}")
 #print(f"The deflection at the tip is {fn.vertical_deflection(planform.b/2, aluminum, wingbox, planform)}")
-#print(f"The twist angle at the tip is {fn.twist_angle(planform.b/2, wingbox, aluminum, planform)}")
+#print(f"The twist angle at the tip is {np.degrees(fn.twist_angle(planform.b/2, wingbox, aluminum, planform))}")
